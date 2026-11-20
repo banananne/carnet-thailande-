@@ -189,6 +189,8 @@ def day_html(i, d):
         h = D.HOTEL[d["night"]]
         out += '<a class="tag" href="#/hotels/%s">%s%s</a>' % (h["id"], icon("bed"), txt(h["name"]))
     out += "</div>"
+    import build_games as BG
+    out += BG.guide_html(d["id"])
     steps = D.FREE_STEPS if d.get("free") else d["steps"]
     if d.get("free"):
         out += '<p class="free-note">Du 30 décembre au 1er janvier : journées libres, on fait ce qui nous plaît.</p>'
@@ -199,13 +201,14 @@ def day_html(i, d):
     if d.get("free"):
         out += '<p class="pen">%s<span>Dans le carnet papier : le labyrinthe du tuk-tuk</span></p>' % icon("pen")
     if d.get("quiz"):
-        out += quiz_html()
+        out += BG.quiz_cta()
     cards = D.facts_for(d)
     if cards:
         out += '<h3 class="sech">Fun facts</h3>' + "".join(fact_card(c) for c in cards)
     if d.get("lexique"):
         out += lexique_html()
     out += snap_html(d)
+    out += BG.day_stamp_html(d["id"])
     if d.get("end"):
         out += '<p class="theend">The end :(</p>'
     out += day_nav(i)
@@ -544,15 +547,18 @@ def view_home(version):
              ("mustard", "#/jours", "camera", "Photo du jour", "Un polaroïd par jour", " data-photo-tile"),
              ("rose", "#/metro", "train", "Métro", "Plan de Bangkok à zoomer", ""),
              ("blue", "#/lexique", "book", "Lexique", "Du thaï à montrer ou écouter", ""),
-             ("sand", "#/taxi", "car", "Cartes taxi", "Les hôtels écrits en thaï", "")]
+             ("sand", "#/taxi", "car", "Cartes taxi", "Les hôtels écrits en thaï", ""),
+             ("rose", "#/jeux", "dice", "Jeux", "Quiz, doudous, mots mêlés", ""),
+             ("blue", "#/passeport", "stamp", "Passeport", "Un tampon par jour", " data-pass-tile")]
     out += '<div class="tiles">'
     for col, href, ic, t, sub, extra in tiles:
-        small = '<small data-photo-count>%s</small>' % txt(sub) if extra else "<small>%s</small>" % txt(sub)
+        attr = " data-photo-count" if "photo" in extra else " data-pass-count" if "pass" in extra else ""
+        small = "<small%s>%s</small>" % (attr, txt(sub))
         out += '<a class="tile %s" href="%s"%s><span class="ic">%s</span><span><b>%s</b>%s</span></a>' % (col, href, extra, icon(ic), txt(t), small)
     out += "</div>"
 
-    out += ('<section class="bubble sand" aria-labelledby="h-soon"><h2 id="h-soon">Bientôt</h2>'
-            '<p>Les jeux du carnet, les doudous et les tampons de passeport : ça arrive !</p></section>')
+    import build_games as BG
+    out += BG.home_quip_html()
     out += ('<section class="bubble rose install" id="install-box" hidden aria-labelledby="h-inst"><h2 id="h-inst">Sur ton écran d’accueil</h2>'
             '<p id="install-hint"></p><div class="acts"><button class="btn" type="button" id="install-btn" hidden>Installer l’appli</button></div></section>')
     out += ('<p class="foot">Carnet Thaïlande 2026 · <a href="test.html">Tester mon téléphone</a><small>version %s</small></p>' % esc(version))
@@ -562,23 +568,26 @@ def view_home(version):
 # ───────────────────────── page complète ─────────────────────────
 def nav_html():
     items = [("home", "#/", "home", "Accueil"), ("days", "#/jours", "calendar", "Jours"),
-             ("hotels", "#/hotels", "bed", "Hôtels"), ("utile", "#/utile", "compass", "Utile")]
+             ("hotels", "#/hotels", "bed", "Hôtels"), ("jeux", "#/jeux", "dice", "Jeux"), ("utile", "#/utile", "compass", "Utile")]
     return ('<nav class="nav" aria-label="Menu">%s</nav>'
             % "".join('<a href="%s" data-nav="%s"><span class="ni">%s</span>%s</a>' % (h, k, icon(ic), t) for k, h, ic, t in items))
 
 
 def css_text():
-    s = open(os.path.join(ROOT, "app.css"), encoding="utf-8").read()
+    s = open(os.path.join(ROOT, "app.css"), encoding="utf-8").read() + "\n" + open(os.path.join(ROOT, "games.css"), encoding="utf-8").read()
     s = re.sub(r"/\*.*?\*/", "", s, flags=re.S)
     return "\n".join(ln.strip() for ln in s.splitlines() if ln.strip())
 
 
 def render(version, head_meta):
+    import build_games as BG
     body = (view_home(version) + view_days() + view_hotels() + view_utile() + view_metro() + view_lexique() + view_taxi()
-            + view_convert() + view_gtk() + nav_html() + show_overlay()
+            + view_convert() + view_gtk() + BG.all_views() + nav_html() + show_overlay()
             + '<div id="toast" role="status" aria-live="polite"></div>'
             + '<div id="upd" hidden><span>Une nouvelle version est prête.</span><button class="btn sm" type="button" id="upd-btn">Actualiser</button></div>')
     js = open(os.path.join(ROOT, "app.js"), encoding="utf-8").read()
+    assert "/*@GAMES@*/" in js
+    js = js.replace("/*@GAMES@*/", open(os.path.join(ROOT, "games.js"), encoding="utf-8").read())
     assert "</script" not in js
     return ('<!doctype html><html lang="fr" data-v="%s"><head>%s<title>Carnet Thaïlande 2026</title>%s<style>%s</style></head><body>%s<script>%s</script></body></html>\n'
             % (esc(version), head_meta, font_css(), css_text(), body, js))

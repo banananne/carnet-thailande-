@@ -1,0 +1,347 @@
+{
+ "n": 20,
+ "grid": [
+  "FFUEGOLENIEHORLNTOPT",
+  "IAHTOHKUSATEMPLERHRE",
+  "ATETBVCGOETEGAICEOAR",
+  "AOUIACLNMPEUHEHMPAIB",
+  "DNULNCAALLIBOINEGALP",
+  "TGIAGNSMEWATDBSNHESE",
+  "BSCDKHRPRTNEASMALUSR",
+  "EVELOUHTSCEAAMAARSOA",
+  "IEEKKAMNBANPHECYRRUC",
+  "UGRDNISOKTCFSSYSIAMU",
+  "AAUTNUTIUNEDEHCRAMHR",
+  "MYHSTAHVHYNDURIANTPB",
+  "BOSOOURASRSATMRMUSAO",
+  "OVLKMBAFEASHATRYHEDO",
+  "EOERYNOIFAWSANUKKLTW",
+  "KUTKUTTUTOSALAEOPLHI",
+  "RWRKMORODANBSAIUOIAE",
+  "ULBDCIAAGDNAFDKAHUIY",
+  "NASOAHKEINHIAGECKOSY",
+  "AACNEAEOUNAAAHMENNWP"
+ ],
+ "words": [
+  {
+   "w": "AVION",
+   "k": "AVION",
+   "r": 12,
+   "c": 7,
+   "dr": -1,
+   "dc": 0
+  },
+  {
+   "w": "BAHT",
+   "k": "BAHT",
+   "r": 3,
+   "c": 19,
+   "dr": -1,
+   "dc": -1
+  },
+  {
+   "w": "BAN PHE",
+   "k": "BANPHE",
+   "r": 8,
+   "c": 8,
+   "dr": 0,
+   "dc": 1
+  },
+  {
+   "w": "BANGKOK",
+   "k": "BANGKOK",
+   "r": 2,
+   "c": 4,
+   "dr": 1,
+   "dc": 0
+  },
+  {
+   "w": "BOUDDHA",
+   "k": "BOUDDHA",
+   "r": 13,
+   "c": 5,
+   "dr": 1,
+   "dc": 1
+  },
+  {
+   "w": "COCOTIER",
+   "k": "COCOTIER",
+   "r": 19,
+   "c": 2,
+   "dr": -1,
+   "dc": 1
+  },
+  {
+   "w": "CURRY",
+   "k": "CURRY",
+   "r": 8,
+   "c": 19,
+   "dr": 0,
+   "dc": -1
+  },
+  {
+   "w": "DURIAN",
+   "k": "DURIAN",
+   "r": 11,
+   "c": 11,
+   "dr": 0,
+   "dc": 1
+  },
+  {
+   "w": "ÉLÉPHANT",
+   "k": "ELEPHANT",
+   "r": 3,
+   "c": 10,
+   "dr": 1,
+   "dc": -1
+  },
+  {
+   "w": "ENCENS",
+   "k": "ENCENS",
+   "r": 7,
+   "c": 10,
+   "dr": 1,
+   "dc": 0
+  },
+  {
+   "w": "ESCALE",
+   "k": "ESCALE",
+   "r": 10,
+   "c": 12,
+   "dr": -1,
+   "dc": 1
+  },
+  {
+   "w": "FERRY",
+   "k": "FERRY",
+   "r": 9,
+   "c": 11,
+   "dr": 1,
+   "dc": 1
+  },
+  {
+   "w": "GECKO",
+   "k": "GECKO",
+   "r": 18,
+   "c": 13,
+   "dr": 0,
+   "dc": 1
+  },
+  {
+   "w": "KHAO SAN",
+   "k": "KHAOSAN",
+   "r": 18,
+   "c": 6,
+   "dr": 0,
+   "dc": -1
+  },
+  {
+   "w": "KHOP KHUN",
+   "k": "KHOPKHUN",
+   "r": 18,
+   "c": 16,
+   "dr": -1,
+   "dc": 0
+  },
+  {
+   "w": "KOH SAMET",
+   "k": "KOHSAMET",
+   "r": 8,
+   "c": 3,
+   "dr": -1,
+   "dc": 1
+  },
+  {
+   "w": "LOTUS",
+   "k": "LOTUS",
+   "r": 13,
+   "c": 2,
+   "dr": -1,
+   "dc": 1
+  },
+  {
+   "w": "MANGUE",
+   "k": "MANGUE",
+   "r": 5,
+   "c": 7,
+   "dr": -1,
+   "dc": 0
+  },
+  {
+   "w": "MARCHÉ DE NUIT",
+   "k": "MARCHEDENUIT",
+   "r": 10,
+   "c": 17,
+   "dr": 0,
+   "dc": -1
+  },
+  {
+   "w": "MASSAGE",
+   "k": "MASSAGE",
+   "r": 12,
+   "c": 13,
+   "dr": 1,
+   "dc": -1
+  },
+  {
+   "w": "NOUILLES",
+   "k": "NOUILLES",
+   "r": 19,
+   "c": 17,
+   "dr": -1,
+   "dc": 0
+  },
+  {
+   "w": "OFFRANDE",
+   "k": "OFFRANDE",
+   "r": 15,
+   "c": 9,
+   "dr": -1,
+   "dc": -1
+  },
+  {
+   "w": "ORCHIDÉE",
+   "k": "ORCHIDEE",
+   "r": 0,
+   "c": 17,
+   "dr": 1,
+   "dc": -1
+  },
+  {
+   "w": "PAD THAI",
+   "k": "PADTHAI",
+   "r": 11,
+   "c": 18,
+   "dr": 1,
+   "dc": 0
+  },
+  {
+   "w": "PASSEPORT",
+   "k": "PASSEPORT",
+   "r": 8,
+   "c": 11,
+   "dr": -1,
+   "dc": 1
+  },
+  {
+   "w": "PLAGE",
+   "k": "PLAGE",
+   "r": 4,
+   "c": 19,
+   "dr": 0,
+   "dc": -1
+  },
+  {
+   "w": "RAMBOUTAN",
+   "k": "RAMBOUTAN",
+   "r": 8,
+   "c": 16,
+   "dr": -1,
+   "dc": -1
+  },
+  {
+   "w": "SABAI",
+   "k": "SABAI",
+   "r": 14,
+   "c": 11,
+   "dr": 1,
+   "dc": 0
+  },
+  {
+   "w": "SANUK",
+   "k": "SANUK",
+   "r": 14,
+   "c": 11,
+   "dr": 0,
+   "dc": 1
+  },
+  {
+   "w": "SAWASDEE",
+   "k": "SAWASDEE",
+   "r": 12,
+   "c": 8,
+   "dr": 1,
+   "dc": 1
+  },
+  {
+   "w": "SKYTRAIN",
+   "k": "SKYTRAIN",
+   "r": 12,
+   "c": 2,
+   "dr": 1,
+   "dc": 1
+  },
+  {
+   "w": "SUKHOTHAI",
+   "k": "SUKHOTHAI",
+   "r": 1,
+   "c": 8,
+   "dr": 0,
+   "dc": -1
+  },
+  {
+   "w": "TEMPLE",
+   "k": "TEMPLE",
+   "r": 1,
+   "c": 10,
+   "dr": 0,
+   "dc": 1
+  },
+  {
+   "w": "TOM YUM",
+   "k": "TOMYUM",
+   "r": 11,
+   "c": 4,
+   "dr": 1,
+   "dc": 0
+  },
+  {
+   "w": "TONGS",
+   "k": "TONGS",
+   "r": 2,
+   "c": 1,
+   "dr": 1,
+   "dc": 0
+  },
+  {
+   "w": "TUK TUK",
+   "k": "TUKTUK",
+   "r": 15,
+   "c": 5,
+   "dr": 0,
+   "dc": -1
+  },
+  {
+   "w": "VALISE",
+   "k": "VALISE",
+   "r": 2,
+   "c": 5,
+   "dr": 1,
+   "dc": -1
+  },
+  {
+   "w": "VÉLO",
+   "k": "VELO",
+   "r": 7,
+   "c": 1,
+   "dr": 0,
+   "dc": 1
+  },
+  {
+   "w": "VOYAGE",
+   "k": "VOYAGE",
+   "r": 13,
+   "c": 1,
+   "dr": -1,
+   "dc": 0
+  },
+  {
+   "w": "WAT",
+   "k": "WAT",
+   "r": 5,
+   "c": 9,
+   "dr": 0,
+   "dc": 1
+  }
+ ]
+}

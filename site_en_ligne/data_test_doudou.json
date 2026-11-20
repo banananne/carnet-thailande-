@@ -1,0 +1,302 @@
+{
+ "questions": [
+  {
+   "n": 1,
+   "q": "Le réveil sonne à l’aube : départ pour Ayutthaya.",
+   "opts": [
+    {
+     "sym": "●",
+     "who": "moomoo",
+     "t": "Cinq minutes de plus. Puis cinq autres. Puis le petit-déjeuner."
+    },
+    {
+     "sym": "★",
+     "who": "aftonsparv",
+     "t": "Debout avant l’alarme : j’ai déjà repéré trois choses bizarres par la fenêtre."
+    },
+    {
+     "sym": "■",
+     "who": "boop",
+     "t": "Je réveille tout l’étage en chantant. Bonne humeur obligatoire."
+    },
+    {
+     "sym": "▲",
+     "who": "minou",
+     "t": "J’arrive à la dernière seconde, lunettes noires, sans un mot."
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "q": "Premier trajet en tuk-tuk.",
+   "opts": [
+    {
+     "sym": "★",
+     "who": "aftonsparv",
+     "t": "Je pose mille questions au chauffeur : le moteur, les klaxons, la ville."
+    },
+    {
+     "sym": "■",
+     "who": "boop",
+     "t": "Je monte en premier et je salue toute la rue."
+    },
+    {
+     "sym": "▲",
+     "who": "minou",
+     "t": "Je négocie le prix d’un simple regard, puis je m’installe en silence."
+    },
+    {
+     "sym": "●",
+     "who": "moomoo",
+     "t": "Je ferme les yeux : le vent, c’est un massage gratuit."
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "q": "Devant un temple immense, à Bangkok ou à Sukhothaï.",
+   "opts": [
+    {
+     "sym": "■",
+     "who": "boop",
+     "t": "J’organise la photo de groupe, avec la pose la plus ridicule possible."
+    },
+    {
+     "sym": "▲",
+     "who": "minou",
+     "t": "Je trouve que ça manque de mystère, puis je reste une heure en silence."
+    },
+    {
+     "sym": "●",
+     "who": "moomoo",
+     "t": "Je repère l’ombre et le banc le plus proche. Le temple attendra."
+    },
+    {
+     "sym": "★",
+     "who": "aftonsparv",
+     "t": "Je lis chaque panneau et je traque le détail que personne n’a vu."
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "q": "Marché de Maeklong : le train arrive et les étals se replient en quelques secondes.",
+   "opts": [
+    {
+     "sym": "▲",
+     "who": "minou",
+     "t": "Je reste droit, impassible, comme si le train m’appartenait."
+    },
+    {
+     "sym": "●",
+     "who": "moomoo",
+     "t": "Je regarde de loin, un fruit à la main. C’est le meilleur spectacle."
+    },
+    {
+     "sym": "★",
+     "who": "aftonsparv",
+     "t": "Je cherche à comprendre le mécanisme : comment les étals se replient aussi vite ?"
+    },
+    {
+     "sym": "■",
+     "who": "boop",
+     "t": "Je fais coucou au conducteur et à tout le marché."
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "q": "Chatuchak, ses 15 000 stands et sa foule.",
+   "opts": [
+    {
+     "sym": "★",
+     "who": "aftonsparv",
+     "t": "Je file vers l’objet que personne ne sait nommer."
+    },
+    {
+     "sym": "▲",
+     "who": "minou",
+     "t": "Je cherche un seul objet, noir de préférence. Le reste ne me concerne pas."
+    },
+    {
+     "sym": "●",
+     "who": "moomoo",
+     "t": "Je ne quitte pas le coin des glaces et des jus de coco."
+    },
+    {
+     "sym": "■",
+     "who": "boop",
+     "t": "Je parle à tous les vendeurs et je repars avec trois nouveaux amis."
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "q": "Au marché de nuit, face à un stand de street food.",
+   "opts": [
+    {
+     "sym": "▲",
+     "who": "minou",
+     "t": "J’inspecte le stand comme un juge. Verdict : « Acceptable. » Je commande quand même."
+    },
+    {
+     "sym": "●",
+     "who": "moomoo",
+     "t": "Un mango sticky rice. Puis un deuxième, pour vérifier que le premier était bon."
+    },
+    {
+     "sym": "■",
+     "who": "boop",
+     "t": "Je commande un peu de tout, à partager avec les inconnus de la table d’à côté."
+    },
+    {
+     "sym": "★",
+     "who": "aftonsparv",
+     "t": "Je prends le plat que je n’arrive pas à identifier. (Des grillons ? Pourquoi pas.)"
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "q": "À vélo dans le parc historique de Sukhothaï.",
+   "opts": [
+    {
+     "sym": "●",
+     "who": "moomoo",
+     "t": "Je pédale doucement, avec une pause jus de fruit toutes les quinze minutes."
+    },
+    {
+     "sym": "■",
+     "who": "boop",
+     "t": "Je roule en tête, sonnette en folie, en chantant à tue-tête."
+    },
+    {
+     "sym": "★",
+     "who": "aftonsparv",
+     "t": "Je m’arrête tous les cent mètres : une ruine, un insecte, une inscription."
+    },
+    {
+     "sym": "▲",
+     "who": "minou",
+     "t": "Je file seul loin devant, avec l’air d’un héros de film noir."
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "q": "Journée plage à Ban Phe.",
+   "opts": [
+    {
+     "sym": "■",
+     "who": "boop",
+     "t": "Volley, bain, bêtises et grand concours de châteaux de sable avec classement officiel."
+    },
+    {
+     "sym": "★",
+     "who": "aftonsparv",
+     "t": "J’explore les rochers, les coquillages et les crabes, en maillot argenté (repérable depuis l’espace)."
+    },
+    {
+     "sym": "▲",
+     "who": "minou",
+     "t": "À l’ombre, lunettes noires, j’observe les autres comme un souverain."
+    },
+    {
+     "sym": "●",
+     "who": "moomoo",
+     "t": "Hamac, noix de coco, sieste. Je ne bouge plus avant le coucher du soleil."
+    }
+   ]
+  },
+  {
+   "n": 9,
+   "q": "Le soir du 31 décembre, minuit approche.",
+   "opts": [
+    {
+     "sym": "▲",
+     "who": "minou",
+     "t": "Je tolère la fête, avec dignité, depuis une chaise à l’écart."
+    },
+    {
+     "sym": "★",
+     "who": "aftonsparv",
+     "t": "J’observe cette étrange coutume terrienne, avec des questions plein la tête."
+    },
+    {
+     "sym": "●",
+     "who": "moomoo",
+     "t": "Je garde ma place à table : le dessert n’est pas encore passé."
+    },
+    {
+     "sym": "■",
+     "who": "boop",
+     "t": "Je lance la danse et j’entraîne la plage entière."
+    }
+   ]
+  },
+  {
+   "n": 10,
+   "q": "Un long trajet : avion, van, taxi.",
+   "opts": [
+    {
+     "sym": "■",
+     "who": "boop",
+     "t": "Playlist, karaoké, jeux : le trajet devient un spectacle."
+    },
+    {
+     "sym": "●",
+     "who": "moomoo",
+     "t": "Plaid, coussin, sieste. La route m’a tout appris : je dors n’importe où."
+    },
+    {
+     "sym": "▲",
+     "who": "minou",
+     "t": "Casque sur les oreilles, capuche, regard lointain. Interdit de me parler avant l’arrivée."
+    },
+    {
+     "sym": "★",
+     "who": "aftonsparv",
+     "t": "Le nez à la vitre : chaque panneau, chaque scooter chargé comme un camion, chaque nuage."
+    }
+   ]
+  }
+ ],
+ "cards": {
+  "aftonsparv": {
+   "title": "Tu es Aftonsparv, l’explorateur venu d’une autre planète",
+   "body": "Pour toi, tout est nouveau et tout est fascinant. Tu goûtes ce que tu ne connais pas, tu poses mille questions et tu lis les panneaux jusqu’au bout. Tu te perds souvent, mais pour les plages de Thaïlande tu as prévu un magnifique bikini argenté : on te repère depuis l’espace.",
+   "SUPER-POUVOIR": "Repérer ce que personne n’avait vu.",
+   "POINT FAIBLE": "Tu t’arrêtes tous les cent mètres, et tout le groupe attend.",
+   "ALLIÉ": "Moomoo, bien sûr. Moomoo pilote, tu navigues. Tu découvres, Moomoo goûte. La plus grosse alliance du voyage.",
+   "TON ENDROIT DU VOYAGE": "Ayutthaya, ancienne capitale à explorer ruine par ruine.",
+   "quote": "« Sur ma planète, ça n’existe pas ! »"
+  },
+  "boop": {
+   "title": "Tu es Boop Boops, le rayon de soleil",
+   "body": "Énergie, fous rires, photos de groupe. Tu parles à tous les vendeurs du marché, tu montes en premier dans le tuk-tuk et tu mets l’ambiance même à 6 h du matin.",
+   "SUPER-POUVOIR": "Transformer des inconnus en amis en trois minutes.",
+   "POINT FAIBLE": "Le volume sonore, surtout avant 9 h.",
+   "ALLIÉ": "Tout le monde. Tu es le seul à parler à tous les camps, même à l’alliance Moomoo et Aftonsparv.",
+   "TON ENDROIT DU VOYAGE": "Chatuchak : 15 000 stands, autant de gens à qui parler.",
+   "quote": "« Allez, tout le monde dans le tuk-tuk ! »"
+  },
+  "minou": {
+   "title": "Tu es Minou minou the dark lord, le souverain de l’ombre",
+   "body": "Dramatique, pince-sans-rire, exigeant sur la clim, le café et l’itinéraire. Tu ne te lèves pas avant 11 h, tu juges tout en silence et tu fonds à la première caresse.",
+   "SUPER-POUVOIR": "Une seule apparition fait taire toute la salle.",
+   "POINT FAIBLE": "Une glace fondue peut déclencher une crise (silencieuse, mais historique).",
+   "ALLIÉ": "Personne, officiellement. L’alliance Moomoo et Aftonsparv t’agace, mais tu les suis à trois mètres, toujours.",
+   "TON ENDROIT DU VOYAGE": "Le parc Lumpini et ses varans de 2 mètres, tes cousins.",
+   "quote": "« Je ne boude pas, je règne. »"
+  },
+  "moomoo": {
+   "title": "Tu es Moomoo, le cocon",
+   "body": "Doux, gourmand, jamais pressé : tu sais toujours où se trouvent l’ombre, le hamac et la deuxième part de mango sticky rice. Et pourtant, Moomoo a fait un grand road trip à moto l’été dernier : un cocon, certes, mais un cocon qui connaît la route.",
+   "SUPER-POUVOIR": "Installer un salon n’importe où, même au bord d’une route.",
+   "POINT FAIBLE": "« cinq minutes de plus », trois fois de suite.",
+   "ALLIÉ": "Aftonsparv, bien sûr. Tu pilotes, Aftonsparv navigue (depuis l’espace). La plus grosse alliance du voyage.",
+   "TON ENDROIT DU VOYAGE": "La plage de Ban Phe, hamac inclus.",
+   "quote": "« Cinq minutes de plus ? »"
+  }
+ }
+}

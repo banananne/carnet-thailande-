@@ -105,10 +105,14 @@ who.addEventListener("click", function (e) {
 paintWho();
 
 /* ───────────── navigation ───────────── */
-var NAMES = { "": "home", jours: "days", hotels: "hotels", utile: "utile", metro: "metro", lexique: "lexique", taxi: "taxi", convertisseur: "convert", "good-to-know": "gtk" };
-var NAV_OF = { home: "home", days: "days", hotels: "hotels", utile: "utile", metro: "utile", lexique: "utile", taxi: "utile", convert: "utile", gtk: "utile" };
+var NAMES = { "": "home", jours: "days", hotels: "hotels", utile: "utile", metro: "metro", lexique: "lexique", taxi: "taxi", convertisseur: "convert", "good-to-know": "gtk",
+  jeux: "jeux", quiz: "quiz", "test-doudou": "test", doudous: "doudous", "blind-test": "blind", "mots-meles": "mots", horoscope: "horo", passeport: "pass" };
+var NAV_OF = { home: "home", days: "days", hotels: "hotels", utile: "utile", metro: "utile", lexique: "utile", taxi: "utile", convert: "utile", gtk: "utile",
+  jeux: "jeux", quiz: "jeux", test: "jeux", doudous: "jeux", blind: "jeux", mots: "jeux", horo: "jeux", pass: "jeux" };
 var TITLES = { home: "Carnet Thaïlande 2026", days: "Jours · Carnet Thaïlande", hotels: "Hôtels · Carnet Thaïlande", utile: "Utile · Carnet Thaïlande", metro: "Plan du métro · Carnet Thaïlande",
-  lexique: "Lexique · Carnet Thaïlande", taxi: "Cartes taxi · Carnet Thaïlande", convert: "Convertisseur · Carnet Thaïlande", gtk: "Good to know · Carnet Thaïlande" };
+  lexique: "Lexique · Carnet Thaïlande", taxi: "Cartes taxi · Carnet Thaïlande", convert: "Convertisseur · Carnet Thaïlande", gtk: "Good to know · Carnet Thaïlande",
+  jeux: "Jeux · Carnet Thaïlande", quiz: "Quiz · Carnet Thaïlande", test: "Test du doudou · Carnet Thaïlande", doudous: "Les doudous · Carnet Thaïlande",
+  blind: "Blind test · Carnet Thaïlande", mots: "Mots mêlés · Carnet Thaïlande", horo: "Horoscope · Carnet Thaïlande", pass: "Passeport · Carnet Thaïlande" };
 var days = $$(".day").map(function (a) { return a.getAttribute("data-id"); });
 var curDay = null, curName = "";
 
@@ -159,6 +163,7 @@ function route() {
   } else window.scrollTo(0, 0);
   if (name === "days") centerChip(curDay, !first);
   if (name === "metro") Metro.enter(); else Metro.leave();
+  if (window.CarnetGames) CarnetGames.enter(name);
 }
 function goDay(id) {
   /* d'un jour à l'autre : on remplace l'adresse (le bouton Retour ne doit pas repasser par tous les jours) ;
@@ -248,6 +253,7 @@ function handleFile(id, file) {
   setStatus(st, "", "Lecture de la photo…");
   toJpeg(file).then(function (r) {
     setPhotoUI(id, r.blob, true);
+    if (window.CarnetGames) CarnetGames.photo(id);
     setStatus(st, "ok", "Photo gardée sur ce téléphone. Pense aussi à l’enregistrer dans tes Photos (bouton « Enregistrer »).");
     return blobToBuf(r.blob).then(function (buf) {
       return DB.put(id, { buf: buf, type: "image/jpeg", ts: Date.now() });
@@ -734,6 +740,8 @@ function thaiNum(n) {
   paintRate(); paintPrice();
 })();
 paintPol();
+
+/*@GAMES@*/
 
 /* ───────────── démarrage ───────────── */
 DB.keys().then(function (keys) {

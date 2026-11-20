@@ -45,6 +45,16 @@ ICONS = {
     "trash": '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l.8 12.5h9.4L17.5 7M10 11v5M14 11v5"/>',
     "check": '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
     "x": '<path d="M6 6l12 12M18 6 6 18"/>',
+    "dice": '<rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="8.8" cy="8.8" r=".7"/><circle cx="15.2" cy="8.8" r=".7"/><circle cx="12" cy="12" r=".7"/><circle cx="8.8" cy="15.2" r=".7"/><circle cx="15.2" cy="15.2" r=".7"/>',
+    "question": '<circle cx="12" cy="12" r="8.5"/><path d="M9.5 9.8a2.6 2.6 0 1 1 3.7 2.3c-.8.5-1.2 1-1.2 1.9M12 16.8v.1"/>',
+    "heart": '<path d="M12 19.5s-7-4.4-7-9.6A3.9 3.9 0 0 1 12 7.6a3.9 3.9 0 0 1 7 2.3c0 5.2-7 9.6-7 9.6z"/>',
+    "music": '<path d="M9 17.5V6.5l9-2v11"/><circle cx="6.8" cy="17.5" r="2.2"/><circle cx="15.8" cy="15.5" r="2.2"/>',
+    "grid": '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9.3 4v16M14.7 4v16M4 9.3h16M4 14.7h16"/>',
+    "stamp": '<path d="M9 13.5h6l-.8-3.4a2.4 2.4 0 1 0-4.4 0z"/><path d="M6.2 13.5h11.6a1.7 1.7 0 0 1 1.7 1.7v1.3h-15v-1.3a1.7 1.7 0 0 1 1.7-1.7zM5 20h14"/>',
+    "paw": '<ellipse cx="12" cy="15.6" rx="4.2" ry="3.3"/><circle cx="6.4" cy="11.2" r="1.8"/><circle cx="9.9" cy="6.9" r="1.8"/><circle cx="14.1" cy="6.9" r="1.8"/><circle cx="17.6" cy="11.2" r="1.8"/>',
+    "refresh": '<path d="M19 12a7 7 0 1 1-2.2-5.1M19 4.5V8h-3.5"/>',
+    "bulb": '<path d="M9.6 17.5h4.8M10.2 20h3.6M12 3.8a5.2 5.2 0 0 0-3.1 9.4c.7.6 1.1 1.3 1.1 2.3h4c0-1 .4-1.7 1.1-2.3A5.2 5.2 0 0 0 12 3.8z"/>',
+    "zoomin": '<circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 5 5M10.5 8v5M8 10.5h5"/>',
 }
 
 # (famille, paquet fontsource, graisse, style, fichier, unicode-range ou None)
@@ -236,6 +246,12 @@ def build_web():
         shutil.copy(os.path.join(NM, pkg, "files", fn), os.path.join(WEB, "fonts", fn))
     make_icons(os.path.join(WEB, "icons"))
     build_metro.build(os.path.join(WEB, "assets", "metro.svg"))
+    imgdir = os.path.join(ROOT, "img")
+    if os.path.isdir(imgdir):
+        os.makedirs(os.path.join(WEB, "img"))
+        for fn in sorted(os.listdir(imgdir)):
+            if fn.endswith(".webp"):
+                shutil.copy(os.path.join(imgdir, fn), os.path.join(WEB, "img", fn))
 
     version = time.strftime("%Y%m%d-%H%M%S")
     index = build_app.render(version, APP_META)
@@ -246,7 +262,9 @@ def build_web():
     open(os.path.join(WEB, ".nojekyll"), "w").write("")
 
     core = ["./", "index.html", "test.html", "manifest.webmanifest", "assets/metro.svg"]
-    for sub in ("icons", "fonts"):
+    for sub in ("icons", "fonts", "img"):
+        if not os.path.isdir(os.path.join(WEB, sub)):
+            continue
         for fn in sorted(os.listdir(os.path.join(WEB, sub))):
             if fn.endswith(".svg") and sub == "icons" and fn != "icon.svg":
                 continue

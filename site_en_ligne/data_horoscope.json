@@ -1,0 +1,989 @@
+[
+ {
+  "name": "Bélier",
+  "el": "feu",
+  "chance": "25 déc.",
+  "mot": "sanuk",
+  "th": "สนุก",
+  "mean": "s'amuser, et le dire fort",
+  "text": "Mars, ta planète, te donne des ailes : tu diras oui avant tout le monde au tuk-tuk, à la baignade et au plat « pas trop épicé » (il le sera). Côté cœur, un sourire sur un marché de nuit te suivra.",
+  "stars": [
+   [
+    0.06,
+    0.8,
+    0.55
+   ],
+   [
+    0.34,
+    0.62,
+    1.0
+   ],
+   [
+    0.64,
+    0.45,
+    0.8
+   ],
+   [
+    0.88,
+    0.32,
+    0.65
+   ],
+   [
+    0.22,
+    0.22,
+    0.35
+   ],
+   [
+    0.56,
+    0.9,
+    0.4
+   ],
+   [
+    0.84,
+    0.76,
+    0.3
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ]
+  ]
+ },
+ {
+  "name": "Taureau",
+  "el": "terre",
+  "chance": "20 déc.",
+  "mot": "aroi",
+  "th": "อร่อย",
+  "mean": "délicieux, à dire la bouche pleine",
+  "text": "Vénus, ta planète, veille sur ton appétit : une mangue au riz gluant parfaite t'attend. Côté cœur, un regard complice devant une soupe fumante fera monter la température bien plus que le piment.",
+  "stars": [
+   [
+    0.08,
+    0.2,
+    0.5
+   ],
+   [
+    0.22,
+    0.38,
+    0.6
+   ],
+   [
+    0.38,
+    0.48,
+    1.0
+   ],
+   [
+    0.54,
+    0.34,
+    0.5
+   ],
+   [
+    0.58,
+    0.64,
+    0.6
+   ],
+   [
+    0.82,
+    0.86,
+    0.8
+   ],
+   [
+    0.9,
+    0.46,
+    0.75
+   ],
+   [
+    0.7,
+    0.18,
+    0.3
+   ],
+   [
+    0.14,
+    0.8,
+    0.35
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    2,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    3,
+    6
+   ]
+  ]
+ },
+ {
+  "name": "Gémeaux",
+  "el": "air",
+  "chance": "31 déc.",
+  "mot": "sawasdee",
+  "th": "สวัสดี",
+  "mean": "bonjour, à répéter sans modération",
+  "text": "Mercure, ta planète, te délie la langue : un « sawasdee » pour chaque vendeur et la meilleure adresse dénichée au hasard d'une ruelle. Côté cœur, un fou rire autour d'un bol de nouilles.",
+  "stars": [
+   [
+    0.3,
+    0.9,
+    1.0
+   ],
+   [
+    0.28,
+    0.68,
+    0.5
+   ],
+   [
+    0.25,
+    0.46,
+    0.6
+   ],
+   [
+    0.2,
+    0.2,
+    0.75
+   ],
+   [
+    0.6,
+    0.94,
+    1.0
+   ],
+   [
+    0.64,
+    0.7,
+    0.5
+   ],
+   [
+    0.68,
+    0.47,
+    0.6
+   ],
+   [
+    0.76,
+    0.22,
+    0.75
+   ],
+   [
+    0.88,
+    0.6,
+    0.3
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    1,
+    5
+   ],
+   [
+    2,
+    6
+   ]
+  ]
+ },
+ {
+  "name": "Cancer",
+  "el": "eau",
+  "chance": "30 déc.",
+  "mot": "sabai",
+  "th": "สบาย",
+  "mean": "à l'aise, en mode vacances",
+  "text": "La Lune, ta planète, te souffle toujours le coin le plus douillet : un hamac à l'ombre, un salon de thé bien frais. Côté cœur, un dîner au bord de l'eau te donnera envie de dire ce que tu gardes pour toi.",
+  "stars": [
+   [
+    0.48,
+    0.48,
+    0.5
+   ],
+   [
+    0.26,
+    0.86,
+    0.5
+   ],
+   [
+    0.74,
+    0.84,
+    0.65
+   ],
+   [
+    0.14,
+    0.18,
+    0.55
+   ],
+   [
+    0.84,
+    0.16,
+    1.0
+   ],
+   [
+    0.5,
+    0.92,
+    0.3
+   ],
+   [
+    0.92,
+    0.58,
+    0.3
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    1
+   ],
+   [
+    0,
+    2
+   ],
+   [
+    0,
+    3
+   ],
+   [
+    0,
+    4
+   ]
+  ]
+ },
+ {
+  "name": "Lion",
+  "el": "feu",
+  "chance": "1er janv.",
+  "mot": "suay",
+  "th": "สวย",
+  "mean": "beau, belle, à glisser en compliment",
+  "text": "Le Soleil, ta planète, a bien fait les choses : les temples dorés de Bangkok semblent peints pour ta crinière, photo garantie. Côté cœur, une danse sur la plage volera la vedette aux étoiles.",
+  "stars": [
+   [
+    0.083,
+    0.147,
+    1.0
+   ],
+   [
+    0.172,
+    0.442,
+    0.4
+   ],
+   [
+    0.319,
+    0.653,
+    0.7
+   ],
+   [
+    0.292,
+    0.926,
+    0.4
+   ],
+   [
+    0.486,
+    0.926,
+    0.45
+   ],
+   [
+    0.597,
+    0.547,
+    0.65
+   ],
+   [
+    0.917,
+    0.611,
+    0.8
+   ],
+   [
+    0.708,
+    0.189,
+    0.55
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    2,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    5
+   ]
+  ]
+ },
+ {
+  "name": "Vierge",
+  "el": "terre",
+  "chance": "22 déc.",
+  "mot": "riap roi",
+  "th": "เรียบร้อย",
+  "mean": "impeccable, tout est en ordre",
+  "text": "Mercure, ta planète, t'offre un sens de l'organisation sans faille : horaires de bus, plan B pour la chaleur, lingettes pour tous. Côté cœur, une bouteille d'eau fraîche vaut un grand discours.",
+  "stars": [
+   [
+    0.12,
+    0.16,
+    1.0
+   ],
+   [
+    0.3,
+    0.38,
+    0.5
+   ],
+   [
+    0.48,
+    0.5,
+    0.6
+   ],
+   [
+    0.26,
+    0.7,
+    0.4
+   ],
+   [
+    0.44,
+    0.88,
+    0.5
+   ],
+   [
+    0.72,
+    0.66,
+    0.55
+   ],
+   [
+    0.84,
+    0.84,
+    0.6
+   ],
+   [
+    0.92,
+    0.5,
+    0.45
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    2,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    5,
+    7
+   ]
+  ]
+ },
+ {
+  "name": "Balance",
+  "el": "air",
+  "chance": "27 déc.",
+  "mot": "khop khun",
+  "th": "ขอบคุณ",
+  "mean": "merci, avec un petit sourire",
+  "text": "Vénus, ta planète, t'offre un talent rare : mettre tout le monde d'accord. Tom yum ou curry vert, tu hésiteras, puis ton choix fera l'unanimité. Côté cœur, laisse l'autre choisir le dessert.",
+  "stars": [
+   [
+    0.64,
+    0.84,
+    1.0
+   ],
+   [
+    0.18,
+    0.52,
+    0.8
+   ],
+   [
+    0.46,
+    0.14,
+    0.55
+   ],
+   [
+    0.9,
+    0.38,
+    0.55
+   ],
+   [
+    0.1,
+    0.88,
+    0.3
+   ],
+   [
+    0.94,
+    0.8,
+    0.3
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    0
+   ],
+   [
+    0,
+    2
+   ]
+  ]
+ },
+ {
+  "name": "Scorpion",
+  "el": "eau",
+  "chance": "28 déc.",
+  "mot": "mai pen rai",
+  "th": "ไม่เป็นไร",
+  "mean": "pas de souci",
+  "text": "Pluton, ta planète, te rend magnétique : on se retournera sur toi dans les temples. Sous ton air mystérieux, personne n'est plus généreux. Côté cœur, Koh Samet te fera lâcher prise.",
+  "stars": [
+   [
+    0.08,
+    0.88,
+    0.5
+   ],
+   [
+    0.22,
+    0.74,
+    0.65
+   ],
+   [
+    0.06,
+    0.58,
+    0.5
+   ],
+   [
+    0.3,
+    0.52,
+    1.0
+   ],
+   [
+    0.44,
+    0.34,
+    0.5
+   ],
+   [
+    0.56,
+    0.16,
+    0.6
+   ],
+   [
+    0.72,
+    0.08,
+    0.7
+   ],
+   [
+    0.9,
+    0.2,
+    0.6
+   ],
+   [
+    0.92,
+    0.46,
+    0.55
+   ],
+   [
+    0.78,
+    0.58,
+    0.75
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    1,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ]
+  ]
+ },
+ {
+  "name": "Sagittaire",
+  "el": "feu",
+  "chance": "23 déc.",
+  "mot": "pai tiao",
+  "th": "ไปเที่ยว",
+  "mean": "partir en balade",
+  "text": "Jupiter, ta planète, te pousse plus loin : tu seras de toutes les expéditions, du marché flottant à l'aube à la dernière marche du temple. Côté cœur, un éclat de rire fera fondre bien des réserves.",
+  "stars": [
+   [
+    0.64,
+    0.2,
+    1.0
+   ],
+   [
+    0.34,
+    0.26,
+    0.5
+   ],
+   [
+    0.22,
+    0.58,
+    0.55
+   ],
+   [
+    0.44,
+    0.84,
+    0.6
+   ],
+   [
+    0.66,
+    0.64,
+    0.6
+   ],
+   [
+    0.9,
+    0.4,
+    0.55
+   ],
+   [
+    0.08,
+    0.84,
+    0.35
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    0
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    0
+   ],
+   [
+    2,
+    6
+   ]
+  ]
+ },
+ {
+  "name": "Capricorne",
+  "el": "terre",
+  "chance": "24 déc.",
+  "mot": "chok dee",
+  "th": "โชคดี",
+  "mean": "bonne chance",
+  "text": "Saturne, ta planète, aime les plans bien ficelés, et le voyage te tend un défi : lâcher la montre, le temps d'une sieste. Côté cœur, une personne patiente t'apprivoisera devant un thé glacé thaï.",
+  "stars": [
+   [
+    0.1,
+    0.8,
+    0.6
+   ],
+   [
+    0.18,
+    0.62,
+    0.5
+   ],
+   [
+    0.34,
+    0.34,
+    0.5
+   ],
+   [
+    0.58,
+    0.18,
+    0.55
+   ],
+   [
+    0.86,
+    0.28,
+    1.0
+   ],
+   [
+    0.8,
+    0.62,
+    0.5
+   ],
+   [
+    0.54,
+    0.76,
+    0.5
+   ],
+   [
+    0.32,
+    0.9,
+    0.3
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    0
+   ]
+  ]
+ },
+ {
+  "name": "Verseau",
+  "el": "air",
+  "chance": "2 janv.",
+  "mot": "nam",
+  "th": "น้ำ",
+  "mean": "eau, à boire sans modération",
+  "text": "Uranus, ta planète, trouve l'ordinaire trop ordinaire : tu goûteras le plat que personne n'ose nommer, et la tablée suivra. Côté cœur, une conversation sous les étoiles fera des étincelles.",
+  "stars": [
+   [
+    0.16,
+    0.88,
+    0.8
+   ],
+   [
+    0.46,
+    0.84,
+    0.9
+   ],
+   [
+    0.32,
+    0.66,
+    0.5
+   ],
+   [
+    0.4,
+    0.48,
+    0.45
+   ],
+   [
+    0.2,
+    0.42,
+    0.4
+   ],
+   [
+    0.58,
+    0.3,
+    0.5
+   ],
+   [
+    0.7,
+    0.52,
+    0.5
+   ],
+   [
+    0.8,
+    0.24,
+    0.55
+   ],
+   [
+    0.92,
+    0.46,
+    0.5
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    2
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    3,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    7
+   ],
+   [
+    7,
+    8
+   ]
+  ]
+ },
+ {
+  "name": "Poissons",
+  "el": "eau",
+  "chance": "29 déc.",
+  "mot": "pla",
+  "th": "ปลา",
+  "mean": "poisson, grillé de préférence",
+  "text": "Neptune, ta planète, te berce de rêveries : au coucher de soleil de Koh Samet, tu oublieras le temps, le plat qui refroidit et même l'heure du dîner. Côté cœur, un moment doux au clair de lune.",
+  "stars": [
+   [
+    0.5,
+    0.14,
+    0.8
+   ],
+   [
+    0.36,
+    0.28,
+    0.4
+   ],
+   [
+    0.22,
+    0.4,
+    0.45
+   ],
+   [
+    0.1,
+    0.54,
+    0.4
+   ],
+   [
+    0.12,
+    0.82,
+    0.45
+   ],
+   [
+    0.3,
+    0.88,
+    0.4
+   ],
+   [
+    0.32,
+    0.64,
+    0.5
+   ],
+   [
+    0.64,
+    0.3,
+    0.45
+   ],
+   [
+    0.78,
+    0.42,
+    0.5
+   ],
+   [
+    0.9,
+    0.58,
+    0.5
+   ],
+   [
+    0.88,
+    0.84,
+    0.6
+   ]
+  ],
+  "lines": [
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    5
+   ],
+   [
+    5,
+    6
+   ],
+   [
+    6,
+    3
+   ],
+   [
+    0,
+    7
+   ],
+   [
+    7,
+    8
+   ],
+   [
+    8,
+    9
+   ],
+   [
+    9,
+    10
+   ]
+  ]
+ }
+]

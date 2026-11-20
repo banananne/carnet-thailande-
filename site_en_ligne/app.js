@@ -395,7 +395,7 @@ $("#upd-btn").addEventListener("click", function () { location.reload(); });
 var Metro = (function () {
   var box = $("#mv"), stage = $("#mv-stage"), msg = $("#mv-load");
   var svg = null, state = "idle", active = false;
-  var W0 = 510.224, H0 = 396.85;          /* taille du plan, en unités du SVG */
+  var W0 = 490.392, H0 = 601.214;         /* taille du plan, en unités du SVG (relue dans le viewBox au chargement) */
   var M = 90;                              /* marge dessinée autour de l'écran, en pixels */
   var VW = 0, VH = 0, sMin = 1, sMax = 10;
   var s = 1, vx = 0, vy = 0;               /* vue voulue : pixels par unité, coin haut-gauche (unités) */

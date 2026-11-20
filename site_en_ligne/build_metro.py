@@ -1,29 +1,27 @@
 # -*- coding: utf-8 -*-
-"""Plan du métro de Bangkok (moitié droite de la page 4 du carnet) → SVG vectoriel pour le site.
-On retire de la page la moitié gauche (hôtels, photos) et le numéro de page, puis on exporte avec MuPDF
-(SVG sans filtres feImage : ceux de poppler/cairo ne s'affichent pas dans Safari)."""
+"""Plan du métro de Bangkok pour le site : le plan complet BTS / MRT envoyé par Anne le 20 novembre 2026
+(PDF vectoriel de une page, _dev/bts_metro_map.pdf) converti en SVG.
+On retire le bandeau gris du titre (le site a son propre titre), on recadre, puis on exporte avec MuPDF :
+texte converti en tracés (le thaï s'affiche sans police) et SVG sans filtres feImage (ceux de poppler / cairo
+ne s'affichent pas dans Safari)."""
 import re, sys, os
 import pymupdf
 
-PDF = "/mnt/user-data/uploads/Journal_de_bord.pdf"
-OUT = sys.argv[1] if len(sys.argv) > 1 else "/home/claude/site_en_ligne/web/assets/metro.svg"
-SPLIT = 510.236
+HERE = os.path.dirname(os.path.abspath(__file__))
+PDF = os.path.join(HERE, "_dev", "bts_metro_map.pdf")
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "web", "assets", "metro.svg")
+TOP = 92.0        # bas du bandeau gris de titre, en points (le plan commence plus bas)
 
 
 def build(out=OUT):
     doc = pymupdf.open(PDF)
-    doc.select([3])                      # page 4
     pg = doc[0]
     mb = pg.mediabox
-    # numéro de page (tout en bas à droite)
-    for w in pg.get_text("words"):
-        if w[0] > 980 and w[1] > 360:
-            pg.add_redact_annot(pymupdf.Rect(w[0] - 2, w[1] - 2, w[2] + 2, w[3] + 2), fill=False)
-    pg.add_redact_annot(pymupdf.Rect(0, 0, SPLIT, mb.y1), fill=False)
-    pg.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_REMOVE,
-                        graphics=pymupdf.PDF_REDACT_LINE_ART_REMOVE_IF_COVERED,
+    pg.add_redact_annot(pymupdf.Rect(-12, -12, mb.x1 + 12, TOP), fill=False)
+    pg.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE,
+                        graphics=pymupdf.PDF_REDACT_LINE_ART_REMOVE_IF_TOUCHED,
                         text=pymupdf.PDF_REDACT_TEXT_REMOVE)
-    pg.set_cropbox(pymupdf.Rect(SPLIT, 0, mb.x1 - 0.01, mb.y1))
+    pg.set_cropbox(pymupdf.Rect(0, TOP, mb.x1, mb.y1))
     svg = pg.get_svg_image(text_as_path=True)
 
     TOK = re.compile(r"[A-Za-z]|-?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?")
@@ -51,6 +49,7 @@ def build(out=OUT):
     svg = re.sub(r'\bd="([^"]*)"', fix_d, svg)
     svg = re.sub(r'transform="matrix\(([^)]*)\)"', fix_tr, svg)
     svg = re.sub(r' data-text="[^"]*"', "", svg)          # texte de secours des glyphes : inutile à l'écran
+    svg = re.sub(r' inkscape:[A-Za-z]+="[^"]*"', "", svg)       # calques Inkscape : inutiles (et sans eux, on peut retirer la déclaration)
     svg = svg.replace(' xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"', "")
     svg = re.sub(r"\n\s*\n", "\n", svg)
     os.makedirs(os.path.dirname(out), exist_ok=True)

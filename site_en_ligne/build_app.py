@@ -277,7 +277,7 @@ def view_hotels():
 
 # ───────────────────────── utile + métro ─────────────────────────
 def view_utile():
-    items = [("rose", "#/metro", "train", "Plan du métro", "Bangkok : pince pour zoomer"),
+    items = [("rose", "#/metro", "train", "Plan du métro", "Tout le réseau, à zoomer"),
              ("sand", "#/lexique", "book", "Lexique en thaï", "À montrer ou à écouter"),
              ("mustard", "#/taxi", "car", "Cartes taxi", "Les hôtels écrits en thaï"),
              ("blue", "#/convertisseur", "coin", "Convertisseur", "Baht et euro"),
@@ -293,14 +293,14 @@ def view_utile():
 def view_metro():
     return ('<main class="view" id="v-metro" hidden>'
             '<header class="vhead"><div class="wrap"><a class="back" href="#/utile" aria-label="Retour">%s</a>'
-            '<div><h1 tabindex="-1">Plan du métro</h1><p>Bangkok</p></div></div></header>'
+            '<div><h1 tabindex="-1">Plan du métro</h1><p>Tout le réseau de Bangkok</p></div></div></header>'
             '<div class="wrap"><div class="mv" id="mv" role="img" aria-label="Plan du métro de Bangkok, à zoomer avec deux doigts">'
             '<div class="mv-stage" id="mv-stage"></div>'
             '<div class="load" id="mv-load">Chargement du plan…</div>'
             '<div class="mctl"><button type="button" data-z="in" aria-label="Zoomer">%s</button>'
             '<button type="button" data-z="out" aria-label="Dézoomer">%s</button>'
             '<button type="button" data-z="fit" aria-label="Tout le plan">%s</button></div></div>'
-            '<p class="hint">Pince avec deux doigts pour zoomer, glisse pour te déplacer, touche deux fois pour zoomer d’un coup.</p></div></main>'
+            '<p class="hint">Pince avec deux doigts pour zoomer, glisse pour te déplacer, touche deux fois pour zoomer d’un coup. Les stations sont écrites en thaï et en anglais.</p></div></main>'
             % (icon("chevl"), icon("plus"), icon("minus"), icon("fit")))
 
 
@@ -550,7 +550,7 @@ def view_home(version):
     # l'accueil ne garde que l'essentiel : le reste est dans la barre du bas (Jeux, Utile)
     tiles = [("sand", "#/jours", "calendar", "Jours", "18 décembre → 3 janvier"),
              ("blue", "#/hotels", "bed", "Hôtels", "Adresses et téléphones"),
-             ("rose", "#/metro", "train", "Métro", "Plan de Bangkok à zoomer"),
+             ("rose", "#/metro", "train", "Métro", "Tout le réseau, à zoomer"),
              ("mustard", "#/taxi", "car", "Cartes taxi", "Les hôtels écrits en thaï")]
     out += '<div class="tiles">'
     for col, href, ic, t, sub in tiles:

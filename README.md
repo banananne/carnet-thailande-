@@ -3,14 +3,16 @@
 Cette branche ne sert qu'à garder une copie des fichiers qui fabriquent le site. Le site publié
 est sur la branche `main` (GitHub Pages) : ne rien publier ici.
 
-Dernière mise à jour : 20 novembre 2026, 23 h 40. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
+Dernière mise à jour : 21 novembre 2026, 0 h 05. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
 cartes taxi, convertisseur, Good to know) et étape 3 (jeux : quiz, test de personnalité, blind test, mots mêlés,
 horoscope, mascottes, passeport de tampons), publiées ensemble à 22 h 24 (commit 34db76e), puis vague 1 des
 améliorations (accueil allégé à quatre rubriques, « Qui es-tu ? » qui se replie, « doudous » devenus « mascottes »,
 « test du doudou » devenu « test de personnalité ») publiée à 22 h 59 (branche `main`, commit fd09c91, version de
 construction 20261120-225758), puis vague 2 (nouveaux tampons du passeport : un cadre, une encre et un dessin par
 jour, 6 tampons spéciaux) validée par Anne le 20 novembre à 23 h 32 et publiée à 23 h 33 (branche `main`, commit
-1157c6d, version de construction 20261120-232939). Ces sources correspondent à ce qui est publié.
+1157c6d, version de construction 20261120-232939), puis nouvelle carte complète du métro (BTS, MRT, Airport Link, SRT) publiée
+le 21 novembre à 0 h 02 (branche `main`, commit b6f517f, version de construction 20261120-235823).
+Ces sources correspondent à ce qui est publié (hors travail en cours sur le cadenas du test de personnalité, sauvegardé à part).
 
 ## Reconstruire le site
 1. Remettre `site_en_ligne/` dans `/home/claude/site_en_ligne/` et les autocollants de `stickers/`
@@ -19,9 +21,10 @@ jour, 6 tampons spéciaux) validée par Anne le 20 novembre à 23 h 32 et publi�
 2. Polices : `cd /home/claude/site_en_ligne/_dev && npm install` (lit `package.json` : Barlow,
    Barlow Condensed, Libre Baskerville, Noto Sans Thai, via @fontsource). Les .woff2 déjà publiés
    sont aussi dans le dossier `fonts/` de la branche `main`.
-3. Plan du métro : fabriqué à partir de `/mnt/user-data/uploads/Journal_de_bord.pdf` (page 4) par
-   `build_metro.py`. Le résultat est déjà publié dans `assets/metro.svg` sur `main` : on peut le copier
-   dans `web/assets/` si le PDF n'est plus disponible.
+3. Plan du métro : fabriqué à partir de `site_en_ligne/_dev/bts_metro_map.pdf` (carte complète du réseau envoyée par Anne
+   le 20 novembre 2026 à 23 h 47) par `build_metro.py` (pymupdf/MuPDF : bandeau de titre retiré, textes thaï convertis
+   en tracés, SVG d'environ 1,9 Mo). Le résultat est déjà publié dans `assets/metro.svg` sur `main` : on peut le copier
+   dans `web/assets/` si le PDF ou pymupdf ne sont plus disponibles.
 4. `cd /home/claude/site_en_ligne && python3 -I build.py` fabrique le dossier `web/` (index.html,
    test.html, sw.js, manifest, polices, icônes, plan du métro).
 5. Publier : copier le contenu de `web/` à la racine de la branche `main` (tout supprimer sauf `.git`

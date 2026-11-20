@@ -8,13 +8,9 @@ cartes taxi, convertisseur, Good to know) et étape 3 (jeux : quiz, test de pers
 horoscope, mascottes, passeport de tampons), publiées ensemble à 22 h 24 (commit 34db76e), puis vague 1 des
 améliorations (accueil allégé à quatre rubriques, « Qui es-tu ? » qui se replie, « doudous » devenus « mascottes »,
 « test du doudou » devenu « test de personnalité ») publiée à 22 h 59 (branche `main`, commit fd09c91, version de
-construction 20261120-225758).
-
-**ATTENTION : ces sources contiennent aussi la vague 2, NON PUBLIÉE** (nouveaux tampons du passeport : `stamps.py`,
-et modifications de `build_games.py`, `games.js`, `games.css`). Version de construction locale 20261120-232939. Anne a
-reçu une planche à 23 h 40 et doit donner son accord avant la publication. Tant que le site en ligne n'affiche pas
-une version de construction 20261120-232939 ou plus récente, le site publié correspond aux sources de la vague 1
-(commit 685cfe7 de cette branche). Quand la vague 2 sera publiée, remplacer ce paragraphe.
+construction 20261120-225758), puis vague 2 (nouveaux tampons du passeport : un cadre, une encre et un dessin par
+jour, 6 tampons spéciaux) validée par Anne le 20 novembre à 23 h 32 et publiée à 23 h 33 (branche `main`, commit
+1157c6d, version de construction 20261120-232939). Ces sources correspondent à ce qui est publié.
 
 ## Reconstruire le site
 1. Remettre `site_en_ligne/` dans `/home/claude/site_en_ligne/` et les autocollants de `stickers/`
@@ -49,7 +45,7 @@ une version de construction 20261120-232939 ou plus récente, le site publié co
   `#/doudous` marchent encore).
 - `app.css`, `app.js` : style et comportement (navigation, photo du jour, copie, plan du métro, voix thaïe,
   lexique, cartes taxi, convertisseur).
-- `stamps.py` (vague 2, non publié) : dessins (pictogrammes en traits), cadres (ticket, rond, ovale, arche, hexagone,
+- `stamps.py` (vague 2) : dessins (pictogrammes en traits), cadres (ticket, rond, ovale, arche, hexagone,
   rectangle, timbre, dentelé, cachet postal, bandeau, octogone) et encres des 23 tampons ; `DAY_SPEC` et `BONUS_SPEC` donnent
   cadre, couleur et dessin de chaque jour et de chaque tampon spécial ; `stamp_svg()` dessine un tampon.
 - `games.js`, `games.css` : comportement et style des jeux. `games.js` est collé dans `app.js` au moment du

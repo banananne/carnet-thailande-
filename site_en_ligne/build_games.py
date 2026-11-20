@@ -27,6 +27,21 @@ MOTS = jload("data_motsmeles.json")
 DD = {d["key"]: d for d in G.DOUDOUS}
 
 
+def norm_word(w):
+    """même règle que dans games.js : sans accents, sans majuscules, lettres et chiffres seulement"""
+    w = unicodedata.normalize("NFD", w)
+    w = "".join(c for c in w if not unicodedata.combining(c)).lower()
+    return re.sub(r"[^a-z0-9]", "", w)
+
+
+def fnv(w):
+    """FNV-1a sur 32 bits (simple dissuasion : ce n'est pas un coffre-fort), identique à games.js"""
+    h = 0x811C9DC5
+    for ch in w:
+        h = ((h ^ ord(ch)) * 16777619) & 0xFFFFFFFF
+    return h
+
+
 def photo_dims(fn):
     from PIL import Image
     with Image.open(os.path.join(ROOT, "img", fn)) as im:
@@ -60,8 +75,12 @@ def view_jeux():
         out += dd_img(d["key"], "dd-mini", lazy=False)
     out += '</a><div class="list">'
     for col, href, ic, t, sub, hid in HUB:
-        out += ('<a class="tile %s" href="%s"><span class="ic">%s</span><span><b>%s</b><small data-hub="%s" data-def="%s">%s</small></span></a>'
-                % (col, href, icon(ic), txt(t), hid, esc(sub), txt(sub)))
+        pic, cls = icon(ic), ""
+        if hid == "doudou":      # le cœur et le cadenas sont tous deux dans la page ; la classe « tlock » de <html> choisit
+            pic = icon(ic).replace('class="i"', 'class="i ic-open"') + icon("lock").replace('class="i"', 'class="i ic-lock"')
+            cls = " lockable"
+        out += ('<a class="tile %s%s" href="%s"><span class="ic">%s</span><span><b>%s</b><small data-hub="%s" data-def="%s">%s</small></span></a>'
+                % (col, cls, href, pic, txt(t), hid, esc(sub), txt(sub)))
     return out + "</div></div></main>"
 
 
@@ -120,7 +139,8 @@ def dd_card(key):
 def view_doudous():
     out = ('<main class="view" id="v-doudous" hidden>' + back_head("Les mascottes", "Elles voyagent avec vous", "#/jeux")
            + '<div class="wrap"><p class="how">Quatre mascottes, quatre caractères. Elles ont leur avis sur tout, et elles vous guident jour après jour.</p>'
-           '<div class="acts"><a class="btn" href="#/personnalite">%s Quelle est la mienne ?</a></div><div class="ddlist">' % icon("heart"))
+           '<div class="acts dd-go"><a class="btn" href="#/personnalite">%s Quelle est la mienne ?</a></div>'
+           '<p class="how dd-wait">%s Le test pour trouver ta mascotte s’ouvre le %s.</p><div class="ddlist">' % (icon("heart"), icon("lock"), G.TEST_OPEN_TXT))
     for d in G.DOUDOUS:
         out += dd_card(d["key"])
     return out + "</div></div></main>"
@@ -132,10 +152,20 @@ def view_test():
     intro = ("Pour chaque question, choisis la réponse qui te ressemble vraiment, pas celle que tu aimerais être. "
              "À la fin, la mascotte qui revient le plus souvent est la tienne. Égalité ? Tes amis tranchent.")
     out = ('<main class="view" id="v-test" hidden>' + back_head("Test de personnalité", "Quelle mascotte es-tu ?", "#/jeux")
-           + '<div class="wrap"><section class="dt" id="dt" data-n="%d">' % n)
+           + '<div class="wrap"><section class="dt" id="dt" data-n="%d" data-open="%s" data-k="%s">'
+           % (n, G.TEST_OPEN, ",".join(str(fnv(norm_word(w))) for w in G.TEST_WORDS)))
+    out += ('<div class="bubble sand dt-lock" id="dt-lock" hidden><div class="dd-four dd-sleep">%s</div>'
+            '<h2><span class="lk-ic">%s</span>Pas encore !</h2>'
+            '<p>Les mascottes ont besoin de vous observer encore un peu avant de deviner qui vous êtes. Le test s’ouvre le <b>%s</b>.</p>'
+            '<button class="lk-link" type="button" data-lk="ask">J’ai le mot secret</button>'
+            '<form class="lk-form" id="lk-form" hidden autocomplete="off"><label for="lk-in">Mot secret</label>'
+            '<div class="lk-row"><input id="lk-in" name="mot" type="text" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" maxlength="40">'
+            '<button class="btn" type="submit">Ouvrir</button></div><p class="lk-err" id="lk-err" role="status"></p></form></div>'
+            % ("".join(dd_img(d["key"], "dd-mini", lazy=False) for d in G.DOUDOUS), icon("lock"), G.TEST_OPEN_TXT))
     out += ('<div class="bubble rose dt-intro" id="dt-intro"><div class="dd-four">%s</div><h2>Quelle mascotte es-tu ?</h2><p>%s</p>'
             '<div class="acts"><button class="btn" type="button" data-dt="start">Commencer</button></div>'
-            '<div id="dt-last" hidden><p class="dt-lastp">Ton dernier résultat : <b id="dt-lastn"></b></p><div class="acts"><button class="btn alt" type="button" data-dt="last">Revoir ma mascotte</button></div></div></div>'
+            '<div id="dt-last" hidden><p class="dt-lastp">Ton dernier résultat : <b id="dt-lastn"></b></p><div class="acts"><button class="btn alt" type="button" data-dt="last">Revoir ma mascotte</button></div></div>'
+            '<button class="lk-link" id="lk-relock" type="button" data-lk="relock" hidden>Remettre le cadenas</button></div>'
             % ("".join(dd_img(d["key"], "dd-mini", lazy=False) for d in G.DOUDOUS), txt(intro)))
     for i, q in enumerate(qs):
         out += ('<article class="dt-q" data-i="%d" hidden><p class="qz-n">Question %d sur %d</p><div class="qz-bar" aria-hidden="true"><i style="width:%d%%"></i></div>'

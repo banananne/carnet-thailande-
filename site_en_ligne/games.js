@@ -224,19 +224,55 @@ window.CarnetGames = (function () {
     return { reset: reset };
   })();
 
+  /* ───────────── cadenas : le test de personnalité s'ouvre le 29 décembre (heure du téléphone),
+     ou plus tôt avec le mot secret d'Anne (gardé sur ce téléphone). La classe « tlock » de <html> allume les cadenas. ───────────── */
+  var Lock = (function () {
+    var root = $("#dt"), KEY = "carnet.open";
+    var OPEN = root.getAttribute("data-open") || "";
+    var HASH = (root.getAttribute("data-k") || "").split(",").map(Number);
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+    function today() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+    function byDate() { return !OPEN || today() >= OPEN; }
+    function byWord() { return LS.get(KEY, "") === "1"; }
+    function locked() { return !byDate() && !byWord(); }
+    function norm(w) {
+      var t = String(w);
+      try { t = t.normalize("NFD"); } catch (e) {}
+      return t.replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    }
+    function fnv(w) { var h = 0x811c9dc5; for (var i = 0; i < w.length; i++) h = Math.imul(h ^ w.charCodeAt(i), 16777619) >>> 0; return h; }
+    function good(w) { var n = norm(w); return !!n && HASH.indexOf(fnv(n)) >= 0; }
+    function paint() {
+      document.documentElement.classList.toggle("tlock", locked());
+      var rl = $("#lk-relock"); if (rl) rl.hidden = !(byWord() && !byDate());   /* « remettre le cadenas » : seulement si ouvert avec le mot, avant la date */
+    }
+    function open() { LS.set(KEY, "1"); paint(); }
+    function close() { LS.del(KEY); paint(); }
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) paint(); });
+    paint();
+    return { locked: locked, paint: paint, good: good, open: open, close: close };
+  })();
+
   /* ───────────── test de personnalité (mascottes) ───────────── */
   var Test = (function () {
-    var root = $("#dt"), intro = $("#dt-intro"), qs = $$(".dt-q", root), tie = $("#dt-tie"), res = $("#dt-res");
+    var root = $("#dt"), intro = $("#dt-intro"), qs = $$(".dt-q", root), tie = $("#dt-tie"), res = $("#dt-res"), lock = $("#dt-lock");
+    var lkForm = $("#lk-form"), lkIn = $("#lk-in"), lkErr = $("#lk-err");
     var cur = 0, ans = [];
     var NAME = {}; $$("#v-doudous .dd-card").forEach(function (c) { NAME[c.getAttribute("data-who")] = $(".dd-kick", c).textContent; });
-    function show(el) { [intro, tie, res].concat(qs).forEach(function (x) { x.hidden = x !== el; }); }
+    var OPEN_TXT = ((lock.querySelector("b") || {}).textContent) || "";
+    function show(el) { [lock, intro, tie, res].concat(qs).forEach(function (x) { x.hidden = x !== el; }); }
     function last() { var k = LS.get("carnet.doudou", ""); return NAME[k] ? k : ""; }
     function paintLast() {
       var k = last(), box = $("#dt-last");
       box.hidden = !k; if (k) $("#dt-lastn").textContent = NAME[k];
-      hub("doudou", k ? "Ta mascotte : " + NAME[k] : "");
+      hub("doudou", Lock.locked() ? "À partir du " + OPEN_TXT : k ? "Ta mascotte : " + NAME[k] : "");
     }
-    function reset() { cur = 0; ans = []; show(intro); paintLast(); }
+    function reset() {
+      cur = 0; ans = []; Lock.paint();
+      if (Lock.locked()) { lkForm.hidden = true; $('[data-lk="ask"]', lock).hidden = false; lkErr.textContent = ""; lkIn.value = ""; show(lock); }
+      else show(intro);
+      paintLast();
+    }
     function showQ(i) { cur = i; show(qs[i]); window.scrollTo(0, 0); focusTitle(qs[i]); }
     function lc(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
     function result(key, again) {
@@ -270,6 +306,11 @@ window.CarnetGames = (function () {
     }
     root.addEventListener("click", function (e) {
       var t = e.target.closest ? e.target.closest("button, a") : null; if (!t) return;
+      var lk = t.getAttribute("data-lk");
+      if (lk === "ask") { t.hidden = true; lkForm.hidden = false; try { lkIn.focus(); } catch (x) {} return; }
+      if (lk === "relock") { Lock.close(); reset(); toast("Cadenas remis"); return; }
+      if (lock.contains(t)) return;                 /* le bouton « Ouvrir » du formulaire : c'est l'envoi du formulaire qui décide */
+      if (Lock.locked()) { reset(); return; }       /* tout autre bouton tant que c'est fermé : retour à l'écran du cadenas */
       var a = t.getAttribute("data-dt");
       if (a === "start") { ans = []; showQ(0); }
       else if (a === "last") { var k = last(); if (k) result(k, true); }
@@ -279,6 +320,14 @@ window.CarnetGames = (function () {
         if (cur + 1 < qs.length) showQ(cur + 1); else finish();
       } else if (t.getAttribute("data-pick")) result(t.getAttribute("data-pick"));
     });
+    lkForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (Lock.good(lkIn.value)) { Lock.open(); lkIn.value = ""; lkErr.textContent = ""; reset(); toast("Test débloqué"); Confetti.burst(null, null, 50); return; }
+      lkErr.textContent = "Ce n’est pas le bon mot."; buzz(40);
+      lock.classList.remove("no"); void lock.offsetWidth; lock.classList.add("no");
+      lkIn.select();
+    });
+    lock.addEventListener("animationend", function () { lock.classList.remove("no"); });
     paintLast();
     return { reset: reset };
   })();
@@ -503,6 +552,8 @@ window.CarnetGames = (function () {
 
   return {
     enter: function (name) {
+      Lock.paint();
+      if (name === "jeux") Test.reset();            /* met à jour la tuile du test (cadenas, ou « Ta mascotte : … ») */
       if (name === "quiz") Quiz.reset();
       else if (name === "test") Test.reset();
       else if (name === "blind") Blind.paint();

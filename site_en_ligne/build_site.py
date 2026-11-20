@@ -47,6 +47,7 @@ ICONS = {
     "x": '<path d="M6 6l12 12M18 6 6 18"/>',
     "dice": '<rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="8.8" cy="8.8" r=".7"/><circle cx="15.2" cy="8.8" r=".7"/><circle cx="12" cy="12" r=".7"/><circle cx="8.8" cy="15.2" r=".7"/><circle cx="15.2" cy="15.2" r=".7"/>',
     "question": '<circle cx="12" cy="12" r="8.5"/><path d="M9.5 9.8a2.6 2.6 0 1 1 3.7 2.3c-.8.5-1.2 1-1.2 1.9M12 16.8v.1"/>',
+    "lock": '<rect x="5" y="10.5" width="14" height="9.5" rx="2.2"/><path d="M8.2 10.5V8a3.8 3.8 0 0 1 7.6 0v2.5"/><circle cx="12" cy="15.2" r=".9"/>',
     "heart": '<path d="M12 19.5s-7-4.4-7-9.6A3.9 3.9 0 0 1 12 7.6a3.9 3.9 0 0 1 7 2.3c0 5.2-7 9.6-7 9.6z"/>',
     "music": '<path d="M9 17.5V6.5l9-2v11"/><circle cx="6.8" cy="17.5" r="2.2"/><circle cx="15.8" cy="15.5" r="2.2"/>',
     "grid": '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9.3 4v16M14.7 4v16M4 9.3h16M4 14.7h16"/>',

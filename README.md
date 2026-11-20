@@ -3,7 +3,7 @@
 Cette branche ne sert qu'à garder une copie des fichiers qui fabriquent le site. Le site publié
 est sur la branche `main` (GitHub Pages) : ne rien publier ici.
 
-Dernière mise à jour : 21 novembre 2026, 0 h 05. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
+Dernière mise à jour : 21 novembre 2026, 0 h 30. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
 cartes taxi, convertisseur, Good to know) et étape 3 (jeux : quiz, test de personnalité, blind test, mots mêlés,
 horoscope, mascottes, passeport de tampons), publiées ensemble à 22 h 24 (commit 34db76e), puis vague 1 des
 améliorations (accueil allégé à quatre rubriques, « Qui es-tu ? » qui se replie, « doudous » devenus « mascottes »,
@@ -12,7 +12,8 @@ construction 20261120-225758), puis vague 2 (nouveaux tampons du passeport : un 
 jour, 6 tampons spéciaux) validée par Anne le 20 novembre à 23 h 32 et publiée à 23 h 33 (branche `main`, commit
 1157c6d, version de construction 20261120-232939), puis nouvelle carte complète du métro (BTS, MRT, Airport Link, SRT) publiée
 le 21 novembre à 0 h 02 (branche `main`, commit b6f517f, version de construction 20261120-235823).
-Ces sources correspondent à ce qui est publié (hors travail en cours sur le cadenas du test de personnalité, sauvegardé à part).
+Puis le cadenas du test de personnalité (ouvert le 29 décembre, ou avec un mot secret) publié le 21 novembre à 0 h 20
+(branche `main`, commit 6b85e54, version de construction 20261121-000925). Ces sources correspondent à ce qui est publié.
 
 ## Reconstruire le site
 1. Remettre `site_en_ligne/` dans `/home/claude/site_en_ligne/` et les autocollants de `stickers/`
@@ -39,6 +40,9 @@ Ces sources correspondent à ce qui est publié (hors travail en cours sur le ca
   des mascottes (nommées `DOUDOUS` dans le code), mots des tampons, `PLAYLIST_URL` à remplir quand le lien arrive).
   `data_test_doudou.json`, `data_horoscope.json`, `data_motsmeles.json` : extraits des pages 19 à 23 du PDF
   (`_dev/extract_step3.py`, `_dev/extract_horoscope.py`, `_dev/ocr_grid.py` et `_dev/solve_grid.py` pour la grille).
+- Cadenas du test de personnalité : `data_games.py` (`TEST_OPEN` = date d'ouverture, `TEST_OPEN_TXT`, `TEST_WORDS` = mots secrets ;
+  seules leurs empreintes FNV-1a vont dans le site, voir `build_games.fnv`), `games.js` (module `Lock`, classe `tlock` sur `<html>`),
+  `games.css` (fin du fichier). Clé de mémoire : `carnet.open` = « 1 » quand le mot secret a été tapé.
 - `build_app.py` : fabrique les pages HTML (accueil, jours, hôtels, utile, métro, lexique, cartes taxi,
   convertisseur, Good to know, fenêtre « montrer en grand »).
 - `build_games.py` : pages des jeux (hub, quiz, test de personnalité, mascottes, blind test, mots mêlés, horoscope,

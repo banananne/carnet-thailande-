@@ -42,6 +42,7 @@ with sync_playwright() as p:
     for w, h in ((320, 640), (360, 740), (390, 844), (412, 915), (768, 1024)):
         ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=1, is_mobile=(w < 700), has_touch=True, locale="fr-FR", service_workers="block")
         pg = ctx.new_page()
+        ctx.add_init_script("try{localStorage.setItem('carnet.open','1')}catch(e){}")  # le test de personnalité est ouvert (cadenas levé)
         pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.on("console", lambda m: errs.append(m.text) if m.type == "error" else None)
         pg.goto(BASE); pg.wait_for_timeout(300)

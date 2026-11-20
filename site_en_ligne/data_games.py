@@ -79,9 +79,16 @@ STAMP_WORDS = {
 # (clé, mot du tampon, titre affiché, comment on le gagne)
 BONUS_STAMPS = [
     ("quiz", "QUIZZZZ", "Quiz", "Aller au bout du quiz du 26 décembre"),
-    ("doudou", "MASCOTTE", "Mascotte", "Faire le test de personnalité"),
+    ("doudou", "MASCOTTE", "Mascotte", "Faire le test de personnalité (dès le 29\u00a0décembre)"),
     ("mots", "MOTS MÊLÉS", "Mots mêlés", "Trouver les 40 mots"),
     ("blind", "BLIND TEST", "Blind test", "Marquer un point au blind test"),
     ("etoiles", "ÉTOILES", "Horoscope", "Lire l’horoscope du voyage"),
     ("photos", "PHOTOGRAPHE", "Photographe", "Prendre 5 photos du jour"),
 ]
+
+# ───────────── cadenas : le test de personnalité s'ouvre à une date (heure locale du téléphone) ─────────────
+# Anne peut l'ouvrir plus tôt en tapant un mot secret (les mots, sans accents ni majuscules, sont les mêmes pour tous les téléphones).
+# Dans le site publié, on ne garde que leur empreinte (voir build_games.fnv) ; les mots eux-mêmes sont dans la conversation avec Anne.
+TEST_OPEN = "2026-12-29"
+TEST_OPEN_TXT = "29\u00a0décembre"   # espace insécable : le jour et le mois ne se séparent pas en fin de ligne
+TEST_WORDS = ["mangoustan", "mangosteen"]

@@ -6,6 +6,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, locale="fr-FR", service_workers="block")
     pg = ctx.new_page()
+    ctx.add_init_script("try{localStorage.setItem('carnet.open','1')}catch(e){}")  # le test de personnalité est ouvert (cadenas levé)
     pg.goto(BASE); pg.wait_for_timeout(400)
     def go(h, w=350):
         pg.evaluate("location.hash=%r" % h); pg.wait_for_timeout(w)

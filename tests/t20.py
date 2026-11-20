@@ -33,6 +33,7 @@ with sync_playwright() as p:
         tag = "%d" % vw
         ctx = b.new_context(viewport={"width": vw, "height": vh}, device_scale_factor=2 if vw in (320, 390) else 1, is_mobile=vw < 700, has_touch=True, locale="fr-FR", service_workers="block")
         pg = ctx.new_page()
+        ctx.add_init_script("try{localStorage.setItem('carnet.open','1')}catch(e){}")  # le test de personnalité est ouvert (cadenas levé)
         pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.on("console", lambda m: errs.append(m.text) if m.type == "error" else None)
 
@@ -102,6 +103,7 @@ with sync_playwright() as p:
     # ── 8) avant l'exécution du script principal : pas de clignotement (script du bas retiré)
     ctx = b.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True, service_workers="block")
     pg = ctx.new_page()
+    ctx.add_init_script("try{localStorage.setItem('carnet.open','1')}catch(e){}")  # le test de personnalité est ouvert (cadenas levé)
     ctx.add_init_script("try{localStorage.setItem('carnet.who','Daphne')}catch(e){}")
 
     def strip_main(route):
@@ -118,6 +120,7 @@ with sync_playwright() as p:
     # ── 9) vocabulaire : anciens liens et nouveaux noms
     ctx = b.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True, service_workers="block")
     pg = ctx.new_page()
+    ctx.add_init_script("try{localStorage.setItem('carnet.open','1')}catch(e){}")  # le test de personnalité est ouvert (cadenas levé)
     pg.on("pageerror", lambda e: errs.append(str(e)))
     pg.on("console", lambda m: errs.append(m.text) if m.type == "error" else None)
     pg.goto(BASE); pg.wait_for_timeout(300)

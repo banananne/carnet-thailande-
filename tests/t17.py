@@ -69,14 +69,14 @@ try:
         go("#/jeux"); ok(vis("#v-jeux"), "hub visible")
         r = imgs_ok("#v-jeux"); ok(r["n"] == 4 and not r["bad"], "hub : 4 doudous affichés %s" % r)
         # doudous
-        go("#/doudous", 400); r = imgs_ok("#v-doudous"); ok(r["n"] >= 4 and not r["bad"], "doudous : images OK %s" % r)
+        go("#/mascottes", 400); r = imgs_ok("#v-doudous"); ok(r["n"] >= 4 and not r["bad"], "doudous : images OK %s" % r)
         # quiz
         go("#/quiz"); pg.click('[data-qz="start"]'); pg.wait_for_timeout(120)
         for i in range(6):
             q = pg.locator(".qz-q").nth(i); q.locator(".qz-o").nth(1).click(); pg.wait_for_timeout(60); q.locator('[data-qz="next"]').click(); pg.wait_for_timeout(60)
         ok(vis("#qz-end"), "quiz hors-ligne : fin atteinte"); print("  score:", pg.inner_text("#qz-s"))
         # test du doudou
-        go("#/test-doudou"); pg.click('[data-dt="start"]'); pg.wait_for_timeout(120)
+        go("#/personnalite"); pg.click('[data-dt="start"]'); pg.wait_for_timeout(120)
         for i in range(10):
             pg.locator(".dt-q").nth(i).locator('.qz-o[data-who="minou"]').click(); pg.wait_for_timeout(40)
         ok(vis("#dt-res"), "test du doudou hors-ligne : résultat"); r = imgs_ok("#dt-res"); ok(r["n"] >= 1 and not r["bad"], "résultat : image OK %s" % r)

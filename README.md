@@ -3,10 +3,12 @@
 Cette branche ne sert qu'à garder une copie des fichiers qui fabriquent le site. Le site publié
 est sur la branche `main` (GitHub Pages) : ne rien publier ici.
 
-Dernière mise à jour : 20 novembre 2026, 22 h 30. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
-cartes taxi, convertisseur, Good to know) et étape 3 (jeux : quiz, test du doudou, blind test, mots mêlés,
-horoscope, doudous, passeport de tampons), publiées ensemble à 22 h 24 (branche `main`, commit 34db76e,
-version de construction 20261120-222245). Ces sources correspondent à ce qui est publié.
+Dernière mise à jour : 20 novembre 2026, 23 h 15. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
+cartes taxi, convertisseur, Good to know) et étape 3 (jeux : quiz, test de personnalité, blind test, mots mêlés,
+horoscope, mascottes, passeport de tampons), publiées ensemble à 22 h 24 (commit 34db76e), puis vague 1 des
+améliorations (accueil allégé à quatre rubriques, « Qui es-tu ? » qui se replie, « doudous » devenus « mascottes »,
+« test du doudou » devenu « test de personnalité ») publiée à 22 h 59 (branche `main`, commit fd09c91, version de
+construction 20261120-225758). Ces sources correspondent à ce qui est publié.
 
 ## Reconstruire le site
 1. Remettre `site_en_ligne/` dans `/home/claude/site_en_ligne/` et les autocollants de `stickers/`
@@ -29,18 +31,21 @@ version de construction 20261120-222245). Ces sources correspondent à ce qui es
 - `data_facts.json` : fun facts par jour. `data_step2.json` : lexique et bulles « Good to know »
   (extraits des pages du carnet par `_dev/extract_step2.py`).
 - `data_games.py` : textes et réglages des jeux qui ne viennent pas du PDF (joueurs du blind test, phrases
-  des doudous, mots des tampons, `PLAYLIST_URL` à remplir quand le lien arrive).
+  des mascottes (nommées `DOUDOUS` dans le code), mots des tampons, `PLAYLIST_URL` à remplir quand le lien arrive).
   `data_test_doudou.json`, `data_horoscope.json`, `data_motsmeles.json` : extraits des pages 19 à 23 du PDF
   (`_dev/extract_step3.py`, `_dev/extract_horoscope.py`, `_dev/ocr_grid.py` et `_dev/solve_grid.py` pour la grille).
 - `build_app.py` : fabrique les pages HTML (accueil, jours, hôtels, utile, métro, lexique, cartes taxi,
   convertisseur, Good to know, fenêtre « montrer en grand »).
-- `build_games.py` : pages des jeux (hub, quiz, test du doudou, doudous, blind test, mots mêlés, horoscope,
-  passeport, tampons en SVG), importé par `build_app.py`.
+- `build_games.py` : pages des jeux (hub, quiz, test de personnalité, mascottes, blind test, mots mêlés, horoscope,
+  passeport, tampons en SVG), importé par `build_app.py`. Le mot « doudou » reste dans les noms internes (clé de
+  mémoire `carnet.doudou`, tampon `doudou`, fichiers `img/doudou_*.webp`, ids `v-doudous`) pour que ceux qui ont
+  déjà joué gardent leurs données ; adresses `#/personnalite` et `#/mascottes` (les anciennes `#/test-doudou` et
+  `#/doudous` marchent encore).
 - `app.css`, `app.js` : style et comportement (navigation, photo du jour, copie, plan du métro, voix thaïe,
   lexique, cartes taxi, convertisseur).
 - `games.js`, `games.css` : comportement et style des jeux. `games.js` est collé dans `app.js` au moment du
   build (repère `/*@GAMES@*/`) et `games.css` est ajouté à `app.css`.
-- `img/` : les quatre doudous détourés (WebP), extraits de la page 23 du PDF.
+- `img/` : les quatre mascottes détourées (WebP), extraits de la page 23 du PDF.
 - `build_site.py` : assemble `web/`, service worker, manifest, `test.html` (depuis `template.html`).
 - `build.py` : point d'entrée (`python3 -I build.py`). `build_metro.py` : plan du métro en SVG léger.
   `make_qr.py` : QR code de l'adresse du site (PDF et SVG vectoriels).
@@ -54,5 +59,9 @@ sous `/carnet-thailande-/` comme GitHub Pages (`python3 serve.py 8765`). `t7.py`
 `thainum_test.js` : les nombres en thaï. Étape 3 : `t11.py` parcours et captures ; `t12.py` rendu des tampons ;
 `t13.py` quiz, test du doudou, blind test ; `t14.py` mots mêlés (souris) ; `t15.py` tampons, photo, horoscope,
 mot du doudou ; `t16.py` débordements de 320 à 768 px sur les vues des jeux ; `t17.py` hors réseau serveur coupé
-(lance son propre serveur sur le port 8766) ; `t18.py` et `t18b.py` mots mêlés avec de vrais événements tactiles.
+(lance son propre serveur sur le port 8766) ; `t18.py` et `t18b.py` mots mêlés avec de vrais événements tactiles
+(le test « le doigt sur la liste fait défiler la page » de t18 peut échouer à 390 px quand la page est déjà au
+bas : c'est un artéfact, t18b le vérifie correctement) ; `t19.py` captures d'aperçu. Vague 1 : `t20.py` accueil
+(première visite, choix du prénom, repli automatique, réouverture, clavier, rechargement, prénom inconnu, 5 largeurs,
+script d'en-tête sans clignotement) et vocabulaire (mascottes, test de personnalité, anciennes adresses).
 `test_photo_0..4.jpg` : petites photos pour tester la photo du jour. Les chemins de captures (variable `OUT`) sont à adapter.

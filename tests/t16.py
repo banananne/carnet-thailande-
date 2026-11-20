@@ -68,12 +68,12 @@ with sync_playwright() as p:
             q.locator('[data-qz="next"]').click(); pg.wait_for_timeout(80)
         check(pg, w, "quiz fin"); shot("quiz_fin")
         # test du doudou : intro, question, résultat
-        go("#/test-doudou"); check(pg, w, "test intro")
+        go("#/personnalite"); check(pg, w, "test intro")
         pg.click('[data-dt="start"]'); pg.wait_for_timeout(120); check(pg, w, "test question 1")
         for i in range(10):
             pg.locator(".dt-q").nth(i).locator('.qz-o[data-who="boop"]').click(); pg.wait_for_timeout(50)
         pg.wait_for_timeout(200); check(pg, w, "test résultat"); shot("test_res")
-        go("#/doudous"); check(pg, w, "doudous"); shot("doudous")
+        go("#/mascottes"); check(pg, w, "doudous"); shot("doudous")
         # blind test : grands scores
         pg.evaluate("localStorage.setItem('carnet.blind', %r)" % BLIND)
         pg.reload(); pg.wait_for_timeout(350); go("#/blind-test"); check(pg, w, "blind test (99/100)"); shot("blind")

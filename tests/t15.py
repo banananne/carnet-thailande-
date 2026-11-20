@@ -60,7 +60,7 @@ with sync_playwright() as p:
     go("#/jeux")
     print("hub passeport:", pg.inner_text('[data-hub="pass"]'))
     ok("sur 23" in pg.inner_text('[data-hub="pass"]'), "compteur passeport dans le hub")
-    go("#/"); print("tuile accueil:", pg.inner_text("[data-pass-count]"))
+    go("#/"); ok(pg.locator("[data-pass-count]").count() == 0, "l'accueil n'a plus la tuile Passeport (compteur dans le hub Jeux)")
     # ── passeport complet (via LS) + two-tap reset
     go("#/passeport")
     pg.click("#pp-reset"); ok("Sûr" in pg.inner_text("#pp-reset"), "reset armé"); pg.click("#pp-reset"); pg.wait_for_timeout(100)

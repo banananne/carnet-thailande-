@@ -42,19 +42,19 @@ def dd_img(key, cls="dd-img", lazy=True):
 # ───────────────────────── accueil des jeux ─────────────────────────
 HUB = [
     ("sand", "#/quiz", "question", "Quiz du 26 décembre", "6 questions, un cocktail à la clé", "quiz"),
-    ("rose", "#/test-doudou", "heart", "Test du doudou", "Quel doudou es-tu ?", "doudou"),
+    ("rose", "#/personnalite", "heart", "Test de personnalité", "Quelle mascotte es-tu ?", "doudou"),
     ("blue", "#/blind-test", "music", "Blind test", "Le tableau des scores", "blind"),
     ("mustard", "#/mots-meles", "grid", "Mots mêlés", "40 mots à trouver", "mots"),
     ("blue", "#/horoscope", "star", "Horoscope", "Les astres ont parlé", "horo"),
     ("sand", "#/passeport", "stamp", "Passeport", "Un tampon par jour", "pass"),
-    ("rose", "#/doudous", "paw", "Les doudous", "Aftonsparv, Boop Boops, Minou, Moomoo", "doudous"),
+    ("rose", "#/mascottes", "paw", "Les mascottes", "Aftonsparv, Boop Boops, Minou, Moomoo", "doudous"),
 ]
 
 
 def view_jeux():
     out = ('<main class="view" id="v-jeux" hidden>'
            '<header class="vhead"><div class="wrap"><div><h1 tabindex="-1">Jeux</h1><p>Pour la piscine, la route et les files d’attente</p></div></div></header>'
-           '<div class="wrap"><a class="ddrow" href="#/doudous" aria-label="Voir les quatre doudous">')
+           '<div class="wrap"><a class="ddrow" href="#/mascottes" aria-label="Voir les quatre mascottes">')
     for d in G.DOUDOUS:
         out += dd_img(d["key"], "dd-mini", lazy=False)
     out += '</a><div class="list">'
@@ -117,9 +117,9 @@ def dd_card(key):
 
 
 def view_doudous():
-    out = ('<main class="view" id="v-doudous" hidden>' + back_head("Les doudous", "Ils voyagent avec vous", "#/jeux")
-           + '<div class="wrap"><p class="how">Quatre doudous, quatre caractères. Ils ont leur avis sur tout, et ils vous guident jour après jour.</p>'
-           '<div class="acts"><a class="btn" href="#/test-doudou">%s Quel est le mien ?</a></div><div class="ddlist">' % icon("heart"))
+    out = ('<main class="view" id="v-doudous" hidden>' + back_head("Les mascottes", "Elles voyagent avec vous", "#/jeux")
+           + '<div class="wrap"><p class="how">Quatre mascottes, quatre caractères. Elles ont leur avis sur tout, et elles vous guident jour après jour.</p>'
+           '<div class="acts"><a class="btn" href="#/personnalite">%s Quelle est la mienne ?</a></div><div class="ddlist">' % icon("heart"))
     for d in G.DOUDOUS:
         out += dd_card(d["key"])
     return out + "</div></div></main>"
@@ -129,12 +129,12 @@ def view_test():
     qs = TEST["questions"]
     n = len(qs)
     intro = ("Pour chaque question, choisis la réponse qui te ressemble vraiment, pas celle que tu aimerais être. "
-             "À la fin, le doudou qui revient le plus souvent est le tien. Égalité ? Tes amis tranchent.")
-    out = ('<main class="view" id="v-test" hidden>' + back_head("Test du doudou", "Quel doudou es-tu ?", "#/jeux")
+             "À la fin, la mascotte qui revient le plus souvent est la tienne. Égalité ? Tes amis tranchent.")
+    out = ('<main class="view" id="v-test" hidden>' + back_head("Test de personnalité", "Quelle mascotte es-tu ?", "#/jeux")
            + '<div class="wrap"><section class="dt" id="dt" data-n="%d">' % n)
-    out += ('<div class="bubble rose dt-intro" id="dt-intro"><div class="dd-four">%s</div><h2>Quel doudou es-tu ?</h2><p>%s</p>'
+    out += ('<div class="bubble rose dt-intro" id="dt-intro"><div class="dd-four">%s</div><h2>Quelle mascotte es-tu ?</h2><p>%s</p>'
             '<div class="acts"><button class="btn" type="button" data-dt="start">Commencer</button></div>'
-            '<div id="dt-last" hidden><p class="dt-lastp">Ton dernier résultat : <b id="dt-lastn"></b></p><div class="acts"><button class="btn alt" type="button" data-dt="last">Revoir mon doudou</button></div></div></div>'
+            '<div id="dt-last" hidden><p class="dt-lastp">Ton dernier résultat : <b id="dt-lastn"></b></p><div class="acts"><button class="btn alt" type="button" data-dt="last">Revoir ma mascotte</button></div></div></div>'
             % ("".join(dd_img(d["key"], "dd-mini", lazy=False) for d in G.DOUDOUS), txt(intro)))
     for i, q in enumerate(qs):
         out += ('<article class="dt-q" data-i="%d" hidden><p class="qz-n">Question %d sur %d</p><div class="qz-bar" aria-hidden="true"><i style="width:%d%%"></i></div>'
@@ -352,7 +352,7 @@ def guide_html(day_id):
         return ""
     key, text = q
     d = DD[key]
-    return ('<a class="guide" href="#/doudous" style="--dd:%s">%s<p><b>%s</b>%s</p></a>' % (d["bg"], dd_img(key, "guide-img"), txt(d["short"]), txt("« %s »" % text)))
+    return ('<a class="guide" href="#/mascottes" style="--dd:%s">%s<p><b>%s</b>%s</p></a>' % (d["bg"], dd_img(key, "guide-img"), txt(d["short"]), txt("« %s »" % text)))
 
 
 def day_stamp_html(day_id):
@@ -366,14 +366,10 @@ def home_quip_html():
     data = esc(json.dumps([[k, t] for k, t in G.HOME_QUIPS], ensure_ascii=False, separators=(",", ":")))
     imgs = {k: "img/" + DD[k]["photo"] for k in DD}
     return ('<section class="bubble blue hq" id="hq" aria-labelledby="h-hq" data-q="%s" data-img="%s">'
-            '<h2 id="h-hq">Le mot du doudou</h2><div class="hq-in"><button class="hq-btn" type="button" id="hq-btn" aria-label="Un autre mot du doudou">'
+            '<h2 id="h-hq">Le mot de la mascotte</h2><div class="hq-in"><button class="hq-btn" type="button" id="hq-btn" aria-label="Un autre mot de la mascotte">'
             '%s<span class="hq-t"><b id="hq-who">%s</b><span id="hq-q">%s</span></span></button></div>'
-            '<p class="hq-hint">Touche le doudou pour un autre mot.</p></section>'
+            '<p class="hq-hint">Touche la mascotte pour un autre mot.</p></section>'
             % (data, esc(json.dumps(imgs)), dd_img(key, "hq-img", lazy=False).replace("<img ", '<img id="hq-img" ', 1), txt(d["short"]), txt("« %s »" % text)))
-
-
-def home_tiles_extra():
-    return [("rose", "#/jeux", "dice", "Jeux", "Quiz, doudous, mots mêlés"), ("blue", "#/passeport", "stamp", "Passeport", "Un tampon par jour")]
 
 
 def all_views():

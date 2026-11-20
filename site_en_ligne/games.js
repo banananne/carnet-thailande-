@@ -215,7 +215,7 @@ window.CarnetGames = (function () {
     return { reset: reset };
   })();
 
-  /* ───────────── test du doudou ───────────── */
+  /* ───────────── test de personnalité (mascottes) ───────────── */
   var Test = (function () {
     var root = $("#dt"), intro = $("#dt-intro"), qs = $$(".dt-q", root), tie = $("#dt-tie"), res = $("#dt-res");
     var cur = 0, ans = [];
@@ -225,7 +225,7 @@ window.CarnetGames = (function () {
     function paintLast() {
       var k = last(), box = $("#dt-last");
       box.hidden = !k; if (k) $("#dt-lastn").textContent = NAME[k];
-      hub("doudou", k ? "Ton doudou : " + NAME[k] : "");
+      hub("doudou", k ? "Ta mascotte : " + NAME[k] : "");
     }
     function reset() { cur = 0; ans = []; show(intro); paintLast(); }
     function showQ(i) { cur = i; show(qs[i]); window.scrollTo(0, 0); focusTitle(qs[i]); }
@@ -235,10 +235,10 @@ window.CarnetGames = (function () {
       var c = $("#dd-" + key).cloneNode(true); c.removeAttribute("id");
       var kick = $(".dd-kick", c), h = $("h2", c);
       var name = kick.textContent, epi = h.textContent;
-      kick.textContent = "Ton doudou"; h.textContent = "Tu es " + name + ", " + lc(epi);
+      kick.textContent = "Ta mascotte"; h.textContent = "Tu es " + name + ", " + lc(epi);
       res.innerHTML = ""; res.appendChild(c);
       var acts = document.createElement("div"); acts.className = "acts";
-      acts.innerHTML = '<button class="btn" type="button" data-dt="start">Refaire le test</button><a class="btn alt" href="#/doudous">Les quatre doudous</a>';
+      acts.innerHTML = '<button class="btn" type="button" data-dt="start">Refaire le test</button><a class="btn alt" href="#/mascottes">Les quatre mascottes</a>';
       res.appendChild(acts);
       show(res); window.scrollTo(0, 0); focusTitle(res);
       if (!again) { Stamps.bonus("doudou", true); Confetti.burst(null, null, 70); }
@@ -471,7 +471,7 @@ window.CarnetGames = (function () {
     };
   })();
 
-  /* ───────────── le mot du doudou (accueil) ───────────── */
+  /* ───────────── le mot de la mascotte (accueil) ───────────── */
   (function () {
     var hq = $("#hq"); if (!hq) return;
     var list = [], imgs = {}, last = -1;

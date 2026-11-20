@@ -13,7 +13,7 @@ with sync_playwright() as p:
     pg.screenshot(path=OUT+"s3_home_top.png")
     pg.evaluate("window.scrollTo(0, document.body.scrollHeight)"); pg.wait_for_timeout(300)
     pg.screenshot(path=OUT+"s3_home_bottom.png")
-    for name,h in [("jeux","#/jeux"),("quiz","#/quiz"),("test","#/test-doudou"),("doudous","#/doudous"),("blind","#/blind-test"),("mots","#/mots-meles"),("horo","#/horoscope"),("pass","#/passeport")]:
+    for name,h in [("jeux","#/jeux"),("quiz","#/quiz"),("test","#/personnalite"),("doudous","#/mascottes"),("blind","#/blind-test"),("mots","#/mots-meles"),("horo","#/horoscope"),("pass","#/passeport")]:
         pg.evaluate("location.hash=%r"%h); pg.wait_for_timeout(500)
         vis = pg.evaluate("[...document.querySelectorAll('.view')].filter(v=>!v.hidden).map(v=>v.id)")
         print(name, vis, pg.evaluate("document.title"))

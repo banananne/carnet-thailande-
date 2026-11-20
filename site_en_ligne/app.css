@@ -70,6 +70,21 @@ a,button,label,summary,.chip{touch-action:manipulation}
 .who button[aria-pressed="true"]{background:var(--sand);box-shadow:inset 0 0 0 2.5px var(--bordeaux)}
 .hello{margin-top:.9rem;padding:.8rem 1rem;border-radius:16px;background:var(--rose);color:var(--wine);font-weight:500}
 .hello b{font-weight:700}
+#who-box>h2{font-weight:700;font-size:1.55rem;line-height:1.05;color:var(--bordeaux)}
+.who-bar{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:8px 10px;border:0;border-radius:16px;background:var(--white);color:var(--ink);font:600 1.05rem/1.2 var(--font-body);text-align:left;cursor:pointer;
+  box-shadow:inset 0 0 0 2px var(--blue-d);-webkit-tap-highlight-color:transparent}
+.who-bar[hidden],#who-box[hidden]{display:none}
+.has-who #who-box{display:none}
+.has-who #who-bar[hidden]{display:flex!important;visibility:hidden}
+.who-bar.open{margin-bottom:1rem}
+.who-av{display:grid;flex:none}
+.who-av .ini{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;font:800 1.2rem/1 var(--font-display)}
+.who-hi{flex:1;min-width:0}
+.who-hi b{font-weight:700}
+.who-chg{display:inline-flex;align-items:center;gap:2px;flex:none;padding:.4em .45em .4em .85em;border-radius:99px;background:var(--blue);color:var(--ink);font:700 .78rem/1.1 var(--font-body);letter-spacing:.04em}
+.who-chv{display:grid;place-items:center}
+.who-chv svg{width:15px;height:15px;transform:rotate(90deg);transition:transform .2s}
+.who-bar.open .who-chv svg{transform:rotate(-90deg)}
 
 /* Tuiles d'accueil */
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:1rem}

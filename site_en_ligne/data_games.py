@@ -10,13 +10,13 @@ PLAYERS = [("Arthur", "#283881", "#FFFFFF"), ("Daphne", "#E9A9B8", "#5B1025"), (
 # ───────────── les quatre doudous (clé = celle du test : ★ aftonsparv, ■ boop, ▲ minou, ● moomoo) ─────────────
 DOUDOUS = [
     dict(key="aftonsparv", name="Aftonsparv", short="Aftonsparv", bg="#F7D294",
-         alt="Aftonsparv, doudou extraterrestre vert en maillot argenté", photo="doudou_aftonsparv.webp"),
+         alt="Aftonsparv, mascotte extraterrestre verte en maillot argenté", photo="doudou_aftonsparv.webp"),
     dict(key="boop", name="Boop Boops", short="Boop", bg="#CCD9F4",
-         alt="Boop Boops, doudou homard orange en bonnet de Père Noël", photo="doudou_boop.webp"),
+         alt="Boop Boops, mascotte en forme de homard orange, en bonnet de Père Noël", photo="doudou_boop.webp"),
     dict(key="minou", name="Minou minou the dark lord", short="Minou", bg="#F5E6E9",
-         alt="Minou minou the dark lord, doudou chat noir", photo="doudou_minou.webp"),
+         alt="Minou minou the dark lord, mascotte en forme de chat noir", photo="doudou_minou.webp"),
     dict(key="moomoo", name="Moomoo", short="Moomoo", bg="#FCE9C5",
-         alt="Moomoo, doudou vache noir et blanc", photo="doudou_moomoo.webp"),
+         alt="Moomoo, mascotte en forme de vache noire et blanche", photo="doudou_moomoo.webp"),
 ]
 
 # petits mots tirés au hasard sur l'accueil (le premier de chaque doudou est sa phrase du carnet)
@@ -79,7 +79,7 @@ STAMP_WORDS = {
 # (clé, mot du tampon, titre affiché, comment on le gagne)
 BONUS_STAMPS = [
     ("quiz", "QUIZZZZ", "Quiz", "Aller au bout du quiz du 26 décembre"),
-    ("doudou", "DOUDOU", "Doudou", "Faire le test du doudou"),
+    ("doudou", "MASCOTTE", "Mascotte", "Faire le test de personnalité"),
     ("mots", "MOTS MÊLÉS", "Mots mêlés", "Trouver les 40 mots"),
     ("blind", "BLIND TEST", "Blind test", "Marquer un point au blind test"),
     ("etoiles", "ÉTOILES", "Horoscope", "Lire l’horoscope du voyage"),

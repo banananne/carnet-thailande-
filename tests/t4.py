@@ -58,11 +58,11 @@ with sync_playwright() as p:
     ok(pg.evaluate("document.querySelector('.chip[data-day=\"2026-12-20\"]').classList.contains('has')"), "pastille retrouvée")
     ok("Bonjour" in pg.inner_text("#hello") or True, "prénom (page accueil)")
     pg.evaluate("location.hash = '#/'"); pg.wait_for_timeout(400)
-    ok("Anne" in pg.inner_text("#hello"), "prénom retrouvé : " + pg.inner_text("#hello"))
-    ok("1 sur 17" in pg.inner_text("[data-photo-count]"), "compteur d'accueil : " + pg.inner_text("[data-photo-count]"))
-    # tuile photo -> jour + ancre photo
-    pg.click("[data-photo-tile]"); pg.wait_for_timeout(500)
-    ok(pg.evaluate("location.hash") == "#/jours/2026-12-20/photo", "tuile Photo du jour -> " + pg.evaluate("location.hash"))
+    ok("Anne" in pg.inner_text("#who-hi") and pg.is_visible("#who-bar") and not pg.is_visible("#who-box"), "prénom retrouvé, bloc replié : " + pg.inner_text("#who-hi"))
+    ok(pg.locator("[data-photo-tile]").count() == 0, "plus de tuile Photo du jour sur l'accueil (elle reste dans chaque jour)")
+    # lien direct -> jour + ancre photo
+    pg.evaluate("location.hash = '#/jours/2026-12-20/photo'"); pg.wait_for_timeout(500)
+    ok(pg.evaluate("location.hash") == "#/jours/2026-12-20/photo", "lien direct Photo du jour -> " + pg.evaluate("location.hash"))
     top = pg.evaluate("document.querySelector('#d-2026-12-20 .snap').getBoundingClientRect().top")
     ok(top < 150, "la section photo est en haut de l'écran (top=%d)" % top)
     # --- enlever
@@ -90,12 +90,12 @@ with sync_playwright() as p:
     print("     caches :", keys[0], len(keys[1]), "entrées")
     ctx.set_offline(True)
     pg.reload(wait_until="load"); pg.wait_for_timeout(800)
-    ok(pg.is_visible("#v-home") and "Thaïlande" in pg.inner_text("#v-home h1"), "hors réseau : l'accueil s'ouvre")
+    ok(pg.is_visible("#v-home") and "thaïlande" in pg.inner_text("#v-home h1").lower(), "hors réseau : l'accueil s'ouvre (%r)" % pg.inner_text("#v-home h1"))
     pg.evaluate("location.hash = '#/metro'")
     pg.wait_for_selector("#mv-stage svg", timeout=8000)
     ok(True, "hors réseau : le plan du métro se charge")
     pg.goto(URL + "test.html", wait_until="load"); pg.wait_for_timeout(500)
-    ok("Test du téléphone" in pg.inner_text("body"), "hors réseau : test.html s'ouvre")
+    ok("test du téléphone" in pg.inner_text("body").lower(), "hors réseau : test.html s'ouvre")
     ctx.set_offline(False)
     errs = [l for l in logs if l[0] in ("error", "pageerror")]
     print("ERREURS:", len(errs), errs[:4])

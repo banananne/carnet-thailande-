@@ -520,17 +520,22 @@ def view_home(version):
     out = ('<main class="view" id="v-home">'
            '<header class="hero"><div class="wrap">'
            '<p class="eyebrow">Carnet de voyage</p><h1>Thaïlande <span>2026</span></h1>'
-           '<p class="dates">19.12.2026 — 03.01.2027</p><p class="lead">Le carnet papier, version téléphone.</p>'
+           '<p class="dates">19.12.2026 — 03.01.2027</p>'
            '<button class="stk stk-ele" id="ele" type="button" aria-label="L’éléphant te salue">%s</button>'
            '<button class="stk stk-tuk" id="tuk" type="button" aria-label="Le tuk-tuk démarre">%s</button>'
            '</div></header><div class="wrap">'
            % (sticker("elephant"), sticker("tuktuk")))
-    out += ('<section class="sec" aria-labelledby="h-who"><h2 id="h-who">Qui es-tu ?</h2>'
-            '<p class="sub">Ton prénom reste sur ce téléphone.</p><div class="who" id="who" role="group" aria-label="Choisis ton prénom">')
+    out += ('<section class="sec" id="who-sec" aria-labelledby="h-who">'
+            '<button class="who-bar" id="who-bar" type="button" aria-expanded="false" aria-controls="who-box" hidden>'
+            '<span class="who-av" id="who-av" aria-hidden="true"></span><span class="who-hi" id="who-hi"></span>'
+            '<span class="who-chg">Changer<span class="who-chv">%s</span></span></button>'
+            '<div id="who-box"><h2 id="h-who">Qui es-tu ?</h2>'
+            '<p class="sub">Ton prénom reste sur ce téléphone.</p><div class="who" id="who" role="group" aria-label="Choisis ton prénom">'
+            % icon("chevr"))
     for n, bg, fg in who:
         out += ('<button type="button" data-n="%s" aria-pressed="false"><span class="ini" style="background:%s;color:%s">%s</span>%s</button>'
                 % (n, bg, fg, n[0], n))
-    out += '</div><p class="hello" id="hello" role="status">Appuie sur ton prénom.</p></section>'
+    out += '</div><p class="hello" id="hello" role="status">Appuie sur ton prénom.</p></div></section>'
 
     out += '<section class="bubble blue" aria-labelledby="h-trip"><h2 id="h-trip">Le voyage</h2><div class="trip"><div class="tmap">%s</div><ul class="stages">' % thai_map_svg()
     for s in D.STAGES:
@@ -542,19 +547,14 @@ def view_home(version):
                 % (s["first"], s["first"], s["color"], txt(s["city"]), txt(s["dates"]), txt(h["name"]), icon("chevr")))
     out += "</ul></div></section>"
 
-    tiles = [("sand", "#/jours", "calendar", "Jours", "18 décembre → 3 janvier", ""),
-             ("blue", "#/hotels", "bed", "Hôtels", "Adresses et téléphones", ""),
-             ("mustard", "#/jours", "camera", "Photo du jour", "Un polaroïd par jour", " data-photo-tile"),
-             ("rose", "#/metro", "train", "Métro", "Plan de Bangkok à zoomer", ""),
-             ("blue", "#/lexique", "book", "Lexique", "Du thaï à montrer ou écouter", ""),
-             ("sand", "#/taxi", "car", "Cartes taxi", "Les hôtels écrits en thaï", ""),
-             ("rose", "#/jeux", "dice", "Jeux", "Quiz, doudous, mots mêlés", ""),
-             ("blue", "#/passeport", "stamp", "Passeport", "Un tampon par jour", " data-pass-tile")]
+    # l'accueil ne garde que l'essentiel : le reste est dans la barre du bas (Jeux, Utile)
+    tiles = [("sand", "#/jours", "calendar", "Jours", "18 décembre → 3 janvier"),
+             ("blue", "#/hotels", "bed", "Hôtels", "Adresses et téléphones"),
+             ("rose", "#/metro", "train", "Métro", "Plan de Bangkok à zoomer"),
+             ("mustard", "#/taxi", "car", "Cartes taxi", "Les hôtels écrits en thaï")]
     out += '<div class="tiles">'
-    for col, href, ic, t, sub, extra in tiles:
-        attr = " data-photo-count" if "photo" in extra else " data-pass-count" if "pass" in extra else ""
-        small = "<small%s>%s</small>" % (attr, txt(sub))
-        out += '<a class="tile %s" href="%s"%s><span class="ic">%s</span><span><b>%s</b>%s</span></a>' % (col, href, extra, icon(ic), txt(t), small)
+    for col, href, ic, t, sub in tiles:
+        out += '<a class="tile %s" href="%s"><span class="ic">%s</span><span><b>%s</b><small>%s</small></span></a>' % (col, href, icon(ic), txt(t), txt(sub))
     out += "</div>"
 
     import build_games as BG
@@ -589,5 +589,7 @@ def render(version, head_meta):
     assert "/*@GAMES@*/" in js
     js = js.replace("/*@GAMES@*/", open(os.path.join(ROOT, "games.js"), encoding="utf-8").read())
     assert "</script" not in js
-    return ('<!doctype html><html lang="fr" data-v="%s"><head>%s<title>Carnet Thaïlande 2026</title>%s<style>%s</style></head><body>%s<script>%s</script></body></html>\n'
-            % (esc(version), head_meta, font_css(), css_text(), body, js))
+    # prénom déjà choisi : on masque « Qui es-tu ? » dès le premier affichage (pas de clignotement avant que le script du bas ne s'exécute)
+    early = '<script>try{if(localStorage.getItem("carnet.who"))document.documentElement.classList.add("has-who")}catch(e){}</script>'
+    return ('<!doctype html><html lang="fr" data-v="%s"><head>%s%s<title>Carnet Thaïlande 2026</title>%s<style>%s</style></head><body>%s<script>%s</script></body></html>\n'
+            % (esc(version), head_meta, early, font_css(), css_text(), body, js))

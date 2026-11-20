@@ -46,7 +46,7 @@ with sync_playwright() as p:
     ok("quiz" in stamps["b"], "tampon quiz gagné")
     go("#/jeux"); print("hub quiz:", pg.inner_text('[data-hub="quiz"]'))
     # ───── Test du doudou ─────
-    go("#/test-doudou")
+    go("#/personnalite")
     pg.click('[data-dt="start"]'); pg.wait_for_timeout(100)
     # toujours la 1re réponse -> compter selon data-who
     whos=pg.evaluate("[...document.querySelectorAll('.dt-q')].map(q=>q.querySelector('.qz-o').dataset.who)")

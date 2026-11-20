@@ -88,30 +88,49 @@ bump("ele", "wig", function () { var p = POL.get(); return "Sawasdee " + (p || "
 bump("tuk", "drive", "Pouet pouet !");
 
 /* ───────────── qui es-tu ───────────── */
-var who = $("#who"), hello = $("#hello");
-function paintWho() {
-  var me = LS.get("carnet.who", "");
-  $$("button", who).forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-n") === me ? "true" : "false"); });
-  hello.textContent = "";
-  if (me) {
-    var bn = document.createElement("b"); bn.textContent = me;
-    hello.appendChild(document.createTextNode("Bonjour ")); hello.appendChild(bn); hello.appendChild(document.createTextNode(" !"));
-  } else hello.textContent = "Appuie sur ton prénom.";
+var who = $("#who"), hello = $("#hello"), whoBox = $("#who-box"), whoBar = $("#who-bar"), whoHi = $("#who-hi"), whoAv = $("#who-av"), whoT = 0;
+function hi(el, me) {   /* « Bonjour <b>Anne</b> ! » */
+  var bn = document.createElement("b"); bn.textContent = me;
+  el.textContent = ""; el.appendChild(document.createTextNode("Bonjour ")); el.appendChild(bn); el.appendChild(document.createTextNode(" !"));
 }
+function whoOpen(open) {
+  whoBox.hidden = !open;
+  whoBar.setAttribute("aria-expanded", open ? "true" : "false");
+  whoBar.classList.toggle("open", open);
+}
+function paintWho() {
+  var me = LS.get("carnet.who", ""), sel = null;
+  $$("button", who).forEach(function (b) {
+    var on = b.getAttribute("data-n") === me;
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+    if (on) sel = b;
+  });
+  whoAv.textContent = "";
+  if (me && sel) {
+    hi(hello, me); hi(whoHi, me);
+    var ini = $(".ini", sel); if (ini) whoAv.appendChild(ini.cloneNode(true));
+  } else { hello.textContent = "Appuie sur ton prénom."; whoBar.hidden = true; }
+}
+/* une fois le prénom choisi, le bloc se replie (la ligne « Bonjour … Changer » le rouvre) */
+whoBar.addEventListener("click", function () { clearTimeout(whoT); whoOpen(whoBox.hidden); });
 who.addEventListener("click", function (e) {
   var b = e.target.closest ? e.target.closest("button") : null; if (!b) return;
   LS.set("carnet.who", b.getAttribute("data-n")); paintWho();
+  clearTimeout(whoT);
+  whoT = setTimeout(function () { whoBar.hidden = false; whoOpen(false); try { whoBar.focus({ preventScroll: true }); } catch (x) {} }, 550);
 });
 paintWho();
+if ($('button[aria-pressed="true"]', who)) { whoBar.hidden = false; whoOpen(false); } else whoOpen(true);
+document.documentElement.classList.remove("has-who");
 
 /* ───────────── navigation ───────────── */
 var NAMES = { "": "home", jours: "days", hotels: "hotels", utile: "utile", metro: "metro", lexique: "lexique", taxi: "taxi", convertisseur: "convert", "good-to-know": "gtk",
-  jeux: "jeux", quiz: "quiz", "test-doudou": "test", doudous: "doudous", "blind-test": "blind", "mots-meles": "mots", horoscope: "horo", passeport: "pass" };
+  jeux: "jeux", quiz: "quiz", "test-doudou": "test", personnalite: "test", doudous: "doudous", mascottes: "doudous", "blind-test": "blind", "mots-meles": "mots", horoscope: "horo", passeport: "pass" };
 var NAV_OF = { home: "home", days: "days", hotels: "hotels", utile: "utile", metro: "utile", lexique: "utile", taxi: "utile", convert: "utile", gtk: "utile",
   jeux: "jeux", quiz: "jeux", test: "jeux", doudous: "jeux", blind: "jeux", mots: "jeux", horo: "jeux", pass: "jeux" };
 var TITLES = { home: "Carnet Thaïlande 2026", days: "Jours · Carnet Thaïlande", hotels: "Hôtels · Carnet Thaïlande", utile: "Utile · Carnet Thaïlande", metro: "Plan du métro · Carnet Thaïlande",
   lexique: "Lexique · Carnet Thaïlande", taxi: "Cartes taxi · Carnet Thaïlande", convert: "Convertisseur · Carnet Thaïlande", gtk: "Good to know · Carnet Thaïlande",
-  jeux: "Jeux · Carnet Thaïlande", quiz: "Quiz · Carnet Thaïlande", test: "Test du doudou · Carnet Thaïlande", doudous: "Les doudous · Carnet Thaïlande",
+  jeux: "Jeux · Carnet Thaïlande", quiz: "Quiz · Carnet Thaïlande", test: "Test de personnalité · Carnet Thaïlande", doudous: "Les mascottes · Carnet Thaïlande",
   blind: "Blind test · Carnet Thaïlande", mots: "Mots mêlés · Carnet Thaïlande", horo: "Horoscope · Carnet Thaïlande", pass: "Passeport · Carnet Thaïlande" };
 var days = $$(".day").map(function (a) { return a.getAttribute("data-id"); });
 var curDay = null, curName = "";

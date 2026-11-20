@@ -195,8 +195,8 @@ with sync_playwright() as p:
 
     # ---- accueil + titres
     pg.goto(URL, wait_until="load"); pg.wait_for_timeout(300)
-    check("Accueil : 6 tuiles", pg.locator("#v-home .tiles .tile").count() == 6)
-    check("Accueil : « Bientôt » mis à jour", "doudous" in pg.inner_text("#v-home .bubble.sand") and "Lexique" not in pg.inner_text("#v-home .bubble.sand"))
+    check("Accueil : 8 tuiles (étape 3 : + Jeux et Passeport)", pg.locator("#v-home .tiles .tile").count() == 8)
+    check("Accueil : « Le mot du doudou » remplace la bulle « Bientôt » (étape 3)", pg.locator("#v-home #hq").count() == 1 and pg.inner_text("#hq-q").strip() != "")
     pg.click("#ele"); pg.wait_for_timeout(100)
     check("Éléphant : Sawasdee kha", "Sawasdee kha" in pg.inner_text("#toast"), pg.inner_text("#toast"))
     pg.screenshot(path=OUT + "s2_home.png", full_page=True)

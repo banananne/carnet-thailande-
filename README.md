@@ -3,9 +3,10 @@
 Cette branche ne sert qu'à garder une copie des fichiers qui fabriquent le site. Le site publié
 est sur la branche `main` (GitHub Pages) : ne rien publier ici.
 
-Dernière mise à jour : 20 novembre 2026, 22 h. Contenu : étape 1 (en ligne), étape 2 (lexique,
+Dernière mise à jour : 20 novembre 2026, 22 h 30. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
 cartes taxi, convertisseur, Good to know) et étape 3 (jeux : quiz, test du doudou, blind test, mots mêlés,
-horoscope, doudous, passeport de tampons), prêtes et testées en local mais pas encore publiées.
+horoscope, doudous, passeport de tampons), publiées ensemble à 22 h 24 (branche `main`, commit 34db76e,
+version de construction 20261120-222245). Ces sources correspondent à ce qui est publié.
 
 ## Reconstruire le site
 1. Remettre `site_en_ligne/` dans `/home/claude/site_en_ligne/` et les autocollants de `stickers/`

@@ -2,6 +2,7 @@
   "name": "Carnet Thaïlande 2026",
   "short_name": "Thaïlande",
   "lang": "fr",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

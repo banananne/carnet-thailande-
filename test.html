@@ -1,0 +1,574 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#A51C36"><meta name="robots" content="noindex,nofollow,noarchive"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Thaïlande"><meta name="format-detection" content="telephone=no"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="icons/icon.svg"><link rel="icon" type="image/png" sizes="64x64" href="icons/favicon.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><title>Test du téléphone · Carnet Thaïlande</title><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px);background:#FFFCF6}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<style>@font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/barlow-latin-400-normal.woff2') format('woff2')}@font-face{font-family:'Barlow';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/barlow-latin-500-normal.woff2') format('woff2')}@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/barlow-latin-600-normal.woff2') format('woff2')}@font-face{font-family:'Barlow';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/barlow-latin-700-normal.woff2') format('woff2')}@font-face{font-family:'Barlow';font-style:italic;font-weight:400;font-display:swap;src:url('fonts/barlow-latin-400-italic.woff2') format('woff2')}@font-face{font-family:'Barlow';font-style:italic;font-weight:600;font-display:swap;src:url('fonts/barlow-latin-600-italic.woff2') format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/barlow-condensed-latin-700-normal.woff2') format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:800;font-display:swap;src:url('fonts/barlow-condensed-latin-800-normal.woff2') format('woff2')}@font-face{font-family:'Libre Baskerville';font-style:italic;font-weight:400;font-display:swap;src:url('fonts/libre-baskerville-latin-400-italic.woff2') format('woff2')}@font-face{font-family:'Noto Sans Thai';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/noto-sans-thai-thai-500-normal.woff2') format('woff2');unicode-range:U+0E01-0E5B,U+200C-200D,U+25CC}@font-face{font-family:'Noto Sans Thai';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/noto-sans-thai-thai-600-normal.woff2') format('woff2');unicode-range:U+0E01-0E5B,U+200C-200D,U+25CC}</style>
+<style>
+/* Look unique, volontairement clair : les couleurs du carnet imprimé.
+   Mise en page : bandeau bordeaux avec autocollants, puis bulles sable et bleu comme les pages du carnet, polaroïd pour la photo du jour. */
+:root{
+  --bordeaux:#A51C36; --wine:#5B1025; --navy:#283881; --ink:#1B2557;
+  --sand:#F7D294; --mustard:#F2A71B; --blue:#CCD9F4; --blue-d:#B3C4EB; --rose:#F5E6E9; --rose-d:#E9A9B8;
+  --paper:#FFFCF6; --white:#FFFFFF; --text:#1F2548; --muted:#566086; --line:rgba(40,56,129,.2);
+  --ok:#1E7B4F; --warn:#B25E00; --bad:#B3261E;
+  --font-body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-display:"Barlow Condensed","Barlow",system-ui,sans-serif;
+  --font-voice:"Libre Baskerville",Georgia,"Times New Roman",serif;
+  --font-thai:"Noto Sans Thai","Thonburi","Leelawadee UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--text);font:400 16px/1.5 var(--font-body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.02em;margin:0;text-wrap:balance}
+p{margin:0}
+svg.i{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+:focus-visible{outline:3px solid var(--mustard);outline-offset:2px}
+
+/* Bandeau */
+.hero{background:var(--bordeaux);color:var(--white);position:relative;overflow:hidden;
+  margin-top:calc(-1 * env(safe-area-inset-top,0px));padding-top:calc(env(safe-area-inset-top,0px) + 1.5rem);padding-bottom:2.1rem}
+.hero .wrap{position:relative;min-height:176px}
+.eyebrow{display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem;font:600 .78rem/1 var(--font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--sand)}
+.eyebrow .v{padding:.28em .6em;border-radius:99px;background:var(--sand);color:var(--wine);letter-spacing:.08em}
+.hero h1{font-weight:800;font-size:clamp(3rem,15.5vw,4.5rem);line-height:.9;color:var(--sand)}
+.hero h1 span{display:block;color:var(--white)}
+.dates{margin-top:.9rem;font:600 .98rem/1.2 var(--font-body);letter-spacing:.08em}
+.lead{margin-top:.45rem;max-width:11.2rem;color:#FBDDE3;font-family:var(--font-voice);font-style:italic;font-size:.88rem;line-height:1.5}
+.stk{position:absolute;border:0;padding:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.stk svg{display:block;width:100%;height:auto;overflow:visible}
+.stk-ele{right:16px;top:-2px;width:88px;transform:rotate(6deg)}
+.stk-tuk{right:30px;bottom:-4px;width:128px}
+@media (max-width:389px){.dates{font-size:.9rem;letter-spacing:.05em}.stk-tuk{right:22px;width:114px}}
+.wig{animation:wig .7s ease-in-out}
+.drive{animation:drive 1.8s ease-in-out}
+@keyframes wig{0%,100%{transform:rotate(6deg)}25%{transform:rotate(-9deg) scale(1.05)}60%{transform:rotate(13deg) scale(1.03)}}
+@keyframes drive{0%{transform:translateX(0)}46%{transform:translateX(220px)}47%{transform:translateX(-260px)}100%{transform:translateX(0)}}
+
+/* Sections */
+.sec{padding-block:1.7rem 0}
+.sec h2{font-weight:700;font-size:1.55rem;line-height:1.05;color:var(--bordeaux)}
+.sec .sub{margin-top:.35rem;color:var(--muted);font-size:.95rem}
+
+/* Qui es-tu */
+.who{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:1rem}
+.who button{display:flex;align-items:center;gap:12px;min-height:58px;padding:8px 14px 8px 10px;border:0;border-radius:16px;background:var(--white);color:var(--ink);font:600 1.08rem/1 var(--font-body);text-align:left;cursor:pointer;
+  box-shadow:inset 0 0 0 2px var(--blue-d);-webkit-tap-highlight-color:transparent}
+.who .ini{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;font:800 1.2rem/1 var(--font-display);flex:none}
+.who button[aria-pressed="true"]{background:var(--sand);box-shadow:inset 0 0 0 2.5px var(--bordeaux)}
+.hello{margin-top:.9rem;padding:.8rem 1rem;border-radius:16px;background:var(--rose);color:var(--wine);font-weight:500}
+.hello b{font-weight:700}
+
+/* Bulles */
+.bubble{margin-top:1.7rem;padding:20px 16px 18px;border-radius:22px}
+.bubble.sand{background:var(--sand)}
+.bubble.blue{background:var(--blue)}
+.bubble>h2{margin-bottom:.2rem;font-weight:700;font-size:1.55rem;line-height:1.05;color:var(--bordeaux)}
+.feat{list-style:none;margin:.9rem 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 12px}
+.feat li{display:flex;align-items:center;gap:10px;font-weight:500;line-height:1.2;color:var(--wine)}
+.feat .ic{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.62);color:var(--bordeaux);flex:none}
+
+/* Test */
+.row{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:16px 0 4px;border-top:1px solid var(--line);margin-top:14px}
+.bubble.blue>.row:first-of-type{margin-top:.9rem}
+.row .ic{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--white);color:var(--navy)}
+.row h3{font-weight:700;font-size:1.2rem;line-height:1.1;color:var(--bordeaux)}
+.hint{margin-top:.25rem;color:var(--ink);font-size:.95rem}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:.7rem}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border:0;border-radius:99px;background:var(--navy);color:var(--white);
+  font:600 1rem/1 var(--font-body);text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.btn.alt{background:var(--white);color:var(--navy);box-shadow:inset 0 0 0 2px var(--navy)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
+.status{display:flex;gap:8px;align-items:baseline;margin-top:.6rem;color:var(--muted);font-size:.92rem;line-height:1.35}
+.status::before{content:"";flex:none;width:10px;height:10px;border-radius:50%;background:var(--blue-d);box-shadow:inset 0 0 0 2px var(--navy);transform:translateY(1px)}
+.status[data-s="ok"]{color:var(--ok)}.status[data-s="ok"]::before{background:var(--ok);box-shadow:none}
+.status[data-s="warn"]{color:var(--warn)}.status[data-s="warn"]::before{background:var(--warn);box-shadow:none}
+.status[data-s="bad"]{color:var(--bad)}.status[data-s="bad"]::before{background:var(--bad);box-shadow:none}
+.thai{margin-top:.6rem;font:600 2.1rem/1.3 var(--font-thai);color:var(--ink)}
+.rom{font-size:.9rem;color:var(--muted);font-style:italic}
+
+/* Polaroïd */
+.polaroid{margin:20px auto 8px;width:min(100%,290px);padding:12px 12px 14px;background:var(--white);border-radius:4px;transform:rotate(-2deg);
+  box-shadow:0 1px 2px rgba(27,37,87,.22),0 12px 26px rgba(27,37,87,.2)}
+.polaroid .ph{aspect-ratio:4/5;overflow:hidden;border-radius:2px;background:#E7ECF8}
+.polaroid img{display:block;width:100%;height:100%;object-fit:cover}
+.polaroid.dev img{animation:develop 2.4s ease-out both}
+@keyframes develop{from{filter:blur(9px) brightness(1.7) saturate(.15);opacity:.35}to{filter:none;opacity:1}}
+.polaroid figcaption{padding-top:10px}
+.polaroid input{width:100%;padding:6px 0;border:0;border-bottom:1px dashed var(--line);border-radius:0;background:transparent;color:var(--ink);font:italic 400 .95rem/1.3 var(--font-voice)}
+.polaroid .date{display:block;margin-top:7px;font:500 .76rem/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* Rapport */
+.rep{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.rep summary{font:700 1.1rem/1.2 var(--font-display);letter-spacing:.02em;text-transform:uppercase;color:var(--bordeaux);cursor:pointer}
+.rep pre{margin:.7rem 0 0;padding:12px;border-radius:12px;background:var(--white);color:var(--ink);font:500 .78rem/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
+
+.foot{padding-block:2rem calc(2.2rem + env(safe-area-inset-bottom,0px));color:var(--muted);font-size:.85rem;text-align:center}
+
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:20;max-width:calc(100% - 32px);padding:11px 18px;border-radius:99px;background:var(--ink);color:var(--white);
+  font:600 .95rem/1.2 var(--font-body);opacity:0;transform:translate(-50%,12px);transition:opacity .2s,transform .2s;pointer-events:none}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <a class="btn alt" href="./" style="min-height:40px;padding:0 16px;font-size:.95rem;margin-bottom:1rem">‹ Retour au carnet</a><p class="eyebrow">Carnet en ligne <span class="v">test</span></p>
+    <h1>Thaïlande <span>2026</span></h1>
+    <p class="dates">19.12.2026 — 03.01.2027</p>
+    <p class="lead">Quelques essais pour vérifier ton téléphone.</p>
+    <button class="stk stk-ele" id="ele" type="button" aria-label="L'éléphant te salue"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37.2000 37.2000"><g><g transform="translate(18.600 18.600)"><g transform="translate(0.300 0.450)" opacity="0.22"><g transform="rotate(0.00) scale(0.34000 0.34000) translate(-50.000 -50.000)"><circle cx="19" cy="52" r="19" fill="#1B2557" stroke="#1B2557" stroke-width="5.8824" stroke-linecap="round" stroke-linejoin="round"/><circle cx="81" cy="52" r="19" fill="#1B2557" stroke="#1B2557" stroke-width="5.8824" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="31" fill="#1B2557" stroke="#1B2557" stroke-width="5.8824" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 66 C34 66 30 76 34 85 C37 77 42 73 47 71 Z" fill="#1B2557" stroke="#1B2557" stroke-width="6.9824" stroke-linecap="round" stroke-linejoin="round"/><path d="M57 66 C66 66 70 76 66 85 C63 77 58 73 53 71 Z" fill="#1B2557" stroke="#1B2557" stroke-width="6.9824" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 57 V82 C50 92 60 94 64 86" fill="none" stroke="#1B2557" stroke-width="19.8824" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 50 C23 6 77 6 77 50" fill="none" stroke="#1B2557" stroke-width="12.3824" stroke-linecap="round" stroke-linejoin="round"/><rect x="7" y="38" width="18" height="30" rx="7.5" fill="#1B2557" stroke="#1B2557" stroke-width="5.8824" stroke-linecap="round" stroke-linejoin="round"/><rect x="75" y="38" width="18" height="30" rx="7.5" fill="#1B2557" stroke="#1B2557" stroke-width="5.8824" stroke-linecap="round" stroke-linejoin="round"/></g></g><g transform="rotate(0.00) scale(0.34000 0.34000) translate(-50.000 -50.000)"><circle cx="19" cy="52" r="19" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.8824" stroke-linecap="round" stroke-linejoin="round"/><circle cx="81" cy="52" r="19" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.8824" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="31" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.8824" stroke-linecap="round" stroke-linejoin="round"/><path d="M43 66 C34 66 30 76 34 85 C37 77 42 73 47 71 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="6.9824" stroke-linecap="round" stroke-linejoin="round"/><path d="M57 66 C66 66 70 76 66 85 C63 77 58 73 53 71 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="6.9824" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 57 V82 C50 92 60 94 64 86" fill="none" stroke="#FFFFFF" stroke-width="19.8824" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 50 C23 6 77 6 77 50" fill="none" stroke="#FFFFFF" stroke-width="12.3824" stroke-linecap="round" stroke-linejoin="round"/><rect x="7" y="38" width="18" height="30" rx="7.5" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.8824" stroke-linecap="round" stroke-linejoin="round"/><rect x="75" y="38" width="18" height="30" rx="7.5" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.8824" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="52" r="19" fill="#B3C4EB"/><circle cx="81" cy="52" r="19" fill="#B3C4EB"/><circle cx="19" cy="54" r="11" fill="#E9A9B8"/><circle cx="81" cy="54" r="11" fill="#E9A9B8"/><circle cx="50" cy="50" r="31" fill="#CCD9F4"/><path d="M43 66 C34 66 30 76 34 85 C37 77 42 73 47 71 Z" fill="#FFF7E4" stroke="#8EA3DA" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M57 66 C66 66 70 76 66 85 C63 77 58 73 53 71 Z" fill="#FFF7E4" stroke="#8EA3DA" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 57 V82 C50 92 60 94 64 86" fill="none" stroke="#CCD9F4" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><path d="M44.5 68 H55.5 M44.5 74 H55.5 M44.5 80 H55.5" fill="none" stroke="#8EA3DA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="57" r="4.2" fill="#E9A9B8" opacity="0.85"/><circle cx="68" cy="57" r="4.2" fill="#E9A9B8" opacity="0.85"/><circle cx="39" cy="46" r="3.4" fill="#283881"/><circle cx="61" cy="46" r="3.4" fill="#283881"/><circle cx="40.2" cy="44.8" r="1.1" fill="#FFFFFF"/><circle cx="62.2" cy="44.8" r="1.1" fill="#FFFFFF"/><path d="M23 50 C23 6 77 6 77 50" fill="none" stroke="#A51C36" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="7" y="38" width="18" height="30" rx="7.5" fill="#A51C36"/><rect x="75" y="38" width="18" height="30" rx="7.5" fill="#A51C36"/><rect x="21" y="43" width="7" height="20" rx="3.4" fill="#F7D294"/><rect x="72" y="43" width="7" height="20" rx="3.4" fill="#F7D294"/><path d="M12.5 46 V58" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/><path d="M87.5 46 V58" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/></g></g></g></svg></button>
+    <button class="stk stk-tuk" id="tuk" type="button" aria-label="Le tuk-tuk démarre"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 51.2000 44.0000"><g><g transform="translate(25.600 22.000)"><g transform="translate(0.300 0.450)" opacity="0.22"><g transform="rotate(0.00) scale(0.40000 0.40000) translate(-56.000 -37.000)"><rect x="34" y="-8" width="22" height="16" rx="4" fill="#1B2557" stroke="#1B2557" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><path d="M0 27 C0 10 14 5 36 5 H62 C76 5 85 12 88 27 Z" fill="#1B2557" stroke="#1B2557" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><rect x="0" y="22" width="88" height="6" rx="3" fill="#1B2557" stroke="#1B2557" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><rect x="-2" y="24" width="90" height="30" fill="#1B2557" stroke="#1B2557" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><rect x="8" y="26" width="4.5" height="26" fill="#1B2557" stroke="#1B2557" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><rect x="44" y="26" width="4.5" height="26" fill="#1B2557" stroke="#1B2557" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><path d="M76 28 L82 52" fill="none" stroke="#1B2557" stroke-width="9.5000" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="50" width="66" height="24" rx="8" fill="#1B2557" stroke="#1B2557" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><path d="M60 50 H80 C92 50 100 57 106 67 L108 74 H60 Z" fill="#1B2557" stroke="#1B2557" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><path d="M90 52 L86 36" fill="none" stroke="#1B2557" stroke-width="8.4000" stroke-linecap="round" stroke-linejoin="round"/><path d="M81 36 H92" fill="none" stroke="#1B2557" stroke-width="8.4000" stroke-linecap="round" stroke-linejoin="round"/><circle cx="106" cy="63" r="4.2" fill="#1B2557" stroke="#1B2557" stroke-width="6.6000" stroke-linecap="round" stroke-linejoin="round"/><circle cx="30" cy="74" r="12.5" fill="#1B2557" stroke="#1B2557" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><circle cx="96" cy="76" r="10.5" fill="#1B2557" stroke="#1B2557" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/></g></g><g transform="rotate(0.00) scale(0.40000 0.40000) translate(-56.000 -37.000)"><rect x="34" y="-8" width="22" height="16" rx="4" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><path d="M0 27 C0 10 14 5 36 5 H62 C76 5 85 12 88 27 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><rect x="0" y="22" width="88" height="6" rx="3" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><rect x="-2" y="24" width="90" height="30" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><rect x="8" y="26" width="4.5" height="26" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><rect x="44" y="26" width="4.5" height="26" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><path d="M76 28 L82 52" fill="none" stroke="#FFFFFF" stroke-width="9.5000" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="50" width="66" height="24" rx="8" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><path d="M60 50 H80 C92 50 100 57 106 67 L108 74 H60 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><path d="M90 52 L86 36" fill="none" stroke="#FFFFFF" stroke-width="8.4000" stroke-linecap="round" stroke-linejoin="round"/><path d="M81 36 H92" fill="none" stroke="#FFFFFF" stroke-width="8.4000" stroke-linecap="round" stroke-linejoin="round"/><circle cx="106" cy="63" r="4.2" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="6.6000" stroke-linecap="round" stroke-linejoin="round"/><circle cx="30" cy="74" r="12.5" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><circle cx="96" cy="76" r="10.5" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="5.0000" stroke-linecap="round" stroke-linejoin="round"/><rect x="34" y="-8" width="22" height="16" rx="4" fill="#283881"/><circle cx="45" cy="0" r="5.2" fill="#CCD9F4"/><circle cx="45" cy="0" r="1.8" fill="#283881"/><path d="M0 27 C0 10 14 5 36 5 H62 C76 5 85 12 88 27 Z" fill="#F2A71B"/><rect x="0" y="22" width="88" height="6" rx="3" fill="#A51C36"/><rect x="8" y="26" width="4.5" height="26" fill="#283881"/><rect x="44" y="26" width="4.5" height="26" fill="#283881"/><path d="M76 28 L82 52" fill="none" stroke="#283881" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="14" y="36" width="27" height="16" rx="4.5" fill="#CCD9F4"/><rect x="4" y="50" width="66" height="24" rx="8" fill="#A51C36"/><path d="M60 50 H80 C92 50 100 57 106 67 L108 74 H60 Z" fill="#A51C36"/><path d="M10 63 H92 L96 67 H10 Z" fill="#F2A71B"/><path d="M90 52 L86 36" fill="none" stroke="#283881" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M81 36 H92" fill="none" stroke="#283881" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="106" cy="63" r="4.2" fill="#F2A71B" stroke="#283881" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="30" cy="74" r="12.5" fill="#283881"/><circle cx="30" cy="74" r="5.6" fill="#F7D294"/><circle cx="30" cy="74" r="1.8" fill="#283881"/><circle cx="96" cy="76" r="10.5" fill="#283881"/><circle cx="96" cy="76" r="4.8" fill="#F7D294"/><circle cx="96" cy="76" r="1.6" fill="#283881"/></g></g></g></svg></button>
+  </div>
+</header>
+
+<main>
+  <section class="sec wrap" aria-labelledby="h-who">
+    <h2 id="h-who">Qui es-tu ?</h2>
+    <p class="sub">Ton prénom reste sur ce téléphone. Il servira aux scores du blind test et aux doudous.</p>
+    <div class="who" id="who" role="group" aria-label="Choisis ton prénom">
+      <button type="button" data-n="Arthur" aria-pressed="false"><span class="ini" style="background:#283881;color:#fff">A</span>Arthur</button>
+      <button type="button" data-n="Daphne" aria-pressed="false"><span class="ini" style="background:#E9A9B8;color:#5B1025">D</span>Daphne</button>
+      <button type="button" data-n="Flo" aria-pressed="false"><span class="ini" style="background:#F2A71B;color:#5B1025">F</span>Flo</button>
+      <button type="button" data-n="Anne" aria-pressed="false"><span class="ini" style="background:#A51C36;color:#fff">A</span>Anne</button>
+    </div>
+    <p class="hello" id="hello" role="status">Appuie sur ton prénom.</p>
+  </section>
+
+  <div class="wrap">
+    <section class="bubble blue" id="test" aria-labelledby="h-test">
+      <h2 id="h-test">Test du téléphone</h2>
+      <p class="hint">Essaie chaque bouton. Rien ne quitte ton téléphone. À la fin, fais une capture d'écran du rapport tout en bas et envoie-la à Anne.</p>
+
+      <div class="row">
+        <span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l1.6-2.4h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.6"/></svg></span>
+        <div>
+          <h3>Appareil photo</h3>
+          <p class="hint">Le bouton ouvre la caméra. La photo arrive dans un polaroïd.</p>
+          <div class="acts"><label class="btn"><input id="in-cam" type="file" accept="image/*" capture="environment" aria-label="Prendre une photo"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l1.6-2.4h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.6"/></svg>Prendre une photo</label></div>
+          <p class="status" id="st-cam" role="status" data-s="idle">À tester.</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M4 18l5-5 4 4 3-3 4 4"/></svg></span>
+        <div>
+          <h3>Galerie</h3>
+          <p class="hint">Choisir une photo déjà prise.</p>
+          <div class="acts"><label class="btn alt"><input id="in-gal" type="file" accept="image/*" aria-label="Choisir une photo dans la galerie"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M4 18l5-5 4 4 3-3 4 4"/></svg>Choisir une photo</label></div>
+          <p class="status" id="st-gal" role="status" data-s="idle">À tester.</p>
+        </div>
+      </div>
+
+      <figure class="polaroid" id="polaroid" hidden>
+        <div class="ph"><img id="ph-img" alt="Ta photo du jour"></div>
+        <figcaption>
+          <input id="cap" type="text" maxlength="60" placeholder="Une légende ?" aria-label="Légende de la photo" autocomplete="off">
+          <span class="date" id="ph-date"></span>
+        </figcaption>
+      </figure>
+
+      <div class="row">
+        <span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="2.6"/><path d="M5 6v6c0 1.5 3.1 2.6 7 2.6s7-1.1 7-2.6V6M5 12v6c0 1.5 3.1 2.6 7 2.6s7-1.1 7-2.6v-6"/></svg></span>
+        <div>
+          <h3>Mémoire du téléphone</h3>
+          <p class="hint">Prends une photo, ferme la page, rouvre‑la : la photo doit être encore là.</p>
+          <p class="status" id="st-mem" role="status" data-s="idle">Vérification…</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg></span>
+        <div>
+          <h3>Google Maps</h3>
+          <p class="hint">Chaque bouton doit ouvrir Google Maps, dans l'appli ou sur le site.</p>
+          <div class="acts">
+            <a class="btn alt" id="map-see" href="https://www.google.com/maps/search/?api=1&amp;query=Wat%20Pho%20Bangkok" target="_blank" rel="noopener noreferrer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>Voir Wat Pho</a>
+            <a class="btn" id="map-go" href="https://www.google.com/maps/dir/?api=1&amp;destination=Wat%20Pho%20Bangkok" target="_blank" rel="noopener noreferrer"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>Y aller</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M17.8 6.8a7.2 7.2 0 0 1 0 10.4"/></svg></span>
+        <div>
+          <h3>Voix thaïe</h3>
+          <p class="thai" lang="th">สวัสดีครับ</p>
+          <p class="rom">sawatdee khrap</p>
+          <div class="acts"><button class="btn alt" id="speak" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M17.8 6.8a7.2 7.2 0 0 1 0 10.4"/></svg>Écouter</button></div>
+          <p class="status" id="st-voice" role="status" data-s="idle">Vérification…</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 11 12 15.5 16.5 11M5 19.5h14"/></svg></span>
+        <div>
+          <h3>Enregistrer la photo</h3>
+          <p class="hint">Le bouton ouvre le partage de ton téléphone, ou télécharge la photo. Sinon, appuie longtemps sur la photo du polaroïd.</p>
+          <div class="acts"><button class="btn alt" id="save" type="button"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 11 12 15.5 16.5 11M5 19.5h14"/></svg><span id="save-lbl">Enregistrer</span></button></div>
+          <p class="status" id="st-save" role="status" data-s="idle">Vérification…</p>
+        </div>
+      </div>
+
+      <div class="row" id="row-home">
+        <span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.2 12 4.5l8 6.7V19a1 1 0 0 1-1 1h-4.2v-5.6H9.2V20H5a1 1 0 0 1-1-1z"/></svg></span>
+        <div>
+          <h3>Écran d'accueil</h3>
+          <p class="hint" id="home-hint">Une icône sur l'écran d'accueil ouvre le carnet comme une appli.</p>
+          <div class="acts" id="install-box" hidden><button class="btn alt" id="install" type="button">Installer l'appli</button></div>
+          <p class="status" id="st-home" role="status" data-s="idle">Vérification…</p>
+        </div>
+      </div>
+
+      <div class="row" id="row-offline">
+        <span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 9.2a13 13 0 0 1 17 0M6.6 12.6a8.6 8.6 0 0 1 10.8 0M9.6 15.9a4.2 4.2 0 0 1 4.8 0"/><circle cx="12" cy="19" r=".9"/><path d="M4 4l16 16"/></svg></span>
+        <div>
+          <h3>Sans réseau</h3>
+          <p class="hint">Après une première visite, la page doit s'ouvrir même sans réseau. Pour tester : mode avion, puis rouvre la page.</p>
+          <p class="status" id="st-offline" role="status" data-s="idle">Vérification…</p>
+        </div>
+      </div>
+
+      <details class="rep" open>
+        <summary>Rapport du téléphone</summary>
+        <pre id="rep">…</pre>
+        <div class="acts"><button class="btn alt" id="copy" type="button">Copier le rapport</button></div>
+        <p class="status" id="st-copy" role="status" data-s="idle">Une capture d'écran suffit aussi.</p>
+      </details>
+    </section>
+  </div>
+</main>
+
+<footer class="foot wrap">Carnet Thaïlande 2026 · test du téléphone</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)};
+var LS={
+  get:function(k,d){try{var v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},
+  set:function(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
+};
+var IDBp={
+  db:null,
+  open:function(){
+    if(this.db)return this.db;
+    this.db=new Promise(function(res,rej){
+      try{
+        var r=indexedDB.open("carnet-thailande",1);
+        r.onupgradeneeded=function(){r.result.createObjectStore("photos")};
+        r.onsuccess=function(){res(r.result)};
+        r.onerror=function(){rej(r.error)};
+      }catch(e){rej(e)}
+    });
+    return this.db;
+  },
+  put:function(k,v){return this.open().then(function(db){return new Promise(function(res,rej){
+    var t=db.transaction("photos","readwrite");t.objectStore("photos").put(v,k);
+    t.oncomplete=function(){res(true)};t.onerror=function(){rej(t.error)};t.onabort=function(){rej(t.error)};
+  })})},
+  get:function(k){return this.open().then(function(db){return new Promise(function(res,rej){
+    var q=db.transaction("photos").objectStore("photos").get(k);
+    q.onsuccess=function(){res(q.result)};q.onerror=function(){rej(q.error)};
+  })})}
+};
+
+/* Petits utilitaires */
+var toastT;
+function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("on")},2300)}
+function setStatus(id,s,txt){var e=$("#st-"+id);if(!e)return;e.setAttribute("data-s",s);e.textContent=txt}
+function fmtSize(n){return n>=1048576?(n/1048576).toFixed(1).replace(".",",")+" Mo":Math.max(1,Math.round(n/1024))+" Ko"}
+function fmtDate(ts){
+  try{return new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(new Date(ts))}catch(e){return new Date(ts).toLocaleDateString()}
+}
+function blobToBuf(b){
+  if(b.arrayBuffer)return b.arrayBuffer();
+  return new Promise(function(res,rej){var f=new FileReader();f.onload=function(){res(f.result)};f.onerror=function(){rej(f.error)};f.readAsArrayBuffer(b)});
+}
+
+/* Autocollants */
+function bump(id,cls,msg){
+  var e=$("#"+id);
+  e.addEventListener("click",function(){e.classList.remove("wig","drive");void e.offsetWidth;e.classList.add(cls);if(msg)toast(msg)});
+  e.addEventListener("animationend",function(){e.classList.remove(cls)});
+}
+bump("ele","wig","Sawasdee khrap !");
+bump("tuk","drive","Pouet pouet !");
+
+/* Qui es-tu */
+var who=$("#who"),hello=$("#hello");
+function paintWho(){
+  var me=LS.get("carnet.who","");
+  [].forEach.call(who.querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",b.getAttribute("data-n")===me?"true":"false")});
+  hello.innerHTML=me?"Bonjour <b>"+me+"</b>. Ce téléphone te reconnaîtra à ta prochaine visite.":"Appuie sur ton prénom.";
+}
+who.addEventListener("click",function(e){
+  var b=e.target.closest?e.target.closest("button"):null;if(!b)return;
+  LS.set("carnet.who",b.getAttribute("data-n"));paintWho();refreshReport();
+});
+paintWho();
+
+/* Photo : lecture, réduction, mémoire */
+var cur=null,curUrl=null;
+function loadBitmap(file){
+  if(window.createImageBitmap){
+    return createImageBitmap(file,{imageOrientation:"from-image"}).catch(function(){return viaImg(file)});
+  }
+  return viaImg(file);
+}
+function viaImg(file){
+  return new Promise(function(res,rej){
+    var u=URL.createObjectURL(file),i=new Image();
+    i.onload=function(){URL.revokeObjectURL(u);res(i)};
+    i.onerror=function(){URL.revokeObjectURL(u);rej(new Error("image illisible"))};
+    i.src=u;
+  });
+}
+function toJpeg(file){
+  return loadBitmap(file).then(function(bm){
+    var w0=bm.width||bm.naturalWidth,h0=bm.height||bm.naturalHeight,k=Math.min(1,1600/Math.max(w0,h0));
+    var w=Math.round(w0*k),h=Math.round(h0*k),c=document.createElement("canvas");
+    c.width=w;c.height=h;c.getContext("2d").drawImage(bm,0,0,w,h);
+    if(bm.close){try{bm.close()}catch(e){}}
+    return new Promise(function(res,rej){
+      c.toBlob(function(b){b?res({blob:b,w:w,h:h}):rej(new Error("compression impossible"))},"image/jpeg",0.82);
+    });
+  });
+}
+function showPhoto(blob,ts,fresh){
+  if(curUrl)URL.revokeObjectURL(curUrl);
+  curUrl=URL.createObjectURL(blob);
+  var p=$("#polaroid"),img=$("#ph-img");
+  img.src=curUrl;
+  $("#ph-date").textContent=fmtDate(ts);
+  p.hidden=false;
+  p.classList.remove("dev");
+  if(fresh){void p.offsetWidth;p.classList.add("dev")}
+  paintSave();
+}
+function handle(file,src){
+  setStatus(src,"idle","Lecture de la photo…");
+  toJpeg(file).then(function(r){
+    var ts=Date.now();
+    cur={blob:r.blob,ts:ts};
+    showPhoto(r.blob,ts,true);
+    setStatus(src,"ok","Photo reçue : "+fmtSize(file.size)+", réduite à "+fmtSize(r.blob.size)+" ("+r.w+" × "+r.h+").");
+    return blobToBuf(r.blob).then(function(buf){
+      return IDBp.put("test",{buf:buf,type:"image/jpeg",ts:ts,src:src}).then(function(){
+        setStatus("mem","ok","Photo mémorisée sur ce téléphone. Ferme la page et rouvre-la pour vérifier.");
+        try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().then(computeStor)}catch(e){}
+        refreshReport();
+      });
+    });
+  }).catch(function(err){
+    var m=err&&err.message?err.message:String(err);
+    if(!cur)setStatus(src,"bad","Échec : "+m);
+    else setStatus("mem","bad","La photo n'a pas pu être mémorisée : "+m);
+    refreshReport();
+  });
+}
+function pick(id,src){
+  var inp=$("#"+id);
+  inp.addEventListener("change",function(){
+    var f=inp.files&&inp.files[0];
+    if(f)handle(f,src);
+    try{inp.value=""}catch(e){}
+  });
+}
+pick("in-cam","cam");
+pick("in-gal","gal");
+
+var cap=$("#cap");
+cap.value=LS.get("carnet.test.cap","");
+cap.addEventListener("input",function(){LS.set("carnet.test.cap",cap.value)});
+
+/* Mémoire : visites + photo retrouvée */
+var visits=parseInt(LS.get("carnet.visits","0"),10)||0;
+var lsOk=LS.set("carnet.visits",String(visits+1));
+visits=visits+1;
+var idbOk=false,found=null;
+IDBp.get("test").then(function(rec){
+  idbOk=true;
+  if(rec&&rec.buf){
+    found=rec;
+    cur={blob:new Blob([rec.buf],{type:rec.type||"image/jpeg"}),ts:rec.ts};
+    showPhoto(cur.blob,rec.ts,false);
+    setStatus("mem","ok","Visite n° "+visits+" sur ce téléphone. Photo retrouvée, prise le "+fmtDate(rec.ts)+".");
+  }else{
+    setStatus("mem",lsOk?"ok":"warn",lsOk?("Visite n° "+visits+" sur ce téléphone. Pas encore de photo mémorisée."):"La mémoire simple est bloquée sur ce téléphone.");
+  }
+  refreshReport();
+}).catch(function(){
+  setStatus("mem","bad","La mémoire des photos est indisponible sur ce téléphone.");
+  refreshReport();
+});
+
+/* Voix thaïe */
+var voices=[];
+function getVoices(){
+  return new Promise(function(res){
+    if(!("speechSynthesis" in window)){res([]);return}
+    var v=speechSynthesis.getVoices();
+    if(v&&v.length){res(v);return}
+    var done=false,fin=function(){if(done)return;done=true;res(speechSynthesis.getVoices()||[])};
+    try{speechSynthesis.addEventListener("voiceschanged",fin,{once:true})}catch(e){}
+    setTimeout(fin,1800);
+  });
+}
+function thaiVoice(){for(var i=0;i<voices.length;i++){if(/^th/i.test(voices[i].lang))return voices[i]}return null}
+getVoices().then(function(v){
+  voices=v;
+  var t=thaiVoice();
+  if(!("speechSynthesis" in window))setStatus("voice","bad","Ce navigateur ne sait pas lire à voix haute. L'écran affichera le thaï en grand.");
+  else if(t)setStatus("voice","ok","Voix thaïe trouvée : "+t.name+".");
+  else setStatus("voice","warn","Pas de voix thaïe sur ce téléphone. L'écran affichera le thaï en grand.");
+  refreshReport();
+});
+var curU=null,vstate="jamais lancée";
+$("#speak").addEventListener("click",function(){
+  if(!("speechSynthesis" in window)){toast("Lecture à voix haute indisponible");return}
+  try{
+    var ss=window.speechSynthesis,busy=!!(ss.speaking||ss.pending);
+    var u=new SpeechSynthesisUtterance("สวัสดีครับ");
+    u.lang="th-TH";u.rate=0.85;u.volume=1;
+    var t=thaiVoice();if(t)u.voice=t;
+    var started=false,silentHint=" Rien entendu ? Vérifie le volume et l'interrupteur de sonnerie sur le côté de l'iPhone : il doit être en mode sonnerie, pas en silencieux.";
+    u.onstart=function(){started=true;vstate="démarrée";refreshReport();setStatus("voice","ok","Lecture en cours"+(t?" avec "+t.name:"")+".")};
+    u.onend=function(){vstate=started?"terminée":"terminée sans démarrer";refreshReport();setStatus("voice",started?"ok":"warn",started?"Lecture terminée."+silentHint:"La lecture s'est terminée sans démarrer."+silentHint)};
+    u.onerror=function(ev){var c=(ev&&ev.error)||"erreur";vstate="erreur : "+c;refreshReport();setStatus("voice","bad","La lecture a échoué ("+c+").")};
+    curU=u;  /* garder une référence : sinon iOS peut couper la lecture */
+    vstate="demandée";setStatus("voice","idle","Lecture demandée…");refreshReport();
+    var go=function(){try{ss.resume()}catch(e){}ss.speak(u)};
+    if(busy){ss.cancel();setTimeout(go,150)}else go();
+    setTimeout(function(){if(!started&&vstate==="demandée"){vstate="ne démarre pas";refreshReport();setStatus("voice","warn","La lecture ne démarre pas."+silentHint)}},2800);
+  }catch(e){vstate="exception";refreshReport();setStatus("voice","bad","La lecture a échoué.")}
+});
+
+/* Enregistrer : partage (iPhone, Android), sinon téléchargement, sinon appui long sur la photo */
+function canShareFile(){
+  try{
+    if(!navigator.share||!navigator.canShare)return false;
+    var f=new File([new Blob(["x"],{type:"image/jpeg"})],"x.jpg",{type:"image/jpeg"});
+    return !!navigator.canShare({files:[f]});
+  }catch(e){return false}
+}
+var shareOk=canShareFile();
+function paintSave(){
+  var btn=$("#save");
+  btn.disabled=!cur;
+  $("#save-lbl").textContent=shareOk?"Enregistrer ou partager":"Télécharger la photo";
+  if(!cur)setStatus("save","idle","Prends d'abord une photo.");
+  else if(shareOk)setStatus("save","ok","Le bouton ouvre le partage : choisis « Enregistrer l'image » pour la mettre dans Photos.");
+  else setStatus("save","ok","Le bouton télécharge la photo dans l'appli Fichiers.");
+}
+function downloadFile(file){
+  try{
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(file);a.download=file.name;a.rel="noopener";
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},5000);
+    setStatus("save","ok","Téléchargement lancé. Cherche la photo dans l'appli Fichiers.");
+  }catch(e){setStatus("save","bad","Téléchargement impossible : appuie longtemps sur la photo.")}
+}
+$("#save").addEventListener("click",function(){
+  if(!cur)return;
+  var d=new Date(cur.ts),p2=function(n){return (n<10?"0":"")+n};
+  var file=new File([cur.blob],"photo-du-jour-"+d.getFullYear()+p2(d.getMonth()+1)+p2(d.getDate())+".jpg",{type:"image/jpeg"});
+  if(shareOk){
+    navigator.share({files:[file],title:"Photo du jour"}).then(function(){
+      setStatus("save","ok","Partage ouvert. Choisis « Enregistrer l'image » pour la mettre dans Photos.");
+    }).catch(function(e){
+      if(e&&e.name==="AbortError")setStatus("save","warn","Annulé.");
+      else{setStatus("save","warn","Le partage a échoué ("+((e&&e.name)||"erreur")+"), essai du téléchargement.");downloadFile(file)}
+    });
+  }else downloadFile(file);
+});
+paintSave();
+
+/* Écran d'accueil et mode hors réseau */
+var framed=window.top!==window;
+var standalone=false;try{standalone=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||!!navigator.standalone}catch(e){}
+var ios=/iPad|iPhone|iPod/.test(navigator.userAgent||"")||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+var deferred=null,swState="non pris en charge";
+function paintHome(){
+  var hint=$("#home-hint"),box=$("#install-box");
+  if(framed){$("#row-home").hidden=true;$("#row-offline").hidden=true;return}
+  if(standalone){box.hidden=true;setStatus("home","ok","Tu utilises déjà le carnet comme une appli.");return}
+  if(deferred){box.hidden=false;setStatus("home","idle","Appuie sur « Installer l'appli ».");return}
+  box.hidden=true;
+  hint.textContent=ios?"Dans Safari : touche le bouton Partager (le carré avec une flèche), puis « Sur l'écran d'accueil ».":"Dans le menu du navigateur (les trois points) : « Installer l'appli » ou « Ajouter à l'écran d'accueil ».";
+  setStatus("home","idle","À faire une fois par téléphone.");
+}
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;paintHome()});
+$("#install").addEventListener("click",function(){if(!deferred)return;deferred.prompt();deferred.userChoice.then(function(){deferred=null;paintHome()})});
+window.addEventListener("appinstalled",function(){standalone=true;paintHome();refreshReport()});
+function paintOffline(){
+  if(framed)return;
+  if(swState==="actif")setStatus("offline","ok","Oui : la page et les polices sont gardées sur ce téléphone.");
+  else if(swState==="installé")setStatus("offline","warn","Presque : recharge la page une fois pour finir la mise en place.");
+  else if(swState==="inscription")setStatus("offline","idle","Mise en place…");
+  else if(swState==="non pris en charge")setStatus("offline","warn","Ce navigateur ne garde pas la page hors réseau.");
+  else setStatus("offline","bad","Impossible ici ("+swState+").");
+}
+if(!framed&&"serviceWorker" in navigator&&(location.protocol==="https:"||/^(localhost|127\.0\.0\.1)$/.test(location.hostname))){
+  swState="inscription";
+  navigator.serviceWorker.register("sw.js",{scope:"./"}).then(function(){return navigator.serviceWorker.ready}).then(function(){
+    swState=navigator.serviceWorker.controller?"actif":"installé";paintOffline();refreshReport();
+  }).catch(function(e){swState="échec : "+((e&&e.message)||e);paintOffline();refreshReport()});
+  navigator.serviceWorker.addEventListener("controllerchange",function(){if(swState==="installé"){swState="actif";paintOffline();refreshReport()}});
+}
+paintHome();paintOffline();
+
+/* Rapport */
+var stor="…";
+function computeStor(){
+  try{
+    if(navigator.storage&&navigator.storage.estimate){
+      Promise.all([navigator.storage.persisted?navigator.storage.persisted():Promise.resolve("?"),navigator.storage.estimate()]).then(function(r){
+        stor="durable : "+r[0]+", quota "+Math.round((r[1].quota||0)/1048576)+" Mo, utilisé "+Math.round((r[1].usage||0)/1024)+" Ko";refreshReport();
+      }).catch(function(){stor="indisponible";refreshReport()});
+    }else stor="indisponible";
+  }catch(e){stor="indisponible"}
+}
+computeStor();
+function where(){try{return location.href.replace(/#.*$/,"").slice(0,400)}catch(e){return "?"}}
+function parents(){try{var a=location.ancestorOrigins;return a&&a.length?Array.prototype.join.call(a," > "):"aucun ou illisible"}catch(e){return "illisible"}}
+function pad(k){return (k+" ").concat(new Array(Math.max(1,19-k.length)).join(" "))}
+function refreshReport(){
+  var L=[],add=function(k,v){L.push(pad(k)+v)};
+  var th=thaiVoice();
+  var st=false;try{st=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||!!navigator.standalone}catch(e){}
+  var tz="";try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){}
+  add("Prénom",LS.get("carnet.who","—"));
+  add("Écran",innerWidth+" × "+innerHeight+" (x"+(window.devicePixelRatio||1)+")");
+  add("Langue, fuseau",(navigator.language||"?")+", "+tz);
+  add("Dans un cadre",window.top!==window?"oui":"non");
+  add("Appli plein écran",st?"oui":"non");
+  add("Champ photo",("capture" in document.createElement("input"))?"oui":"non");
+  add("Mémoire simple",lsOk?"oui":"non");
+  add("Mémoire photos",idbOk?"oui":"non");
+  add("Voix",voices.length+" (thaï : "+(th?th.name:"non")+")");
+  add("Dernière lecture",vstate);
+  add("Enregistrer",shareOk?"par le partage":"par téléchargement");
+  add("Partage natif",navigator.share?"présent":"absent");
+  add("Réseau",navigator.onLine?"en ligne":"hors ligne");
+  add("Stockage",stor);
+  add("Hors réseau",framed?"sans objet (dans un cadre)":swState);
+  add("Adresse de la page",where());
+  add("Cadre parent",parents());
+  add("Référent",document.referrer||"vide");
+  add("Appareil",(navigator.userAgent||"").replace(/\s+/g," "));
+  $("#rep").textContent=L.join("\n");
+}
+$("#copy").addEventListener("click",function(){
+  var txt=$("#rep").textContent;
+  var ok=function(){setStatus("copy","ok","Rapport copié.")};
+  var ko=function(){setStatus("copy","warn","Copie impossible : fais une capture d'écran du rapport.")};
+  try{navigator.clipboard.writeText(txt).then(ok,ko)}catch(e){ko()}
+});
+refreshReport();
+window.addEventListener("online",refreshReport);window.addEventListener("offline",refreshReport);
+})();
+</script>
+
+</body></html>

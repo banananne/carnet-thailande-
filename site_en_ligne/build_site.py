@@ -44,6 +44,7 @@ ICONS = {
     "pen": '<path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 2.8 0l.2.2a2 2 0 0 1 0 2.8L8 19l-4 1z"/><path d="M14.5 6.5l3 3"/>',
     "trash": '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l.8 12.5h9.4L17.5 7M10 11v5M14 11v5"/>',
     "check": '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+    "x": '<path d="M6 6l12 12M18 6 6 18"/>',
 }
 
 # (famille, paquet fontsource, graisse, style, fichier, unicode-range ou None)

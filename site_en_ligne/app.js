@@ -80,11 +80,11 @@ function bump(id, cls, msg) {
   var e = $("#" + id); if (!e) return;
   e.addEventListener("click", function () {
     e.classList.remove("wig", "drive"); void e.offsetWidth; e.classList.add(cls);
-    if (msg) toast(msg);
+    if (msg) toast(typeof msg === "function" ? msg() : msg);
   });
   e.addEventListener("animationend", function () { e.classList.remove(cls); });
 }
-bump("ele", "wig", "Sawasdee khrap !");
+bump("ele", "wig", function () { var p = POL.get(); return "Sawasdee " + (p || "khrap / kha") + " !"; });
 bump("tuk", "drive", "Pouet pouet !");
 
 /* ───────────── qui es-tu ───────────── */
@@ -105,9 +105,10 @@ who.addEventListener("click", function (e) {
 paintWho();
 
 /* ───────────── navigation ───────────── */
-var NAMES = { "": "home", jours: "days", hotels: "hotels", utile: "utile", metro: "metro" };
-var NAV_OF = { home: "home", days: "days", hotels: "hotels", utile: "utile", metro: "utile" };
-var TITLES = { home: "Carnet Thaïlande 2026", days: "Jours · Carnet Thaïlande", hotels: "Hôtels · Carnet Thaïlande", utile: "Utile · Carnet Thaïlande", metro: "Plan du métro · Carnet Thaïlande" };
+var NAMES = { "": "home", jours: "days", hotels: "hotels", utile: "utile", metro: "metro", lexique: "lexique", taxi: "taxi", convertisseur: "convert", "good-to-know": "gtk" };
+var NAV_OF = { home: "home", days: "days", hotels: "hotels", utile: "utile", metro: "utile", lexique: "utile", taxi: "utile", convert: "utile", gtk: "utile" };
+var TITLES = { home: "Carnet Thaïlande 2026", days: "Jours · Carnet Thaïlande", hotels: "Hôtels · Carnet Thaïlande", utile: "Utile · Carnet Thaïlande", metro: "Plan du métro · Carnet Thaïlande",
+  lexique: "Lexique · Carnet Thaïlande", taxi: "Cartes taxi · Carnet Thaïlande", convert: "Convertisseur · Carnet Thaïlande", gtk: "Good to know · Carnet Thaïlande" };
 var days = $$(".day").map(function (a) { return a.getAttribute("data-id"); });
 var curDay = null, curName = "";
 
@@ -140,7 +141,12 @@ function route() {
     curDay = id;
   } else if (name === "hotels" && parts[1]) {
     target = document.getElementById("h-" + parts[1]);
+  } else if (name === "taxi") {
+    var tid = showTaxi(parts[1]);
+    if (parts[1] !== tid) { try { history.replaceState(null, "", "#/taxi/" + tid); } catch (e) {} }
   }
+  Show.hide();
+  clearTimeout(toastT); $("#toast").classList.remove("on");   /* un message ne suit pas d'une page à l'autre */
   $$(".view").forEach(function (v) { v.hidden = v.id !== "v-" + name; });
   $$(".nav a").forEach(function (a) {
     if (a.getAttribute("data-nav") === NAV_OF[name]) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
@@ -509,6 +515,225 @@ var Metro = (function () {
     leave: function () { active = false; }
   };
 })();
+
+/* ───────────── étape 2 : voix thaïe, « montrer en grand », cartes taxi, convertisseur ───────────── */
+
+/* mon petit mot poli : kha (femme) ou khrap (homme), gardé sur ce téléphone */
+var POL = {
+  get: function () { var v = LS.get("carnet.pol", ""); return v === "kha" || v === "khrap" ? v : ""; },
+  th: function (q) { var p = this.get(); return p === "khrap" ? "ครับ" : p === "kha" ? (q ? "คะ" : "ค่ะ") : ""; },
+  rom: function () { var p = this.get(); return p ? " " + p : ""; }
+};
+function paintPol() {
+  var cur = POL.get();
+  $$("[data-pol]").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-pol") === cur ? "true" : "false"); });
+  Show.refresh();
+}
+document.addEventListener("click", function (e) {
+  var b = e.target.closest ? e.target.closest("[data-pol]") : null; if (!b) return;
+  var v = b.getAttribute("data-pol");
+  if (POL.get() === v) LS.del("carnet.pol"); else LS.set("carnet.pol", v);
+  paintPol();
+});
+
+/* voix thaïe (même réglage que la page de test, validé sur iPhone) */
+var voices = [];
+function getVoices() {
+  return new Promise(function (res) {
+    if (!("speechSynthesis" in window)) { res([]); return; }
+    var v = speechSynthesis.getVoices();
+    if (v && v.length) { res(v); return; }
+    var done = false, fin = function () { if (done) return; done = true; res(speechSynthesis.getVoices() || []); };
+    try { speechSynthesis.addEventListener("voiceschanged", fin, { once: true }); } catch (e) {}
+    setTimeout(fin, 1800);
+  });
+}
+function thaiVoice() { for (var i = 0; i < voices.length; i++) { if (/^th/i.test(voices[i].lang)) return voices[i]; } return null; }
+getVoices().then(function (v) { voices = v; });
+var curU = null, speakingBtn = null;
+function mark(btn, on) { if (speakingBtn && speakingBtn !== btn) speakingBtn.classList.remove("on"); if (btn) btn.classList.toggle("on", on); speakingBtn = on ? btn : null; }
+function say(text, btn) {
+  if (!("speechSynthesis" in window) || !window.SpeechSynthesisUtterance) { toast("Ce téléphone ne sait pas lire à voix haute : montre l’écran."); return; }
+  try {
+    var ss = window.speechSynthesis, busy = !!(ss.speaking || ss.pending);
+    var u = new SpeechSynthesisUtterance(text), t = thaiVoice(), started = false;
+    u.lang = "th-TH"; u.rate = 0.85; u.volume = 1;
+    if (t) u.voice = t;
+    u.onstart = function () { started = true; mark(btn, true); };
+    u.onend = function () { if (curU === u) mark(btn, false); };
+    u.onerror = function () { mark(btn, false); toast("La lecture a échoué : montre l’écran."); };
+    curU = u;   /* garder une référence : sinon iOS peut couper la lecture */
+    var go = function () { try { ss.resume(); } catch (e) {} ss.speak(u); };
+    if (busy) { ss.cancel(); setTimeout(go, 150); } else go();
+    if (voices.length && !t) toast("Pas de voix thaïe sur ce téléphone : montre l’écran.");
+    else setTimeout(function () { if (!started && curU === u) toast("Rien entendu ? Vérifie le volume (et l’interrupteur de sonnerie).") }, 2800);
+  } catch (e) { toast("La lecture a échoué : montre l’écran."); }
+}
+
+/* « montrer en grand » : une seule fenêtre pour le lexique, les prix et les cartes taxi */
+var Show = (function () {
+  var box = $("#show"), th = $("#show-th"), rom = $("#show-rom"), fr = $("#show-fr"), phrase = $("#show-phrase"), card = $("#show-card");
+  var pol = $("#show-pol"), sayB = $("#show-say"), closeB = $(".show-x", box);
+  var cur = null, pushed = false, lock = null, opener = null;
+  function sizeTh() {
+    var s = th.textContent, n = (s.match(/[ก-ะาำเ-ๆ]/g) || []).length || s.length;
+    var rem = n <= 4 ? 6 : n <= 7 ? 4.6 : n <= 12 ? 3.4 : n <= 20 ? 2.6 : 2.1;
+    th.style.fontSize = rem + "rem";
+    for (var g = 0; g < 16 && th.scrollWidth > th.clientWidth + 1; g++) { rem *= 0.92; th.style.fontSize = rem + "rem"; }
+  }
+  function refresh() {
+    if (!cur || box.hidden) return;
+    if (cur.card) return;
+    th.textContent = cur.th + (cur.np ? "" : POL.th(cur.q));
+    rom.textContent = cur.rom + (cur.np ? "" : POL.rom());
+    fr.textContent = cur.fr || "";
+    fr.hidden = !cur.fr;
+    sizeTh();
+  }
+  function wake() {
+    try { if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request("screen").then(function (l) { lock = l; }, function () {}); } catch (e) {}
+  }
+  function unwake() { try { if (lock) lock.release(); } catch (e) {} lock = null; }
+  function openBox(d, from) {
+    cur = d; opener = from || document.activeElement;
+    phrase.hidden = !!d.card; card.hidden = !d.card;
+    pol.hidden = !!(d.card || d.np);   /* un chiffre ou un prix ne prend pas de petit mot poli : on cache les pastilles */
+    if (d.card) { card.innerHTML = ""; var c = d.card.cloneNode(true); c.removeAttribute("id"); card.appendChild(c); }
+    box.hidden = false;
+    refresh();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
+    if (!pushed) { try { history.pushState({ show: 1 }, ""); pushed = true; } catch (e) {} }
+    wake();
+    try { closeB.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function hideNow() {
+    if (box.hidden) return;
+    box.hidden = true; cur = null; unwake(); mark(null, false);
+    try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) {}
+    if (opener && opener.focus && document.contains(opener)) { try { opener.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  function close() {
+    hideNow();
+    if (pushed) { pushed = false; try { history.back(); } catch (e) {} }
+  }
+  window.addEventListener("popstate", function () { pushed = false; hideNow(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !box.hidden) close(); });
+  document.addEventListener("visibilitychange", function () { if (!document.hidden && !box.hidden) wake(); });
+  closeB.addEventListener("click", close);
+  sayB.addEventListener("click", function () {
+    if (!cur) return;
+    if (cur.card) say(cur.sayTh + POL.th(0), sayB);
+    else say(cur.th + (cur.np ? "" : POL.th(cur.q)), sayB);
+  });
+  return { open: openBox, close: close, hide: hideNow, refresh: refresh };
+})();
+
+document.addEventListener("click", function (e) {
+  var t = e.target.closest ? e.target.closest("[data-show],[data-say],[data-show-card]") : null; if (!t) return;
+  if (t.hasAttribute("data-say")) { say(t.getAttribute("data-th") + (t.hasAttribute("data-np") ? "" : POL.th(t.getAttribute("data-q") === "1")), t); return; }
+  if (t.hasAttribute("data-show-card")) {
+    var art = t.closest(".taxi"), c = art && $(".tc", art), sayEl = art && $("[data-say]", art);
+    if (c) Show.open({ card: c, sayTh: sayEl ? sayEl.getAttribute("data-th") : "" }, t);
+    return;
+  }
+  Show.open({ th: t.getAttribute("data-th"), rom: t.getAttribute("data-rom") || "", fr: t.getAttribute("data-fr") || "",
+              q: t.getAttribute("data-q") === "1", np: t.hasAttribute("data-np") }, t);
+});
+
+/* cartes taxi */
+var taxiIds = $$(".taxi").map(function (a) { return a.getAttribute("data-id"); });
+function showTaxi(id) {
+  if (taxiIds.indexOf(id) < 0) id = LS.get("carnet.taxi", "");
+  if (taxiIds.indexOf(id) < 0) id = taxiIds[0];
+  $$(".taxi").forEach(function (a) { a.hidden = a.getAttribute("data-id") !== id; });
+  $$(".tchip").forEach(function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-go-taxi") === id ? "true" : "false"); });
+  LS.set("carnet.taxi", id);
+  return id;
+}
+function goTaxi(id) {
+  if (curName !== "taxi") { location.hash = "#/taxi/" + id; return; }
+  try { history.replaceState(null, "", "#/taxi/" + id); } catch (e) { location.hash = "#/taxi/" + id; return; }
+  route();
+}
+document.addEventListener("click", function (e) {
+  var t = e.target.closest ? e.target.closest("[data-go-taxi]") : null; if (!t) return;
+  e.preventDefault(); goTaxi(t.getAttribute("data-go-taxi"));
+});
+
+/* dire un nombre en thaï (jusqu'à 999 999) */
+var D_TH = ["ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
+var D_RO = ["sun", "nueng", "song", "sam", "si", "ha", "hok", "chet", "paet", "kao"];
+var U_TH = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน"];
+var U_RO = ["", "sip", "roi", "phan", "muen", "saen"];
+function thaiNum(n) {
+  if (n !== Math.floor(n) || n < 0 || n > 999999) return null;
+  if (n === 0) return { th: D_TH[0], rom: D_RO[0] };
+  var ds = String(n).split("").map(Number), L = ds.length, th = "", ro = [];
+  for (var i = 0; i < L; i++) {
+    var d = ds[i], pos = L - 1 - i, w, r;
+    if (d === 0) continue;
+    if (pos === 1 && d === 1) { w = ""; r = ""; }
+    else if (pos === 1 && d === 2) { w = "ยี่"; r = "yi"; }
+    else if (pos === 0 && d === 1 && L > 1) { w = "เอ็ด"; r = "et"; }
+    else { w = D_TH[d]; r = D_RO[d]; }
+    th += w + U_TH[pos];
+    if (r) ro.push(r);
+    if (U_RO[pos]) ro.push(U_RO[pos]);
+  }
+  return { th: th, rom: ro.join(" ") };
+}
+
+/* convertisseur baht ↔ euro */
+(function () {
+  var root = $("#conv"); if (!root) return;
+  var thb = $("#c-thb"), eur = $("#c-eur"), rateEl = $("#c-rate"), redit = $("#c-redit"), rin = $("#c-rin");
+  var none = $("#c-none"), sayIn = $("#c-sayin"), thEl = $("#c-th"), roEl = $("#c-rom");
+  var def = parseFloat(root.getAttribute("data-rate")), defLabel = root.getAttribute("data-label");
+  var rate = def, label = "taux relevé le " + defLabel, last = "thb", price = null;
+  var r0 = parseFloat(LS.get("carnet.rate", ""));
+  if (r0 >= 10 && r0 <= 100) { rate = r0; label = LS.get("carnet.rate.d", "taux réglé à la main"); }
+  function fmt(x, max) { try { return x.toLocaleString("fr-FR", { maximumFractionDigits: max }); } catch (e) { return String(Math.round(x * Math.pow(10, max)) / Math.pow(10, max)).replace(".", ","); } }
+  function num(s) { var n = parseFloat(String(s).replace(/[\s  ]/g, "").replace(",", ".")); return isFinite(n) && n >= 0 ? n : NaN; }
+  function paintRate() {
+    rateEl.textContent = "";
+    var b = document.createElement("b"), s = document.createElement("span");
+    b.textContent = fmt(rate, 2) + " ฿"; s.textContent = " · " + label;
+    rateEl.appendChild(document.createTextNode("1 € = ")); rateEl.appendChild(b); rateEl.appendChild(s);
+    $$("#c-ref [data-b]").forEach(function (e) { e.textContent = fmt(parseFloat(e.getAttribute("data-b")) / rate, 2) + " €"; });
+    $$("#c-ref [data-e]").forEach(function (e) { e.textContent = fmt(parseFloat(e.getAttribute("data-e")) * rate, 0) + " ฿"; });
+  }
+  function paintPrice() {
+    var n = num(thb.value), t = isFinite(n) ? thaiNum(Math.round(n)) : null;
+    if (!t) { price = null; none.hidden = false; sayIn.hidden = true; none.textContent = isFinite(n) && n > 999999 ? "C’est un très gros montant : essaie avec moins de 1 000 000 ฿." : "Tape un montant en baht, il s’écrira ici en thaï."; return; }
+    price = { th: t.th + "บาท", rom: t.rom + " baht", n: Math.round(n) };
+    none.hidden = true; sayIn.hidden = false; thEl.textContent = price.th; roEl.textContent = price.rom;
+  }
+  function recalc() {
+    if (last === "thb") { var n = num(thb.value); eur.value = isFinite(n) ? fmt(n / rate, 2) : ""; }
+    else { var m = num(eur.value); if (isFinite(m)) { var v = m * rate; thb.value = fmt(v, v >= 100 ? 0 : 1); } else thb.value = ""; }
+    paintPrice();
+  }
+  thb.addEventListener("input", function () { last = "thb"; recalc(); });
+  eur.addEventListener("input", function () { last = "eur"; recalc(); });
+  $$("[data-quick]").forEach(function (b) { b.addEventListener("click", function () { last = "thb"; thb.value = fmt(parseFloat(b.getAttribute("data-quick")), 0); recalc(); }); });
+  $("#c-edit").addEventListener("click", function () { redit.hidden = !redit.hidden; if (!redit.hidden) { rin.value = fmt(rate, 2); try { rin.focus(); rin.select(); } catch (e) {} } });
+  $("#c-rok").addEventListener("click", function () {
+    var r = num(rin.value);
+    if (!(r >= 10 && r <= 100)) { toast("Choisis un taux entre 10 et 100 ฿ pour 1 €"); return; }
+    rate = r; var d = ""; try { d = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" }); } catch (e) {}
+    label = "taux réglé à la main" + (d ? " le " + d : "");
+    LS.set("carnet.rate", String(r)); LS.set("carnet.rate.d", label);
+    redit.hidden = true; paintRate(); recalc(); toast("Taux enregistré");
+  });
+  $("#c-rreset").addEventListener("click", function () {
+    rate = def; label = "taux relevé le " + defLabel; LS.del("carnet.rate"); LS.del("carnet.rate.d");
+    redit.hidden = true; paintRate(); recalc(); toast("Taux de départ remis");
+  });
+  $("#c-show").addEventListener("click", function () { if (price) Show.open({ th: price.th, rom: price.rom, fr: fmt(price.n, 0) + " ฿", np: true }, this); });
+  $("#c-say-btn").addEventListener("click", function () { if (price) say(price.th, this); });
+  paintRate(); paintPrice();
+})();
+paintPol();
 
 /* ───────────── démarrage ───────────── */
 DB.keys().then(function (keys) {

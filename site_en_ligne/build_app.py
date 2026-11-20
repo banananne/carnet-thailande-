@@ -41,6 +41,27 @@ def rich(s):
     return "".join(out)
 
 
+TOKEN = re.compile(r"\*\*(.+?)\*\*|__(.+?)__|\^\^(.+?)\^\^|~~(.+?)~~", re.S)
+
+
+def rich2(s):
+    """Texte des pages « Good to know » : **gras**, __transcription__, ^^thaï^^, ~~exposant~~ (imbriquables)."""
+    out, pos = [], 0
+    for m in TOKEN.finditer(s):
+        out.append(txt(s[pos:m.start()]))
+        if m.group(1) is not None:
+            out.append("<b>%s</b>" % rich2(m.group(1)))
+        elif m.group(2) is not None:
+            out.append('<i class="rom">%s</i>' % txt(m.group(2)))
+        elif m.group(3) is not None:
+            out.append('<span class="th" lang="th">%s</span>' % esc(m.group(3)))
+        else:
+            out.append("<sup>%s</sup>" % txt(m.group(4)))
+        pos = m.end()
+    out.append(txt(s[pos:]))
+    return "".join(out).replace("\n", "<br>")
+
+
 def maps_search(q):
     return "https://www.google.com/maps/search/?api=1&query=" + urllib.parse.quote(q, safe="")
 
@@ -227,7 +248,9 @@ def hotel_html(h):
                '<a class="btn sm" href="%s" target="_blank" rel="noopener noreferrer">%sVoir sur Maps</a>'
                '<a class="btn sm alt" href="%s" target="_blank" rel="noopener noreferrer">%sItinéraire</a>'
                '<button class="btn sm alt" type="button" data-act="copy" data-copy="%s" data-ok="Adresse copiée">%sCopier</button>'
-               % (esc(maps_search(h["q"])), icon("pin"), esc(maps_dir(h["q"])), icon("route"), esc(h["addr"]), icon("copy")))
+               '<a class="btn sm alt" href="#/taxi/%s">%sCarte taxi</a>'
+               % (esc(maps_search(h["q"])), icon("pin"), esc(maps_dir(h.get("ll") or h["q"])), icon("route"), esc(h["addr"]), icon("copy"),
+                  h["id"], icon("car")))
     body += row("Téléphone", esc(h["phone"]),
                 '<a class="btn sm" href="tel:%s">%sAppeler</a>'
                 '<button class="btn sm alt" type="button" data-act="copy" data-copy="%s" data-ok="Numéro copié">%sCopier</button>'
@@ -251,16 +274,16 @@ def view_hotels():
 
 # ───────────────────────── utile + métro ─────────────────────────
 def view_utile():
-    soon = [("book", "Lexique en thaï", "À lire ou à écouter"), ("car", "Cartes taxi", "Les adresses des hôtels, en thaï"),
-            ("coin", "Convertisseur", "Baht et euro"), ("info", "Bon à savoir", "Les petits conseils du carnet")]
+    items = [("rose", "#/metro", "train", "Plan du métro", "Bangkok : pince pour zoomer"),
+             ("sand", "#/lexique", "book", "Lexique en thaï", "À montrer ou à écouter"),
+             ("mustard", "#/taxi", "car", "Cartes taxi", "Les hôtels écrits en thaï"),
+             ("blue", "#/convertisseur", "coin", "Convertisseur", "Baht et euro"),
+             ("rose", "#/good-to-know", "info", "Good to know", "Histoire, savoir-vivre, urgences")]
     out = ('<main class="view" id="v-utile" hidden>'
            '<header class="vhead"><div class="wrap"><div><h1 tabindex="-1">Utile</h1><p>Ce qui dépanne en route</p></div></div></header>'
-           '<div class="wrap"><div class="list">'
-           '<a class="tile rose" href="#/metro"><span class="ic">%s</span><span><b>Plan du métro</b><small>Bangkok : pince pour zoomer</small></span></a>'
-           % icon("train"))
-    for ic, t, sub in soon:
-        out += ('<div class="tile soon"><span class="ic">%s</span><span><b>%s</b><small>%s</small></span><span class="badge">bientôt</span></div>'
-                % (icon(ic), txt(t), txt(sub)))
+           '<div class="wrap"><div class="list">')
+    for col, href, ic, t, sub in items:
+        out += '<a class="tile %s" href="%s"><span class="ic">%s</span><span><b>%s</b><small>%s</small></span></a>' % (col, href, icon(ic), txt(t), txt(sub))
     return out + "</div></div></main>"
 
 
@@ -276,6 +299,204 @@ def view_metro():
             '<button type="button" data-z="fit" aria-label="Tout le plan">%s</button></div></div>'
             '<p class="hint">Pince avec deux doigts pour zoomer, glisse pour te déplacer, touche deux fois pour zoomer d’un coup.</p></div></main>'
             % (icon("chevl"), icon("plus"), icon("minus"), icon("fit")))
+
+
+# ───────────────────────── étape 2 : lexique, cartes taxi, convertisseur, Good to know ─────────────────────────
+NUM_TH = {"1": "หนึ่ง", "2": "สอง", "3": "สาม", "4": "สี่", "5": "ห้า", "6": "หก", "7": "เจ็ด", "8": "แปด", "9": "เก้า", "10": "สิบ",
+          "20": "ยี่สิบ", "100": "หนึ่งร้อย", "1000": "หนึ่งพัน"}
+
+
+def back_head(title, sub, to="#/utile"):
+    return ('<header class="vhead"><div class="wrap"><a class="back" href="%s" aria-label="Retour">%s</a>'
+            '<div><h1 tabindex="-1">%s</h1><p>%s</p></div></div></header>' % (to, icon("chevl"), txt(title), txt(sub)))
+
+
+def say_btn(th, q, label):
+    return ('<button class="lx-say" type="button" data-say data-th="%s" data-q="%d" aria-label="Écouter : %s">%s</button>'
+            % (esc(th), q, esc(label), icon("speaker")))
+
+
+def lx_row(fr, rom, th, long=False):
+    q = 1 if "?" in fr else 0
+    label = re.sub(r"[«»]", "", fr).strip()
+    return ('<li class="lx%s"><button class="lx-main" type="button" data-show data-th="%s" data-rom="%s" data-fr="%s" data-q="%d" aria-label="Montrer en grand : %s">'
+            '<span class="fr">%s</span><span class="rom">%s</span><span class="th" lang="th">%s</span></button>%s</li>'
+            % (" long" if long else "", esc(th), esc(typo(rom)), esc(typo(fr)), q, esc(label),
+               txt(fr), txt(rom), esc(th), say_btn(th, q, label)))
+
+
+def num_tile(d, rom):
+    key = d.replace(NB, "").replace(" ", "")
+    th = NUM_TH[key]
+    return ('<button class="num" type="button" data-show data-np="1" data-th="%s" data-rom="%s" data-fr="%s" aria-label="Montrer en grand : %s">'
+            '<b>%s</b><small>%s</small></button>' % (esc(th), esc(rom), esc(d), esc(d), esc(d), esc(rom)))
+
+
+def lexique_section(d):
+    sid = re.sub(r"\W+", "-", d["title"].lower()).strip("-")
+    out = '<section class="lxs bubble sand" aria-labelledby="lx-%s"><h2 id="lx-%s">%s</h2>' % (sid, sid, txt(d["title"].capitalize()))
+    for b in d["blocks"]:
+        k = b["kind"]
+        if k in ("words", "phrases"):
+            out += '<ul class="lxl%s">%s</ul>' % (" sep" if b.get("sep") else "", "".join(lx_row(fr, rom, th, long=(k == "phrases")) for fr, rom, th in b["rows"]))
+        elif k == "words2":
+            rows = list(b["left"]) + list(b["right"])
+            out += '<ul class="lxl">%s</ul>' % "".join(lx_row(fr, rom, th) for fr, rom, th in rows)
+        elif k == "numbers":
+            lines = b["lines"]
+            top = [x for ln in lines[:2] for x in ln]
+            out += '<div class="nums">%s</div>' % "".join(num_tile(dg, rom) for dg, rom in top)
+            out += '<div class="nums n3">%s</div>' % "".join(num_tile(dg, rom) for dg, rom in lines[2])
+        elif k == "note":
+            out += '<p class="lx-note">%s</p>' % rich2(b["text"])
+        else:
+            raise ValueError(k)
+    return out + "</section>"
+
+
+def pol_html():
+    return ('<section class="pol" aria-labelledby="h-pol"><h2 id="h-pol">Mon petit mot poli</h2>'
+            '<p>En thaï, une phrase se termine par un petit mot poli, selon qui parle. Choisis le tien : il s’ajoutera quand tu montres ou écoutes une phrase.</p>'
+            '<div class="seg" role="group" aria-label="Mon petit mot poli">'
+            '<button type="button" data-pol="kha" aria-pressed="false"><span class="th" lang="th">ค่ะ</span><span><b>kha</b>pour une femme</span></button>'
+            '<button type="button" data-pol="khrap" aria-pressed="false"><span class="th" lang="th">ครับ</span><span><b>khrap</b>pour un homme</span></button>'
+            '</div></section>')
+
+
+def view_lexique():
+    out = ('<main class="view" id="v-lexique" hidden>' + back_head("Lexique", "Du thaï à montrer ou à écouter")
+           + '<div class="wrap"><p class="how">Touche une ligne pour la <b>montrer en grand</b>. Touche le haut-parleur pour l’<b>écouter</b>.</p>')
+    out += pol_html()
+    out += "".join(lexique_section(d) for d in D.STEP2["lexique"])
+    out += ('<p class="hint">Prononciation simplifiée, sans les tons : kh, ph, th = k, p, t avec un petit souffle (ph ne se dit jamais f). '
+            'Un doute ? Montre l’écriture thaïe.</p>')
+    return out + "</div></main>"
+
+
+# ── cartes taxi ──
+TAXI_SHORT = {"h1": "C’HOUSE", "h2": "Thai Thai", "h3": "Novotel", "h4": "Time Sabai"}
+
+
+def taxi_card(t):
+    h = D.HOTEL[t["hotel"]]
+    ask, meter, call = D.TAXI_PHRASES
+    name = ('<p class="tc-name" lang="th">%s</p><p class="tc-lat">%s</p>' % (esc(t["name_th"]), esc(t["name_lat"])) if t["name_th"]
+            else '<p class="tc-name lat">%s</p>' % esc(t["name_lat"]))
+    near = '<p class="tc-near" lang="th">%s</p>' % esc(t["near_th"]) if t["near_th"] else ""
+    card = ('<div class="tc"><p class="tc-ask" lang="th">%s</p>%s%s<p class="tc-addr" lang="th">%s</p><p class="tc-en">%s</p>'
+            '<p class="tc-meter" lang="th">%s</p><p class="tc-call" lang="th">%s</p><p class="tc-tel">%s</p></div>'
+            % (esc(ask[0]), name, near, esc(t["addr_th"]), esc(h["addr"].replace("Thaïlande", "Thailand")), esc(meter[0]), esc(call[0]), esc(h["phone"])))
+    help_ = "".join("<li><i class=\"rom\">%s</i><br>%s</li>" % (esc(rom), txt(fr)) for _th, rom, fr in D.TAXI_PHRASES)
+    near_fr = '<p class="tc-hint">%s%s</p>' % (icon("pin"), txt(t["near_fr"])) if t["near_fr"] else ""
+    acts = ('<div class="acts">'
+            '<button class="btn" type="button" data-show-card>%s Montrer en grand</button>'
+            '<button class="btn alt" type="button" data-say data-th="%s" data-q="0">%s Écouter</button>'
+            '<a class="btn alt" href="%s" target="_blank" rel="noopener noreferrer">%s Ouvrir dans Maps</a>'
+            '<a class="btn alt" href="tel:%s">%s Appeler l’hôtel</a>'
+            '<a class="btn alt" href="#/hotels/%s">%s Fiche de l’hôtel</a></div>'
+            % (icon("fit"), esc(ask[0].split("ครับ")[0]), icon("speaker"), esc(maps_dir(h.get("ll") or h["q"])), icon("route"),
+               esc(h["tel"]), icon("phone"), h["id"], icon("bed")))
+    return ('<article class="taxi" id="tx-%s" data-id="%s" hidden>%s%s%s<ul class="tc-help">%s</ul></article>'
+            % (t["id"], t["id"], card, acts, near_fr, help_))
+
+
+def view_taxi():
+    out = ('<main class="view" id="v-taxi" hidden>' + back_head("Cartes taxi", "À montrer au chauffeur")
+           + '<div class="wrap"><p class="how">Choisis où tu vas, puis montre l’écran au chauffeur.</p><div class="tpick" role="group" aria-label="Où vas-tu ?">')
+    for t in D.TAXI:
+        h = D.HOTEL[t["hotel"]]
+        st = D.STAGE[h["stage"]]
+        out += ('<button class="tchip" type="button" data-go-taxi="%s" aria-pressed="false" style="--c:%s"><i></i><b>%s</b><small>%s</small></button>'
+                % (t["id"], st["color"], txt(TAXI_SHORT[t["id"]]), txt(h["city"])))
+    out += "</div>" + "".join(taxi_card(t) for t in D.TAXI)
+    return out + "</div></main>"
+
+
+# ── convertisseur ──
+def fr_num(x, dec=2):
+    s = ("%." + str(dec) + "f") % x
+    if "." in s:
+        s = s.rstrip("0").rstrip(".")
+    ip, _, fp = s.partition(".")
+    ip = re.sub(r"(?<=\d)(?=(\d{3})+$)", NB, ip)
+    return ip + ("," + fp if fp else "")
+
+
+def view_convert():
+    r = D.RATE
+    out = ('<main class="view" id="v-convert" hidden>' + back_head("Convertisseur", "Baht et euro")
+           + '<div class="wrap"><section class="conv" id="conv" data-rate="%s" data-label="%s" aria-label="Convertisseur">'
+           % (r["value"], esc(r["label"])))
+    out += ('<label class="cf"><span class="cl"><b>฿</b>Baht</span><input id="c-thb" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="0" aria-label="Montant en baht"></label>'
+            '<label class="cf"><span class="cl"><b>€</b>Euro</span><input id="c-eur" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="0" aria-label="Montant en euros"></label>')
+    out += ('<div class="quick" role="group" aria-label="Montants rapides en baht">%s</div>'
+            % "".join('<button type="button" data-quick="%d">%s ฿</button>' % (v, fr_num(v, 0)) for v in (20, 50, 100, 200, 500, 1000)))
+    out += ('<p class="rate" id="c-rate">1 € = <b>%s ฿</b><span> · taux relevé le %s</span></p>'
+            '<div class="acts"><button class="btn sm alt" type="button" id="c-edit">Changer le taux</button></div>'
+            '<div class="redit" id="c-redit" hidden><label for="c-rin">1 € =</label><input id="c-rin" type="text" inputmode="decimal" autocomplete="off" aria-label="Taux : baht pour un euro"><span>฿</span>'
+            '<button class="btn sm" type="button" id="c-rok">OK</button><button class="btn sm alt" type="button" id="c-rreset">Taux de départ</button></div>'
+            '<p class="hint">Taux moyen du marché : un bureau de change, un distributeur ou ta carte donneront un peu moins. Règle le taux à la main quand tu veux.</p>'
+            % (fr_num(r["value"], 2), esc(r["label"])))
+    out += "</section>"
+    out += ('<section class="bubble sand" id="c-say" aria-labelledby="h-csay"><h2 id="h-csay">Dire le prix en thaï</h2>'
+            '<p class="csay-none" id="c-none">Tape un montant en baht, il s’écrira ici en thaï.</p>'
+            '<div id="c-sayin" hidden><p class="say-th" id="c-th" lang="th"></p><p class="say-rom" id="c-rom"></p>'
+            '<div class="acts"><button class="btn" type="button" id="c-show">%s Montrer</button>'
+            '<button class="btn alt" type="button" id="c-say-btn">%s Écouter</button></div></div></section>'
+            % (icon("fit"), icon("speaker")))
+    out += ('<section class="bubble blue" aria-labelledby="h-rep"><h2 id="h-rep">Repères</h2><div class="ref" id="c-ref" data-rate="%s">'
+            '<div><h3>Baht → euro</h3><ul>%s</ul></div><div><h3>Euro → baht</h3><ul>%s</ul></div></div></section>'
+            % (r["value"],
+               "".join('<li><span>%s ฿</span><b data-b="%d">%s €</b></li>' % (fr_num(v, 0), v, fr_num(v / r["value"], 2)) for v in (20, 50, 100, 200, 500, 1000, 2000)),
+               "".join('<li><span>%s €</span><b data-e="%d">%s ฿</b></li>' % (fr_num(v, 0), v, fr_num(v * r["value"], 0)) for v in (1, 5, 10, 20, 50, 100))))
+    return out + "</div></main>"
+
+
+# ── Good to know ──
+GTK_TEASER = {"HISTOIRE EN DATES": "De Sukhothaï à aujourd’hui", "SAVOIR-VIVRE EN PLUS": "Seuils, moines, repas…",
+              "BOUDDHISME ET ESPRITS": "Temples, moines, maisons des esprits", "UNE COULEUR PAR JOUR": "Chaque jour a la sienne",
+              "URGENCES": "Numéros utiles et mots clés"}
+
+
+def gtk_block(b):
+    k = b["kind"]
+    if k == "timeline":
+        return '<dl class="tm">%s</dl>' % "".join("<div><dt>%s</dt><dd>%s</dd></div>" % (esc(dt), rich2(t)) for dt, t in b["rows"])
+    if k == "bullets":
+        return '<ul class="bl">%s</ul>' % "".join("<li>%s</li>" % rich2(t) for t in b["items"])
+    if k == "para":
+        t = re.sub(r"\+66[\d ]+\d", lambda m: m.group(0).replace(" ", NB), b["text"])
+        return '<p class="gp%s">%s</p>' % (" sepl" if b.get("sep") else "", rich2(t))
+    if k == "days":
+        return '<ul class="dy">%s</ul>' % "".join('<li><i style="background:%s"></i><b>%s</b>%s</li>' % (c, esc(j), esc(col)) for j, col, c in b["items"])
+    if k == "emergency":
+        return '<div class="em">%s</div>' % "".join("<div><small>%s</small><b>%s</b></div>" % (txt(lab), esc(num)) for lab, num in b["items"])
+    if k == "words":
+        return '<ul class="lxl">%s</ul>' % "".join(lx_row(fr, rom, th, long=True) for fr, rom, th in b["rows"])
+    raise ValueError(k)
+
+
+def view_gtk():
+    out = ('<main class="view" id="v-gtk" hidden>' + back_head("Good to know", "Histoire, savoir-vivre, urgences")
+           + '<div class="wrap"><p class="how">Touche un titre pour ouvrir.</p>')
+    for d in D.STEP2["gtk"]:
+        sid = re.sub(r"\W+", "-", d["title"].lower()).strip("-")
+        out += ('<details class="gb" id="gb-%s"><summary><span><b>%s</b><small>%s</small></span>%s</summary><div class="gb-in">%s</div></details>'
+                % (sid, txt(d["title"].capitalize()), txt(GTK_TEASER[d["title"]]), icon("chevr"), "".join(gtk_block(b) for b in d["blocks"])))
+    return out + "</div></main>"
+
+
+# ── fenêtre « montrer en grand » (une seule pour tout le site) ──
+def show_overlay():
+    return ('<div id="show" class="show" role="dialog" aria-modal="true" aria-label="Montrer en grand" hidden>'
+            '<button class="show-x" type="button" data-show-close aria-label="Fermer">%s</button>'
+            '<div class="show-scroll"><div id="show-phrase"><p class="show-th" id="show-th" lang="th"></p><p class="show-rom" id="show-rom"></p><p class="show-fr" id="show-fr"></p></div>'
+            '<div id="show-card" hidden></div></div>'
+            '<div class="show-bar"><button class="btn" type="button" id="show-say">%s Écouter</button>'
+            '<div class="seg sm" id="show-pol" role="group" aria-label="Mon petit mot poli">'
+            '<button type="button" data-pol="kha" aria-pressed="false"><span class="th" lang="th">ค่ะ</span> kha</button>'
+            '<button type="button" data-pol="khrap" aria-pressed="false"><span class="th" lang="th">ครับ</span> khrap</button></div></div></div>'
+            % (icon("x"), icon("speaker")))
 
 
 # ───────────────────────── accueil ─────────────────────────
@@ -320,8 +541,10 @@ def view_home(version):
 
     tiles = [("sand", "#/jours", "calendar", "Jours", "18 décembre → 3 janvier", ""),
              ("blue", "#/hotels", "bed", "Hôtels", "Adresses et téléphones", ""),
+             ("mustard", "#/jours", "camera", "Photo du jour", "Un polaroïd par jour", " data-photo-tile"),
              ("rose", "#/metro", "train", "Métro", "Plan de Bangkok à zoomer", ""),
-             ("mustard", "#/jours", "camera", "Photo du jour", "Un polaroïd par jour", " data-photo-tile")]
+             ("blue", "#/lexique", "book", "Lexique", "Du thaï à montrer ou écouter", ""),
+             ("sand", "#/taxi", "car", "Cartes taxi", "Les hôtels écrits en thaï", "")]
     out += '<div class="tiles">'
     for col, href, ic, t, sub, extra in tiles:
         small = '<small data-photo-count>%s</small>' % txt(sub) if extra else "<small>%s</small>" % txt(sub)
@@ -329,7 +552,7 @@ def view_home(version):
     out += "</div>"
 
     out += ('<section class="bubble sand" aria-labelledby="h-soon"><h2 id="h-soon">Bientôt</h2>'
-            '<p>Lexique en thaï, cartes taxi, convertisseur de baht, jeux et doudous : ça arrive !</p></section>')
+            '<p>Les jeux du carnet, les doudous et les tampons de passeport : ça arrive !</p></section>')
     out += ('<section class="bubble rose install" id="install-box" hidden aria-labelledby="h-inst"><h2 id="h-inst">Sur ton écran d’accueil</h2>'
             '<p id="install-hint"></p><div class="acts"><button class="btn" type="button" id="install-btn" hidden>Installer l’appli</button></div></section>')
     out += ('<p class="foot">Carnet Thaïlande 2026 · <a href="test.html">Tester mon téléphone</a><small>version %s</small></p>' % esc(version))
@@ -351,7 +574,8 @@ def css_text():
 
 
 def render(version, head_meta):
-    body = (view_home(version) + view_days() + view_hotels() + view_utile() + view_metro() + nav_html()
+    body = (view_home(version) + view_days() + view_hotels() + view_utile() + view_metro() + view_lexique() + view_taxi()
+            + view_convert() + view_gtk() + nav_html() + show_overlay()
             + '<div id="toast" role="status" aria-live="polite"></div>'
             + '<div id="upd" hidden><span>Une nouvelle version est prête.</span><button class="btn sm" type="button" id="upd-btn">Actualiser</button></div>')
     js = open(os.path.join(ROOT, "app.js"), encoding="utf-8").read()

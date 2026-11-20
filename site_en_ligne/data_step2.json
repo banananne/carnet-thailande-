@@ -1,0 +1,445 @@
+{
+ "lexique": [
+  {
+   "title": "POLITESSE",
+   "blocks": [
+    {
+     "kind": "words",
+     "rows": [
+      [
+       "Bonjour, au revoir",
+       "sa-wat-dee",
+       "สวัสดี"
+      ],
+      [
+       "Merci",
+       "khop khun",
+       "ขอบคุณ"
+      ],
+      [
+       "Excusez-moi, pardon",
+       "kho thot",
+       "ขอโทษ"
+      ],
+      [
+       "Pas de souci, de rien",
+       "mai pen rai",
+       "ไม่เป็นไร"
+      ],
+      [
+       "Non merci",
+       "mai ao",
+       "ไม่เอา"
+      ]
+     ]
+    },
+    {
+     "kind": "note",
+     "text": "Les hommes ajoutent __khrap__ ^^ครับ^^ en fin de phrase, les femmes __kha__ ^^ค่ะ^^."
+    }
+   ]
+  },
+  {
+   "title": "CHIFFRES",
+   "blocks": [
+    {
+     "kind": "numbers",
+     "lines": [
+      [
+       [
+        "1",
+        "nueng"
+       ],
+       [
+        "2",
+        "song"
+       ],
+       [
+        "3",
+        "sam"
+       ],
+       [
+        "4",
+        "si"
+       ],
+       [
+        "5",
+        "ha"
+       ]
+      ],
+      [
+       [
+        "6",
+        "hok"
+       ],
+       [
+        "7",
+        "chet"
+       ],
+       [
+        "8",
+        "paet"
+       ],
+       [
+        "9",
+        "kao"
+       ],
+       [
+        "10",
+        "sip"
+       ]
+      ],
+      [
+       [
+        "20",
+        "yi sip"
+       ],
+       [
+        "100",
+        "nueng roi"
+       ],
+       [
+        "1 000",
+        "nueng phan"
+       ]
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "title": "À TABLE",
+   "blocks": [
+    {
+     "kind": "words2",
+     "left": [
+      [
+       "eau",
+       "nam plao",
+       "น้ำเปล่า"
+      ],
+      [
+       "bière",
+       "bia",
+       "เบียร์"
+      ],
+      [
+       "thé glacé",
+       "cha yen",
+       "ชาเย็น"
+      ],
+      [
+       "riz",
+       "khao",
+       "ข้าว"
+      ],
+      [
+       "nouilles",
+       "kuai tiao",
+       "ก๋วยเตี๋ยว"
+      ]
+     ],
+     "right": [
+      [
+       "poulet",
+       "kai",
+       "ไก่"
+      ],
+      [
+       "porc",
+       "mu",
+       "หมู"
+      ],
+      [
+       "poisson",
+       "pla",
+       "ปลา"
+      ],
+      [
+       "légumes",
+       "phak",
+       "ผัก"
+      ],
+      [
+       "coriandre",
+       "phak chi",
+       "ผักชี"
+      ]
+     ]
+    },
+    {
+     "kind": "words",
+     "sep": true,
+     "rows": [
+      [
+       "piment",
+       "phrik",
+       "พริก"
+      ],
+      [
+       "pimenté, piquant",
+       "phet",
+       "เผ็ด"
+      ],
+      [
+       "sans piment",
+       "mai sai phrik",
+       "ไม่ใส่พริก"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "title": "EN VOYAGE",
+   "blocks": [
+    {
+     "kind": "phrases",
+     "rows": [
+      [
+       "« Parlez-vous anglais ? »",
+       "phut pha-sa ang-krit dai mai ?",
+       "พูดภาษาอังกฤษได้ไหม"
+      ],
+      [
+       "« Je ne comprends pas. »",
+       "mai khao jai",
+       "ไม่เข้าใจ"
+      ],
+      [
+       "« Où sont les toilettes ? »",
+       "hong nam yu thi nai ?",
+       "ห้องน้ำอยู่ที่ไหน"
+      ],
+      [
+       "« Vous utilisez le compteur ? »",
+       "chai mi-toe mai ?",
+       "ใช้มิเตอร์ไหม"
+      ],
+      [
+       "« Combien pour aller à … ? »",
+       "pai … thao rai ?",
+       "ไป … เท่าไหร่"
+      ],
+      [
+       "« Arrêtez-vous ici. »",
+       "jot thi ni",
+       "จอดที่นี่"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "title": "AU MARCHÉ ET AU RESTAURANT",
+   "blocks": [
+    {
+     "kind": "phrases",
+     "rows": [
+      [
+       "« Combien ça coûte ? »",
+       "ni thao rai ?",
+       "นี่เท่าไหร่"
+      ],
+      [
+       "« C’est trop cher ! »",
+       "phaeng pai",
+       "แพงไป"
+      ],
+      [
+       "« Pas piquant, s’il vous plaît. »",
+       "kho mai phet",
+       "ขอไม่เผ็ด"
+      ],
+      [
+       "« De l’eau, s’il vous plaît. »",
+       "kho nam plao noi",
+       "ขอน้ำเปล่าหน่อย"
+      ],
+      [
+       "« L’addition, s’il vous plaît. »",
+       "kep ngoen duai",
+       "เก็บเงินด้วย"
+      ]
+     ]
+    }
+   ]
+  }
+ ],
+ "gtk": [
+  {
+   "title": "HISTOIRE EN DATES",
+   "blocks": [
+    {
+     "kind": "timeline",
+     "rows": [
+      [
+       "1238",
+       "Naissance du royaume de **Sukhothai**, souvent présenté comme le premier royaume thaï."
+      ],
+      [
+       "1351",
+       "Fondation d’**Ayutthaya**, capitale du royaume pendant plus de 400 ans."
+      ],
+      [
+       "1767",
+       "Ayutthaya est pillée et incendiée par l’armée birmane."
+      ],
+      [
+       "1782",
+       "**Rama I~~er~~** fonde **Bangkok** : début de la dynastie Chakri, qui règne encore."
+      ],
+      [
+       "1932",
+       "Fin de la monarchie absolue."
+      ],
+      [
+       "1939",
+       "Le Siam devient la Thaïlande."
+      ],
+      [
+       "1941",
+       "L’année commence le 1~~er~~ janvier, et non plus le 1~~er~~ avril."
+      ],
+      [
+       "1991",
+       "Sukhothai et Ayutthaya entrent au patrimoine mondial de l’UNESCO."
+      ],
+      [
+       "2016",
+       "Mort de **Bhumibol** : son fils **Vajiralongkorn** lui succède (couronné en 2019)."
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "title": "SAVOIR-VIVRE EN PLUS",
+   "blocks": [
+    {
+     "kind": "bullets",
+     "items": [
+      "**Seuils** : enjambe celui d’un temple, ne marche pas dessus.",
+      "**Objets** : donne et reçois de la main droite ou des deux mains, jamais de la gauche seule.",
+      "**Désigner** : de la main ouverte, jamais du doigt.",
+      "**Moines** : une femme ne les touche pas et ne leur tend rien directement. Elle pose l’objet pour qu’il le prenne.",
+      "**Chez quelqu’un** : on se déchausse et on apporte un petit cadeau (des fruits, pas d’argent).",
+      "**À table** : la cuillère est reine, la fourchette sert d’appui. On ne pique pas.",
+      "**Hymne national** : à 8 h et à 18 h, dans un parc ou une gare, on s’arrête et on reste immobile jusqu’à la fin de la musique.",
+      "**Photos** : ne photographie pas des fidèles en train de prier sans leur accord, et respecte les panneaux."
+     ]
+    }
+   ]
+  },
+  {
+   "title": "BOUDDHISME ET ESPRITS",
+   "blocks": [
+    {
+     "kind": "bullets",
+     "items": [
+      "**Plus de 9 Thaïs sur 10** sont bouddhistes (courant **theravada**) : les temples, ^^วัด^^ __wat__, font partie du quotidien.",
+      "**À l’aube**, les moines font leur tournée : les habitants leur donnent de la nourriture pour **faire du mérite** (^^ทำบุญ^^ __tham bun__).",
+      "Beaucoup d’hommes deviennent **moines** pour quelques jours ou quelques mois, parfois pour honorer leurs parents.",
+      "**Maisons des esprits** (^^ศาลพระภูมิ^^ __san phra phum__) : ces petits autels abritent l’esprit gardien d’un lieu. On y dépose fleurs, encens, eau ou boissons. Ne touche à rien et ne pose pas devant."
+     ]
+    }
+   ]
+  },
+  {
+   "title": "UNE COULEUR PAR JOUR",
+   "blocks": [
+    {
+     "kind": "para",
+     "text": "Chaque jour de la semaine a sa couleur. Beaucoup de Thaïs portent celle de leur jour de naissance lors des grandes occasions, pour se porter chance."
+    },
+    {
+     "kind": "days",
+     "items": [
+      [
+       "dimanche",
+       "rouge",
+       "#D9473F"
+      ],
+      [
+       "lundi",
+       "jaune",
+       "#F2C531"
+      ],
+      [
+       "mardi",
+       "rose",
+       "#EE8DB8"
+      ],
+      [
+       "mercredi",
+       "vert",
+       "#5CAA63"
+      ],
+      [
+       "jeudi",
+       "orange",
+       "#EE8A2E"
+      ],
+      [
+       "vendredi",
+       "bleu clair",
+       "#7DC0EA"
+      ],
+      [
+       "samedi",
+       "violet",
+       "#8C5FBA"
+      ]
+     ]
+    },
+    {
+     "kind": "para",
+     "text": "Le **jaune** du lundi est la couleur du roi, né un lundi comme son père : on le porte surtout lors des cérémonies royales."
+    }
+   ]
+  },
+  {
+   "title": "URGENCES",
+   "blocks": [
+    {
+     "kind": "emergency",
+     "first": true,
+     "items": [
+      [
+       "police",
+       "191"
+      ],
+      [
+       "police touristique",
+       "1155"
+      ],
+      [
+       "ambulance",
+       "1669"
+      ]
+     ]
+    },
+    {
+     "kind": "words",
+     "rows": [
+      [
+       "« Au secours ! »",
+       "chuai duai",
+       "ช่วยด้วย"
+      ],
+      [
+       "« Je suis malade. »",
+       "mai sa-bai",
+       "ไม่สบาย"
+      ]
+     ]
+    },
+    {
+     "kind": "para",
+     "sep": true,
+     "text": "**Ambassade de France** : +66 2 657 51 00.\nUrgence consulaire : +66 81 994 49 01."
+    }
+   ]
+  }
+ ]
+}

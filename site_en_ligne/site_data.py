@@ -27,7 +27,7 @@ STAGE = {s["id"]: s for s in STAGES}
 HOTELS = [
     dict(id="h1", name="C’HOUSE", city="Bangkok", dates="19 → 26 décembre", nights="7 nuits", stage="s1",
          addr="114 Salak Hin Alley, Rong Mueang, Pathum Wan, Bangkok 10330, Thaïlande",
-         q="114 Salak Hin Alley, Rong Mueang, Pathum Wan, Bangkok 10330",
+         q="C'HOUSE Bangkok, 114 Salak Hin Alley, Rong Mueang, Pathum Wan, Bangkok 10330", ll="13.73991585,100.51773834",
          phone="+66 97 005 4500", tel="+66970054500", mail="c.house.bangkok@gmail.com"),
     dict(id="h2", name="Thai Thai Sukhothaï Resort", city="Sukhothaï", dates="26 → 29 décembre", nights="3 nuits", stage="s2",
          addr="95/8 Moo 3 Napho-Khirimas Road Historical Park Mueang Kao, Mueang Sukhothai District, Sukhothai 64210, Thaïlande",
@@ -259,3 +259,36 @@ def facts_for(day):
     if page == "15":
         cards = cards[:2]          # la 3e carte est le lexique des temples (mis en forme à part)
     return cards
+
+
+# ───────────────────────── étape 2 : lexique, cartes taxi, convertisseur, Good to know ─────────────────────────
+# Lexique et bulles « Good to know » : copie fidèle des pages 5 du carnet (extraites par _dev/extract_step2.py).
+STEP2 = json.load(open(os.path.join(ROOT, "data_step2.json"), encoding="utf-8"))
+
+# Taux du convertisseur : réglable à la main sur chaque téléphone ; valeur de départ = taux moyen du marché relevé le 20 novembre 2026
+# (1 € = 37,24 ฿ sur currencyconvert.online, 37,21 ฿ sur OFX le 18 novembre) : un taux de bureau de change ou de carte sera un peu moins bon.
+RATE = dict(value=37.2, label="20 novembre 2026")
+
+# Cartes taxi : noms et adresses en thaï relevés sur des pages thaïes (Accor pour le Novotel, hotels.com pour le Thai Thai,
+# page de réservation du C'HOUSE pour « Trok Salakhin », hotels.com pour la rue du Time Sabai). Quand le nom thaï n'est pas
+# connu (C'HOUSE, Time Sabai 134), la carte montre le nom en lettres latines, comme sur l'enseigne.
+TAXI = [
+    dict(id="h1", hotel="h1", name_th=None, name_lat="C’HOUSE Bangkok",
+         addr_th="114 ตรอกสลักหิน แขวงรองเมือง เขตปทุมวัน กรุงเทพมหานคร 10330",
+         near_th="ใกล้สถานีหัวลำโพง", near_fr="Près de la gare de Hua Lamphong"),
+    dict(id="h2", hotel="h2", name_th="ไทย ไทย สุโขทัย รีสอร์ท", name_lat="Thai Thai Sukhothai Resort",
+         addr_th="95/8 หมู่ 3 ถนนนาโพธิ์-คีรีมาศ (อุทยานประวัติศาสตร์) ต.เมืองเก่า อ.เมือง จ.สุโขทัย 64210",
+         near_th=None, near_fr="Près du parc historique de Sukhothaï"),
+    dict(id="h3", hotel="h3", name_th="โนโวเทล ระยอง ริมเพ รีสอร์ท", name_lat="Novotel Rayong Rim Pae Resort",
+         addr_th="4/5 หมู่ 3 ถนนเพ-แกลง-กล่ำ ต.ชากพง อ.แกลง จ.ระยอง 21190",
+         near_th=None, near_fr="En bord de mer, à environ 12 km de Ban Phe"),
+    dict(id="h4", hotel="h4", name_th=None, name_lat="Time Sabai 134",
+         addr_th="134/6 ถนนบ้านพานถม แขวงบ้านพานถม เขตพระนคร กรุงเทพมหานคร 10200",
+         near_th=None, near_fr=None),
+]
+TAXI_PHRASES = [  # (thaï, transcription, français)
+    ("ช่วยไปส่งที่นี่หน่อยครับ/ค่ะ", "chuai pai song thi ni noi khrap/kha", "Emmenez-moi ici, s’il vous plaît."),
+    ("ขอเปิดมิเตอร์ด้วยครับ/ค่ะ", "kho poet mi-toe duai khrap/kha", "Mettez le compteur, s’il vous plaît."),
+    ("ถ้าหาไม่เจอ ช่วยโทรหาโรงแรมให้หน่อยครับ/ค่ะ", "tha ha mai jer, chuai tho ha rong-raem hai noi khrap/kha",
+     "Si vous ne trouvez pas, appelez l’hôtel, s’il vous plaît."),
+]

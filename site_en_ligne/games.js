@@ -100,7 +100,16 @@ window.CarnetGames = (function () {
         btn.hidden = on; box.hidden = !on;
         if (on && !box.firstChild) {
           var src = slotOf("d", id), svg = src && $(".stamp", src);
-          if (svg) { var cl = svg.cloneNode(true); box.appendChild(cl); }
+          if (svg) {
+            /* la copie garde ses propres identifiants : le texte courbé ne dépend pas du passeport (caché sur les pages de jour) */
+            var cl = svg.cloneNode(true);
+            $$("[id]", cl).forEach(function (n) {
+              var o = n.id, u = "d" + o;
+              n.id = u;
+              $$('[href="#' + o + '"]', cl).forEach(function (m) { m.setAttribute("href", "#" + u); });
+            });
+            box.appendChild(cl);
+          }
         }
       });
     }

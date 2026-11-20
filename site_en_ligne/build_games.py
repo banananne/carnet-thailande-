@@ -4,6 +4,7 @@ Données : data_test_doudou.json, data_horoscope.json, data_motsmeles.json (extr
 import json, os, re, unicodedata
 
 import site_data as D
+import stamps as ST
 import data_games as G
 import build_app as A
 from build_site import ROOT, icon, sticker
@@ -221,98 +222,30 @@ def view_horo():
 
 
 # ───────────────────────── passeport ─────────────────────────
-INK = {"vol": "#283881", "s1": "#A51C36", "s2": "#B25E00", "s3": "#283881", "s4": "#6B2F7A"}
-BONUS_INK = ["#1E7B4F", "#6B2F7A", "#0F6B73", "#A51C36", "#283881", "#B25E00"]
 ROT = [-9, 6, -4, 9, -7, 4, -11, 8, -3, 11, -6, 5, -10, 7, -2, 10, -5, 3, -8, 6, -4, 9, -7]
-ARC_TOP = "M 21.5 60 A 38.5 38.5 0 0 1 98.5 60"
-ARC_BOT = "M 15.5 60 A 44.5 44.5 0 0 0 104.5 60"
-
-
-def fit(s, width, mx):
-    return max(6.5, min(mx, width / (max(1, len(s)) * 0.6)))
-
-
-def stamp_svg(uid, shape, top, big, small, bottom, color, rot, picto=None):
-    """Tampon de passeport dessiné à la main (SVG), encre irrégulière grâce au filtre #ink défini une fois dans la page."""
-    g = '<g transform="rotate(%d 60 60)" filter="url(#ink)" fill="none" stroke="currentColor" stroke-linecap="round">' % rot
-    t = lambda x, y, s, fs, extra="": '<text x="%s" y="%s" text-anchor="middle" font-size="%.1f"%s>%s</text>' % (x, y, fs, extra, esc(s))
-    if shape == "round":
-        g += '<circle cx="60" cy="60" r="55" stroke-width="3.4"/><circle cx="60" cy="60" r="49" stroke-width="1.2"/>'
-        g += ('<defs><path id="%st" d="%s"/><path id="%sb" d="%s"/></defs>' % (uid, ARC_TOP, uid, ARC_BOT))
-        g += ('<text font-size="%.1f" letter-spacing="1.1"><textPath href="#%st" startOffset="50%%" text-anchor="middle">%s</textPath></text>' % (fit(top, 96, 11.5), uid, esc(top)))
-        g += ('<text font-size="%.1f" letter-spacing="1.1"><textPath href="#%sb" startOffset="50%%" text-anchor="middle">%s</textPath></text>' % (fit(bottom, 112, 11), uid, esc(bottom)))
-        if picto:
-            g += '<g transform="translate(34 32) scale(2.1)" stroke-width="1.35" fill="none">%s</g>' % picto
-        else:
-            g += t(60, 67, big, 33, ' font-weight="800"') + t(60, 80, small, 9.5, ' letter-spacing="1.2"')
-        g += '<path d="M44 52h-6M76 52h6" stroke-width="1.2"/>' if not picto else ""
-    elif shape == "rect":
-        g += '<rect x="7" y="21" width="106" height="78" rx="11" stroke-width="3.2"/><rect x="12.5" y="26.5" width="95" height="67" rx="6.5" stroke-width="1.2"/>'
-        g += t(60, 43, top, fit(top, 88, 12.5), ' letter-spacing="1.2"')
-        g += '<path d="M20 49.5h80M20 79.5h80" stroke-width="1"/>'
-        if picto:
-            g += '<g transform="translate(46 50) scale(1.1)" stroke-width="1.7" fill="none">%s</g>' % picto
-        else:
-            g += t(60, 74, big, 27, ' font-weight="800"')
-        bl = (bottom + " " + small).strip() if not picto else bottom
-        g += t(60, 90, bl, fit(bl, 88, 11), ' letter-spacing="1.2"')
-    elif shape == "oval":
-        g += '<ellipse cx="60" cy="60" rx="56" ry="41" stroke-width="3.2"/><ellipse cx="60" cy="60" rx="50" ry="35" stroke-width="1.2"/>'
-        g += t(60, 41, top, fit(top, 76, 11), ' letter-spacing="1.1"')
-        if picto:
-            g += '<g transform="translate(40 42) scale(1.65)" stroke-width="1.4" fill="none">%s</g>' % picto
-        else:
-            g += t(60, 69, big, 30, ' font-weight="800"') + t(60, 79, small, 8.5, ' letter-spacing="1.2"')
-        g += t(60, 91, bottom, fit(bottom, 76, 10.5), ' letter-spacing="1.1"')
-    elif shape == "hex":
-        g += ('<polygon points="114,60 87,106.8 33,106.8 6,60 33,13.2 87,13.2" stroke-width="3.2" stroke-linejoin="round"/>'
-              '<polygon points="107,60 83.5,100.7 36.5,100.7 13,60 36.5,19.3 83.5,19.3" stroke-width="1.2" stroke-linejoin="round"/>')
-        g += t(60, 38, top, fit(top, 56, 11), ' letter-spacing="1"')
-        if picto:
-            g += '<g transform="translate(38 41) scale(1.75)" stroke-width="1.4" fill="none">%s</g>' % picto
-        else:
-            g += t(60, 69, big, 30, ' font-weight="800"') + t(60, 79, small, 8.5, ' letter-spacing="1.2"')
-        g += t(60, 93, bottom, fit(bottom, 58, 10.5), ' letter-spacing="1"')
-    else:  # ticket : bords encochés
-        g += ('<path d="M9 22H111V50a10 10 0 0 0 0 20V98H9V70a10 10 0 0 0 0-20Z" stroke-width="3.2" stroke-linejoin="round"/>'
-              '<path d="M16 29H104V50M104 70V91H16V70M16 50V29" stroke-width="1.1" stroke-dasharray="3 2.2"/>')
-        g += t(60, 44, top, fit(top, 76, 12), ' letter-spacing="1.2"')
-        if picto:
-            g += '<g transform="translate(47 48) scale(1.05)" stroke-width="1.7" fill="none">%s</g>' % picto
-        else:
-            g += t(60, 74, big, 26, ' font-weight="800"')
-        bl = (bottom + " " + small).strip() if not picto else bottom
-        g += t(60, 88, bl, fit(bl, 76, 11), ' letter-spacing="1.2"')
-    g += "</g>"
-    return ('<svg class="stamp" viewBox="0 0 120 120" aria-hidden="true" focusable="false" style="color:%s" '
-            'font-family="\'Barlow Condensed\',\'Barlow\',sans-serif" font-weight="700">%s</svg>' % (color, g))
-
-
-SHAPES = ["round", "rect", "oval", "hex", "ticket"]
-ICON_OF = {"quiz": "question", "doudou": "heart", "mots": "grid", "blind": "music", "etoiles": "star", "photos": "camera"}
-
-
-def inner_icon(name):
-    return re.sub(r'^<svg[^>]*>|</svg>$', "", icon(name))
 
 
 def day_stamp(i, d):
+    """Tampon d'un jour : cadre, encre et petit dessin propres à la journée (voir stamps.DAY_SPEC)."""
     dt = A.dparse(d["id"])
     stage = d["stage"]
     city = "PARIS · BANGKOK" if stage == "vol" else D.STAGE[stage]["city"].upper()
-    word = G.STAMP_WORDS[d["id"]]
-    shape = SHAPES[i % 5]
+    shape, color, picto = ST.DAY_SPEC[d["id"]]
     mon = A.MO3[dt.month - 1].replace(".", "").upper()
-    if shape in ("rect", "ticket"):
-        big, small = "%d %s" % (dt.day, mon), str(dt.year)
-    else:
-        big, small = str(dt.day), "%s %d" % (mon, dt.year)
-    return stamp_svg("st%d" % i, shape, word, big, small, city, INK[stage], ROT[i % len(ROT)])
+    rot = ROT[i % len(ROT)]
+    if shape == "banner":
+        rot = max(-4, min(4, rot))
+    return ST.stamp_svg("st%d" % i, shape, G.STAMP_WORDS[d["id"]], ST.P[picto], "%d %s" % (dt.day, mon), city, color, rot)
 
 
 def bonus_stamp(j, key, word):
-    shape = ["round", "hex", "oval", "round", "hex", "oval"][j]
-    return stamp_svg("sb%d" % j, shape, "THAÏLANDE 2026" if shape != "oval" else "THAÏLANDE", "", "", word, BONUS_INK[j], ROT[(j * 3 + 5) % len(ROT)], inner_icon(ICON_OF[key]))
+    shape, color, picto = ST.BONUS_SPEC[key]
+    city = "TAMPON SPÉCIAL" if shape in ("round", "arch", "postage", "banner") else ""
+    rot = ROT[(j * 3 + 5) % len(ROT)]
+    if shape == "banner":
+        rot = max(-4, min(4, rot))
+    top = {"postmark": "2026", "hex": "THAÏLANDE", "arch": "THAÏLANDE", "octagon": "THAÏLANDE", "postage": "THAÏLANDE", "oval": "THAÏLANDE"}.get(shape, "THAÏLANDE 2026")
+    return ST.stamp_svg("sb%d" % j, shape, top, ST.P[picto], word, city, color, rot)
 
 
 INK_FILTER = ('<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>'
@@ -334,13 +267,13 @@ def view_pass():
     for i, d in enumerate(D.DAYS):
         dt = A.dparse(d["id"])
         out += ('<button class="slot" type="button" data-stamp="d" data-id="%s" data-word="%s" aria-pressed="false" aria-label="%s">'
-                '<span class="slot-ph"><b>%d</b><small>%s</small></span>%s</button>'
-                % (d["id"], esc(G.STAMP_WORDS[d["id"]].capitalize()), esc("Tampon du " + A.day_title(d["id"]).lower()), dt.day, A.MO3[dt.month - 1], day_stamp(i, d)))
+                '<span class="slot-ph d"><i>%s</i><b>%d</b><small>%s</small></span>%s</button>'
+                % (d["id"], esc(G.STAMP_WORDS[d["id"]].capitalize()), esc("Tampon du " + A.day_title(d["id"]).lower()), ST.picto_icon(ST.DAY_SPEC[d["id"]][2]), dt.day, A.MO3[dt.month - 1], day_stamp(i, d)))
     out += '</div></section><section class="pp" aria-label="Tampons spéciaux"><h2 class="sech navy">Les tampons spéciaux</h2><div class="pp-grid">'
     for j, (key, word, title, how) in enumerate(G.BONUS_STAMPS):
         out += ('<button class="slot" type="button" data-stamp="b" data-id="%s" data-how="%s" data-title="%s" aria-pressed="false" aria-label="%s">'
                 '<span class="slot-ph"><i>%s</i><small>%s</small></span>%s</button>'
-                % (key, esc(how), esc(title), esc("Tampon spécial : " + title), icon(ICON_OF[key]), esc(title), bonus_stamp(j, key, word)))
+                % (key, esc(how), esc(title), esc("Tampon spécial : " + title), ST.picto_icon(ST.BONUS_SPEC[key][2]), esc(title), bonus_stamp(j, key, word)))
     out += ('</div></section><div class="acts"><button class="btn sm alt" type="button" id="pp-reset">%s <span>Effacer tous les tampons</span></button></div></div></main>' % icon("refresh"))
     return out
 

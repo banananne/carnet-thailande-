@@ -3,12 +3,18 @@
 Cette branche ne sert qu'à garder une copie des fichiers qui fabriquent le site. Le site publié
 est sur la branche `main` (GitHub Pages) : ne rien publier ici.
 
-Dernière mise à jour : 20 novembre 2026, 23 h 15. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
+Dernière mise à jour : 20 novembre 2026, 23 h 40. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
 cartes taxi, convertisseur, Good to know) et étape 3 (jeux : quiz, test de personnalité, blind test, mots mêlés,
 horoscope, mascottes, passeport de tampons), publiées ensemble à 22 h 24 (commit 34db76e), puis vague 1 des
 améliorations (accueil allégé à quatre rubriques, « Qui es-tu ? » qui se replie, « doudous » devenus « mascottes »,
 « test du doudou » devenu « test de personnalité ») publiée à 22 h 59 (branche `main`, commit fd09c91, version de
-construction 20261120-225758). Ces sources correspondent à ce qui est publié.
+construction 20261120-225758).
+
+**ATTENTION : ces sources contiennent aussi la vague 2, NON PUBLIÉE** (nouveaux tampons du passeport : `stamps.py`,
+et modifications de `build_games.py`, `games.js`, `games.css`). Version de construction locale 20261120-232939. Anne a
+reçu une planche à 23 h 40 et doit donner son accord avant la publication. Tant que le site en ligne n'affiche pas
+une version de construction 20261120-232939 ou plus récente, le site publié correspond aux sources de la vague 1
+(commit 685cfe7 de cette branche). Quand la vague 2 sera publiée, remplacer ce paragraphe.
 
 ## Reconstruire le site
 1. Remettre `site_en_ligne/` dans `/home/claude/site_en_ligne/` et les autocollants de `stickers/`
@@ -43,6 +49,9 @@ construction 20261120-225758). Ces sources correspondent à ce qui est publié.
   `#/doudous` marchent encore).
 - `app.css`, `app.js` : style et comportement (navigation, photo du jour, copie, plan du métro, voix thaïe,
   lexique, cartes taxi, convertisseur).
+- `stamps.py` (vague 2, non publié) : dessins (pictogrammes en traits), cadres (ticket, rond, ovale, arche, hexagone,
+  rectangle, timbre, dentelé, cachet postal, bandeau, octogone) et encres des 23 tampons ; `DAY_SPEC` et `BONUS_SPEC` donnent
+  cadre, couleur et dessin de chaque jour et de chaque tampon spécial ; `stamp_svg()` dessine un tampon.
 - `games.js`, `games.css` : comportement et style des jeux. `games.js` est collé dans `app.js` au moment du
   build (repère `/*@GAMES@*/`) et `games.css` est ajouté à `app.css`.
 - `img/` : les quatre mascottes détourées (WebP), extraits de la page 23 du PDF.
@@ -64,4 +73,9 @@ mot du doudou ; `t16.py` débordements de 320 à 768 px sur les vues des jeux ; 
 bas : c'est un artéfact, t18b le vérifie correctement) ; `t19.py` captures d'aperçu. Vague 1 : `t20.py` accueil
 (première visite, choix du prénom, repli automatique, réouverture, clavier, rechargement, prénom inconnu, 5 largeurs,
 script d'en-tête sans clignotement) et vocabulaire (mascottes, test de personnalité, anciennes adresses).
+Vague 2 (tampons) : `t21.py` planches (passeport plein, à moitié rempli, vide ; un fichier par tampon),
+`t22.py` tampon sur les pages de jour, `t23_phone.py` captures du passeport sur téléphone, `t24_planche.py` planche
+légendée montrée à Anne (à partir des fichiers de `t21.py`), `t26.py` texte courbé sur les pages de jour,
+`t27.py` variété des cadres/encres/dessins, tampons non rognés (contrôle des pixels du bord), cases vides, clics,
+identifiants uniques, remise à zéro ; `t27neg.py` contrôle négatif du test de rognage.
 `test_photo_0..4.jpg` : petites photos pour tester la photo du jour. Les chemins de captures (variable `OUT`) sont à adapter.

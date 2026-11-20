@@ -87,8 +87,9 @@ BONUS_STAMPS = [
 ]
 
 # ───────────── cadenas : le test de personnalité s'ouvre à une date (heure locale du téléphone) ─────────────
-# Anne peut l'ouvrir plus tôt en tapant un mot secret (les mots, sans accents ni majuscules, sont les mêmes pour tous les téléphones).
-# Dans le site publié, on ne garde que leur empreinte (voir build_games.fnv) ; les mots eux-mêmes sont dans la conversation avec Anne.
+# Anne peut l'ouvrir plus tôt en tapant un mot secret (sans accents ni majuscules, comme sur tous les téléphones).
+# Dans le site publié, seules les empreintes (FNV-1a, voir build_games.fnv) des mots sont écrites : un coup d'œil dans la page ne les révèle pas.
+# Mais les mots sont ici, en clair, dans la branche `sources` du dépôt public : c'est un verrou de jeu, pas un coffre-fort.
 TEST_OPEN = "2026-12-29"
 TEST_OPEN_TXT = "29\u00a0décembre"   # espace insécable : le jour et le mois ne se séparent pas en fin de ligne
 TEST_WORDS = ["mangoustan", "mangosteen"]

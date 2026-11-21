@@ -2,8 +2,8 @@
 """Étape 3 (les jeux) : textes et réglages qui ne viennent pas du PDF.
 Ce qui vient du PDF est dans data_test_doudou.json, data_horoscope.json, data_motsmeles.json et site_data.QUIZ."""
 
-# Lien de la playlist du blind test : à remplir quand Anne l'envoie (tant que c'est vide, le bouton n'apparaît pas)
-PLAYLIST_URL = ""
+# Lien de la playlist du blind test (Spotify, envoyé par Anne le 21 novembre 2026) ; si on le vide, le bouton disparaît
+PLAYLIST_URL = "https://open.spotify.com/playlist/1OMK0fTqq4Q0TOFdvUxt05"
 
 PLAYERS = [("Arthur", "#283881", "#FFFFFF"), ("Daphne", "#E9A9B8", "#5B1025"), ("Flo", "#F2A71B", "#5B1025"), ("Anne", "#A51C36", "#FFFFFF")]
 

@@ -407,3 +407,8 @@ a.tag{text-decoration:none}
 .gb .lx{border-top-color:rgba(40,56,129,.3)}
 .gb .lx-say{background:rgba(255,255,255,.8)}
 @media (max-width:349px){.show-th{font-size:2.6rem}.nums{gap:6px}.num b{font-size:1.3rem}.dy{grid-template-columns:1fr}.tpick{grid-template-columns:1fr}}
+
+/* espace visiteur : cinquième pastille « Je suis invité·e » sur toute la largeur */
+.who button.guest:last-child:nth-child(odd){grid-column:1/-1}
+.who button.guest{background:rgba(204,217,244,.45)}
+html.is-guest .rl-box{display:none}

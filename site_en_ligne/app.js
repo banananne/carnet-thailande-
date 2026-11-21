@@ -107,7 +107,12 @@ function paintWho() {
     if (on) sel = b;
   });
   whoAv.textContent = "";
-  if (me && sel) {
+  document.documentElement.classList.toggle("is-guest", me === "Invité");   /* espace visiteur : pas d'enveloppes, d'horoscope du jour ni de rôles du jour */
+  if (me === "Invité" && sel) {
+    hello.textContent = "Bienvenue ! Tu visites le carnet en invité·e : les enveloppes secrètes et les rôles du jour sont réservés aux voyageurs.";
+    whoHi.textContent = ""; var gb = document.createElement("b"); gb.textContent = "Bienvenue"; whoHi.appendChild(gb); whoHi.appendChild(document.createTextNode("\u00a0!"));
+    var gi = $(".ini", sel); if (gi) whoAv.appendChild(gi.cloneNode(true));
+  } else if (me && sel) {
     hi(hello, me); hi(whoHi, me);
     var ini = $(".ini", sel); if (ini) whoAv.appendChild(ini.cloneNode(true));
   } else { hello.textContent = "Appuie sur ton prénom."; whoBar.hidden = true; }

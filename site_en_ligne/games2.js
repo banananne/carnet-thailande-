@@ -7,7 +7,7 @@
   function jobj(k) { var v = jget(k, {}); return v && typeof v === "object" && !(v instanceof Array) ? v : {}; }
   function toggleIn(list, id) { var i = list.indexOf(id); if (i >= 0) list.splice(i, 1); else list.push(id); return i < 0; }
   function plural(n, one, many) { return n + " " + (n > 1 ? many : one); }
-  function paintWhoPick(root) { var wp = $(".whopick", root); if (wp) wp.hidden = !!me(); }
+  function paintWhoPick(root) { var wp = $(".whopick", root); if (wp) wp.hidden = !!me() || LS.get("carnet.who", "") === "Invité"; }
   /* pastilles « Qui es-tu ? » des jeux : même mémoire que l'accueil */
   document.addEventListener("click", function (e) {
     var b = e.target.closest ? e.target.closest("[data-wp]") : null; if (!b) return;
@@ -273,7 +273,7 @@
       g.fillStyle = "#A51C36"; g.fillRect(0, 0, W, 250);
       g.textAlign = "center"; g.textBaseline = "alphabetic";
       g.fillStyle = "#F7D294"; g.font = "800 128px " + C; g.fillText("PRIX DU VOYAGE", W / 2, 148);
-      g.fillStyle = "#FFFFFF"; g.font = "600 44px " + B; g.fillText("Thaïlande 2026 · 19.12 → 03.01", W / 2, 214);
+      g.fillStyle = "#FFFFFF"; g.font = "600 44px " + B; g.fillText("Thaïlande 2026 · 18.12 → 03.01", W / 2, 214);
       var y0 = 284, h = 112, gap = 8;
       rows.forEach(function (li, i) {
         var y = y0 + i * (h + gap), w = votes[li.getAttribute("data-k")] || "", col = PCOL[w] || ["#CCD9F4", "#1B2557"];

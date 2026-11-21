@@ -75,7 +75,7 @@ def real_data():
     assert set(d) == {"s", "b"} and set(d["s"]) == set(d["b"]), "env_public.json : forme inattendue"
     for who, bl in d["b"].items():
         for w, x in bl.items():
-            assert w in {"w1", "w2", "w3"} and set(x) == {"iv", "ct"}, (who, w)
+            assert w in {"w1", "w2", "w3", "w4"} and set(x) == {"iv", "ct"}, (who, w)
             base64.b64decode(x["iv"], validate=True), base64.b64decode(x["ct"], validate=True)
     return d
 
@@ -170,7 +170,7 @@ def overlay_html():
 
 
 def view_essai():
-    """La page d'essai : les trois jeux pour de faux (faux prénoms, faux mots, faux code), avec une horloge simulée.
+    """La page d'essai : les quatre jeux pour de faux (faux prénoms, faux mots, faux code), avec une horloge simulée.
     Elle n'est liée de nulle part ; elle disparaît du site publié quand data_env.SIM_ON vaut False."""
     if not E.SIM_ON:
         return ""
@@ -179,13 +179,14 @@ def view_essai():
     seg_w = "".join(
         '<button type="button" data-sw="%d" aria-pressed="false"><i class="sn">%d</i><span><b>%s</b>%s</span></button>' % (i, i, txt(t), txt(s))
         for i, t, s in [(1, "La cacahuète", "Boop · du 20 au 25 décembre"), (2, "Le killer sans victime", "Minou · le 27 décembre"),
-                        (3, "Un rôle à jouer", "Moomoo et Aftonsparv · le 31 décembre")])
+                        (3, "Un rôle à jouer", "Moomoo et Aftonsparv · le 31 décembre"),
+                        (4, "Les questions de Boop", "Boop · le 28 décembre")])
     seg_t = "".join(
         '<button type="button" data-st="%d" aria-pressed="false"><span><b>%s</b>%s</span></button>' % (i, txt(t), txt(s))
         for i, t, s in [(0, "Avant", "Rien à voir"), (1, "Pendant", "L’enveloppe est là"), (2, "Révélation", "L’heure des aveux"), (3, "Après", "Tout s’efface")])
     out = ('<main class="view" id="v-essai" hidden>' + back_head("Essai des enveloppes", "Faux prénoms, faux mots : rien n’est vrai ici", "#/")
            + '<div class="wrap">')
-    out += ('<p class="how">%s</p>' % rich("Voici les trois jeux d’enveloppes, **pour de faux**. Tu joues **Mangue**, avec de fausses missions, de faux mots et un faux code. "
+    out += ('<p class="how">%s</p>' % rich("Voici les quatre jeux d’enveloppes, **pour de faux**. Tu joues **Mangue**, avec de fausses missions, de faux mots et un faux code. "
                                            "Essaie comme si c’était le jour J : rien ne part nulle part, et tout reste sur ton téléphone. "
                                            "À chaque ouverture de l’enveloppe, tu retapes le code (le téléphone ne le garde pas)."))
     out += ('<section class="bubble sand" aria-labelledby="h-sw"><h2 id="h-sw">%s</h2><div class="seg col" role="group" aria-label="%s">%s</div><p id="sim-w-desc"></p></section>'

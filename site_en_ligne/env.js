@@ -12,7 +12,7 @@
     var D = null;
     try { D = JSON.parse(dataEl.textContent); } catch (e) { return nop; }
     if (!D || !D.win) return nop;
-    var WIN = D.win, ITER = D.it || 150000, WAVES = ["w1", "w2", "w3"];
+    var WIN = D.win, ITER = D.it || 150000, WAVES = ["w1", "w2", "w3", "w4"];
     var MAS = { boop: "Boop", minou: "Minou", moomoo: "Moomoo", aftonsparv: "Aftonsparv" };
     var IDLE = 60000, HOLD = 1000;   /* la carte se cache toute seule après une minute sans toucher */
     function G(id) { return document.getElementById(id); }
@@ -75,7 +75,7 @@
     /* ── deux contextes : le vrai jeu (prénom de l'accueil, heure du téléphone) et l'essai (Mangue, heure choisie sur la page d'essai) ── */
     var simSel = (function () {
       var s = String(LS.get("carnet.sim.sel", "1:1")).split(":"), w = +s[0], t = +s[1];
-      return { w: w >= 1 && w <= 3 ? w : 1, t: t >= 0 && t <= 3 ? t : 1 };
+      return { w: w >= 1 && w <= 4 ? w : 1, t: t >= 0 && t <= 3 ? t : 1 };
     })();
     /* phase : 0 pas encore, 1 le jeu est ouvert, 2 l'heure de la révélation est passée, 3 c'est fini (tout est effacé) */
     var REAL = { sim: false, ns: "carnet.env", data: D.real, who: function () { return LS.get("carnet.who", ""); },
@@ -92,7 +92,7 @@
     function wipe(c) {   /* à la fin de chaque vague : le score et les traces s'effacent */
       if (!c.data) return;
       WAVES.forEach(function (w) {
-        if (c.phase(w) === 3) names(c).forEach(function (n) { ["h", "o", "r"].forEach(function (k) { LS.del(c.ns + "." + k + "." + n + "." + w); }); });
+        if (c.phase(w) === 3) names(c).forEach(function (n) { ["h", "o", "r", "v"].forEach(function (k) { LS.del(c.ns + "." + k + "." + n + "." + w); }); });
       });
     }
     sweep("carnet.env.k."); sweep("carnet.sim.k.");   /* une ancienne version gardait la clé tirée du code : plus aucune clé ne reste sur le téléphone */
@@ -141,8 +141,9 @@
       sess++; ctx = c; wave = w; nm = c.who(); ph = c.phase(w); cur = null;
       lastFocus = document.activeElement;
       box.hidden = false; document.documentElement.classList.add("env-open");
+      if (ph === 2) { var st = stashed(c, nm, w); if (st) { cur = st; showReveal(); return; } }   /* la révélation, sans code, si le téléphone l'a de côté */
       if (!CAN) { bad("Cet appareil est trop ancien pour ouvrir les enveloppes. Pas de panique : tout se fera à l’oral, à table."); return; }
-      showCode("");   /* toujours : le code se retape à chaque ouverture */
+      showCode("");   /* sinon, le code se retape à chaque ouverture */
     }
     function showCode(msg) {
       el.err.textContent = msg ? nb(msg) : "";
@@ -150,11 +151,24 @@
       el.simHint.hidden = !ctx.sim; el.simCode.textContent = D.simCode || "";
       pane("code");
     }
-    function sworn() { return LS.get(ctx.ns + ".o." + nm + "." + wave, "") === "1"; }
-    function arrive(p) {   /* la mission est lue : serment (la 1re fois seulement) avant l'heure des aveux, révélation après */
+    /* la révélation est mise de côté sur le téléphone quand la mission a été ouverte : à l'heure dite, plus besoin de retaper le code.
+       (Le téléphone d'une personne qui n'a jamais ouvert son enveloppe redemande le code.) Ce n'est pas un coffre-fort : le tableau n'est affiché qu'à l'heure de la révélation. */
+    function vkey(c, n, w) { return c.ns + ".v." + n + "." + w; }
+    function stash(p) {
+      if (!p || !p.rev) return;
+      try { LS.set(vkey(ctx, nm, wave), btoa(unescape(encodeURIComponent(JSON.stringify({ rev: p.rev, hunt: !!p.hunt }))))); } catch (e) {}
+    }
+    function stashed(c, n, w) {
+      try {
+        var s = LS.get(vkey(c, n, w), ""); if (!s) return null;
+        var o = JSON.parse(decodeURIComponent(escape(atob(s))));
+        return o && o.rev ? o : null;
+      } catch (e) { return null; }
+    }
+    function arrive(p) {   /* la mission est lue : serment à CHAQUE ouverture avant l'heure des aveux, révélation après */
       cur = p; ph = ctx.phase(wave);
       if (ph === 3) { close(); return; }
-      if (ph === 2) showReveal(); else if (sworn()) showCard(); else showChut();
+      if (ph === 2) showReveal(); else { stash(p); showChut(); }
     }
     el.form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -230,7 +244,10 @@
       if (!ctx || box.hidden) return;
       showSealed();
     }
-    function reopen() { showCode(""); }
+    function reopen() {
+      if (ctx && ctx.phase(wave) === 2) { var st = stashed(ctx, nm, wave); if (st) { cur = st; showReveal(); return; } }
+      showCode("");
+    }
     function showReveal() {
       var r = cur.rev || {};
       paintSay(el.revSay, r.say); el.revTitle.textContent = nb(r.title || "");
@@ -345,7 +362,8 @@
     var SIM_W = {
       1: "Tu es Mangue, le gorille de Litchi : trois petites attentions à lui glisser sans te faire repérer. À l’heure des aveux, Boop dévoile tous les gorilles.",
       2: "Tu dois faire dire un mot à Litchi sans que la personne s’en doute. Chaque fois que c’est fait, touche « Mot dit ! » : un autre mot arrive. Essaie aussi « Passer ce mot » et « Annuler le dernier ». Qui en fait dire le plus gagne.",
-      3: "Tu joues un rôle toute la journée sans jamais le dire (ici, le ventilateur : on est au chaud, après tout). Au dîner du réveillon, tout le monde devine qui jouait quoi."
+      3: "Tu joues un rôle toute la journée sans jamais le dire (ici, le ventilateur : on est au chaud, après tout). Au dîner du réveillon, tout le monde devine qui jouait quoi.",
+      4: "Tu interroges Litchi en secret : trois petites questions à lui poser dans la journée, sans qu’il ou elle s’en doute. Le soir, tu racontes les questions et les réponses aux autres, qui devinent qui tu as interrogé."
     };
     function simTime() {
       var h = hhmm("w" + simSel.w);

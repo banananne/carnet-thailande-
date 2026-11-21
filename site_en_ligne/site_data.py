@@ -69,6 +69,11 @@ NOVOTEL = P("Novotel Rim Pae", HOTEL["h3"]["q"])
 THAITHAI = P("Thai Thai Resort", HOTEL["h2"]["q"])
 TIMESABAI = P("Time Sabai 134", HOTEL["h4"]["q"])
 KOHSAMET = P("Koh Samet", "Ko Samet Rayong")
+# points de rendez-vous des activités réservées (adresses données par Anne le 21 novembre 2026)
+RDV_BATEAU = P("Rendez-vous du bateau", "13.724617765054857,100.465503087047")
+SAMYAN = P("Samyan Mitrtown", "KFC Samyan Mitrtown, 974 Phaya Thai Rd, Bangkok")
+RDV_TUKTUK = P("Rendez-vous du tuk-tuk", "315-319 Rama IV Road, Pathum Wan, Bangkok 10330")
+RDV_CUISINE = P("Rendez-vous du cours", "13.7356647,100.5554998")
 
 # (id, stage, ville affichée, hôtel de la nuit, étapes, page du PDF pour les fun facts, pages spéciales)
 DAYS = [
@@ -87,6 +92,7 @@ DAYS = [
         S("Tour bateau longtail", t="9h", sub=[
             L("Big Buddha (Wat Paknam)", p=[P("Wat Paknam", "Wat Paknam Bhasicharoen Bangkok")]),
             L("Artist House (Baan Silapin)", p=[P("Baan Silapin", "Baan Silapin Artist House Bangkok")]),
+            L("Rendez-vous : 46 Phet Kasem 19/1 Alley (Phasi Charoen)", p=[RDV_BATEAU]),
         ]),
         S("Balade dans le quartier d’Artist House (et éventuellement atelier)"),
         S("Déjeuner"),
@@ -96,24 +102,28 @@ DAYS = [
     ]),
     dict(id="2026-12-21", stage="s1", city="Bangkok", night="h1", page=8, steps=[
         S("Départ pour une journée à Ayutthaya", t="8h00", sub=[
-            L("Prise en charge à l’hôtel, 2 heures de trajet"),
+            L("Prise en charge à C’HOUSE, 2 heures de trajet", p=[CHOUSE]),
         ], p=[P("Ayutthaya", "Ayutthaya Historical Park")]),
         S("Wat Maha – visite guidée (45 mn)", p=[P("Wat Mahathat", "Wat Mahathat Ayutthaya")]),
         S("Wat Yai Chai Mongkhon – visite guidée (45 mn)", p=[P("Wat Yai Chai Mongkhon", "Wat Yai Chai Mongkhon Ayutthaya")]),
         S("Phra Nakhon Si Ayutthaya (1 h de pause)"),
         S("Phra Nakhon Si Ayutthaya (croisière de 45 mn)"),
         S("Wat Chaiwatthanaram (visite guidée)", p=[P("Wat Chaiwatthanaram", "Wat Chaiwatthanaram Ayutthaya")]),
-        S("Retour à l’auberge en fin d’après-midi", p=[CHOUSE]),
+        S("Retour à l’auberge en fin d’après-midi", sub=[
+            L("Le minibus vous dépose au KFC de Samyan Mitrtown, à Bangkok", p=[SAMYAN]),
+        ], p=[CHOUSE]),
     ]),
     dict(id="2026-12-22", stage="s1", city="Bangkok", night="h1", page=9, steps=[
         S("Floating Market + marché du train", t="6h30", sub=[
-            L("Prise en charge à l’hôtel"),
+            L("Prise en charge à C’HOUSE", p=[CHOUSE]),
             L("1h30 de voiture puis 1h de train"),
         ]),
         S("Marché ferroviaire de Maeklong", p=[P("Marché de Maeklong", "Maeklong Railway Market")]),
         S("20 minutes de minibus jusqu’au marché flottant"),
         S("Marché flottant de Damnoen Saduak", sub=[L("Déjeuner")], p=[P("Damnoen Saduak", "Damnoen Saduak Floating Market")]),
-        S("Retour (MBK center)", p=[P("MBK Center", "MBK Center Bangkok")]),
+        S("Retour (MBK center)", sub=[
+            L("Le minibus vous dépose au KFC de Samyan Mitrtown (974 Phaya Thai Rd)", p=[SAMYAN]),
+        ], p=[P("MBK Center", "MBK Center Bangkok")]),
         S("Balade à Chinatown", p=[P("Yaowarat", "Yaowarat Road Chinatown Bangkok")]),
         S("Match de boxe thaï au stade Rajadamnern", t="19h", p=[P("Rajadamnern", "Rajadamnern Boxing Stadium Bangkok")]),
     ]),
@@ -129,7 +139,9 @@ DAYS = [
             L("(10 min de Grab depuis Wat Pho)"),
             L("Boutiques, street art…"),
         ], p=[P("Songwat Road", "Songwat Road Bangkok"), P("Talat Noi", "Talat Noi Bangkok")]),
-        S("Tour street food en tuk-tuk", t="19h"),
+        S("Tour street food en tuk-tuk", t="19h", sub=[
+            L("Rendez-vous : 315-319 Rama IV Road (Pathum Wan)", p=[RDV_TUKTUK]),
+        ]),
         S("Retour à l’auberge", t="23h", p=[CHOUSE]),
     ]),
     dict(id="2026-12-24", stage="s1", city="Bangkok", night="h1", page=11, steps=[
@@ -149,7 +161,9 @@ DAYS = [
     dict(id="2026-12-25", stage="s1", city="Bangkok", night="h1", page=12, steps=[
         S("Grasse matinée"),
         S("Parc Lumpini et éventuellement brunch", p=[P("Parc Lumpini", "Lumpini Park Bangkok")]),
-        S("Visite de marché et cours de cuisine", t="13h"),
+        S("Visite de marché et cours de cuisine", t="13h", sub=[
+            L("Rendez-vous : 147/4 Sukhumvit 4 (Khlong Toei)", p=[RDV_CUISINE]),
+        ]),
         S("Dusit Central Park – coucher de soleil sur le rooftop", t="Fin de journée", p=[P("Dusit Central Park", "Dusit Central Park Bangkok")]),
         S("Dîner de Noël chez Jim Thompson et cocktail chez G.O.D", p=[
             P("Jim Thompson", "Jim Thompson, A Thai Restaurant Bangkok"),

@@ -3,7 +3,7 @@
 Cette branche ne sert qu'à garder une copie des fichiers qui fabriquent le site. Le site publié
 est sur la branche `main` (GitHub Pages) : ne rien publier ici.
 
-Dernière mise à jour : 21 novembre 2026, 13 h 20. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
+Dernière mise à jour : 21 novembre 2026, 20 h 10. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
 cartes taxi, convertisseur, Good to know) et étape 3 (jeux : quiz, test de personnalité, blind test, mots mêlés,
 horoscope, mascottes, passeport de tampons), publiées ensemble à 22 h 24 (commit 34db76e), puis vague 1 des
 améliorations (accueil allégé à quatre rubriques, « Qui es-tu ? » qui se replie, « doudous » devenus « mascottes »,
@@ -128,3 +128,9 @@ un code par personne, deux prénoms sur un téléphone, mode essai sans effet ;
 `run_srv.sh` lance le serveur local le temps d'une série (`./run_srv.sh t31 t30 …`, résumé dans `summary.log`) ; `run_all.sh`
 enchaîne les séries. Les tests t12, t14, t15, t18, t22, t26, t27 et t29 posent `carnet.open` = « 1 » et comptent 28 tampons.
 `test_photo_0..4.jpg` : petites photos pour tester la photo du jour. Les chemins de captures (variable `OUT`) sont à adapter.
+
+Puis (21 novembre au soir, branche `main`, commit 5278674) : vraies enveloppes secrètes chiffrées en ligne (jamais de texte, de code ni de tirage dans ce dépôt),
+quatre jeux dont « les questions de Boop » (28 décembre, identifiant w4), toutes les révélations à 20 h, serment à chaque ouverture,
+révélation sans code quand la mission a été lue (mise de côté sur le téléphone), espace invité·e (cinquième pastille « Je suis invité·e » : tout le site
+sauf enveloppes, horoscope du jour et rôles du jour), liens Maps des rendez-vous des activités réservées, bouton de la playlist, date du départ 18.12.2026.
+Ces sources correspondent à ce qui est publié. Tests : t33 (164), t34 (90, faux jeu fabriqué par mkfix.py), t35 (53 : invité·e, Maps, playlist).

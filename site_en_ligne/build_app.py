@@ -536,7 +536,7 @@ def view_home(version):
     out = ('<main class="view" id="v-home">'
            '<header class="hero"><div class="wrap">'
            '<p class="eyebrow">Carnet de voyage</p><h1>Thaïlande <span>2026</span></h1>'
-           '<p class="dates">19.12.2026 — 03.01.2027</p>'
+           '<p class="dates">18.12.2026 — 03.01.2027</p>'
            '<button class="stk stk-ele" id="ele" type="button" aria-label="L’éléphant te salue">%s</button>'
            '<button class="stk stk-tuk" id="tuk" type="button" aria-label="Le tuk-tuk démarre">%s</button>'
            '</div></header><div class="wrap">'
@@ -552,6 +552,8 @@ def view_home(version):
     for n, bg, fg in who:
         out += ('<button type="button" data-n="%s" aria-pressed="false"><span class="ini" style="background:%s;color:%s">%s</span>%s</button>'
                 % (n, bg, fg, n[0], n))
+    out += ('<button type="button" class="guest" data-n="Invité" aria-pressed="false"><span class="ini" style="background:#CCD9F4;color:#283881">✦</span>'
+            'Je suis invité·e</button>')   # espace visiteur : tout le site, sans les enveloppes, l’horoscope du jour ni les rôles du jour
     out += '</div><p class="hello" id="hello" role="status">Appuie sur ton prénom.</p></div></section>'
 
     import build_days as BD

@@ -62,6 +62,7 @@ def who_pick():
            '<div class="who" role="group" aria-label="Choisis ton prénom">')
     for n, bg, fg in G.PLAYERS:
         out += ('<button type="button" data-wp="%s"><span class="ini" style="background:%s;color:%s">%s</span>%s</button>' % (n, bg, fg, n[0], n))
+    out += ('<button type="button" class="guest" data-wp="Invité"><span class="ini" style="background:#CCD9F4;color:#283881">✦</span>Je suis invité·e</button>')
     return out + "</div></div>"
 
 

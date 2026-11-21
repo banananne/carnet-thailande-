@@ -25,20 +25,22 @@ ITERATIONS = 150000          # PBKDF2-SHA256 : ~0,2 à 0,6 s sur un téléphone,
 
 # (identifiant, apparition, révélation, effacement) en heure locale du téléphone : (année, mois, jour, heure, minute)
 WINDOWS = [
-    ("w1", (2026, 12, 20, 7, 0), (2026, 12, 25, 19, 0), (2026, 12, 26, 4, 0)),    # la cacahuète (Boop) : dîner de Noël
-    ("w2", (2026, 12, 27, 7, 0), (2026, 12, 27, 19, 0), (2026, 12, 28, 4, 0)),    # le killer sans victime (Minou) : une journée
+    ("w1", (2026, 12, 20, 7, 0), (2026, 12, 25, 20, 0), (2026, 12, 26, 4, 0)),    # la cacahuète (Boop) : dîner de Noël
+    ("w2", (2026, 12, 27, 7, 0), (2026, 12, 27, 20, 0), (2026, 12, 28, 4, 0)),    # le killer sans victime (Minou) : une journée
+    ("w4", (2026, 12, 28, 7, 0), (2026, 12, 28, 20, 0), (2026, 12, 29, 4, 0)),    # les questions de Boop : une journée
     ("w3", (2026, 12, 31, 7, 0), (2026, 12, 31, 20, 0), (2027, 1, 1, 6, 0)),      # un rôle à jouer (Moomoo et Aftonsparv) : réveillon
 ]
 
 # ───────────────────────── simulation : tout est inventé ─────────────────────────
 SIM_WHO = "Mangue"
 SIM_CODE = "essai-0000"      # un mot et quatre chiffres : il se retape à chaque ouverture, donc court
-WAVES_LABEL = {"w1": "La cacahuète", "w2": "Le killer sans victime", "w3": "Un rôle à jouer"}
+WAVES_LABEL = {"w1": "La cacahuète", "w2": "Le killer sans victime", "w3": "Un rôle à jouer", "w4": "Les questions de Boop"}
 
 # Les voix des mascottes (serments et révélations) sont celles du document validé ; le reste est un exemple inventé.
 CHUT = {
     "w1": "Chut ! Cette enveloppe est pour toi, et seulement pour toi. Pas un mot à ta cacahuète, au groupe, ni au chauffeur de tuk-tuk. Maintiens le doigt une seconde pour jurer.",
     "w2": "Cette enveloppe n’existe pas. Si quelqu’un t’en parle, tu ne vois pas de quoi il s’agit. Maintiens le doigt pour jurer le silence.",
+    "w4": "Chut ! Cette enveloppe est pour toi, et seulement pour toi. Ni ta personne, ni le groupe, ni le serveur du petit-déjeuner ne doivent savoir que tu mènes l’enquête. Maintiens le doigt une seconde pour jurer.",
     "w3": "Message crypté, niveau galactique. Il s’autodétruit demain matin et, d’ici là, il reste entre toi et ton hamac. Maintiens le doigt pour confirmer.",
 }
 
@@ -60,11 +62,18 @@ INTRO = {
            "Le principe : chacun reçoit un personnage secret, sans cible ni mot, à jouer toute la journée sans jamais dire que c’est un rôle. "
            "Les autres doivent deviner qui joue quoi. Ce n’est pas facile, et c’est fait exprès. Tu as de quoi jouer : la mer, la chaleur, les repas, les départs…",
            ANNE % "ne sait pas quel rôle tu joues, ni ceux des autres"],
+    "w4": ["Aujourd’hui, toute la journée jusqu’au dîner, nous jouons tous aux « questions de Boop ».",
+           "Le principe : chacun interroge en secret une personne du groupe et lui pose trois questions, un peu piquantes mais bienveillantes, glissées dans la conversation au fil de la journée. "
+           "Retiens ses réponses : ce soir, tu raconteras aux autres les questions posées et les réponses obtenues, sans dire qui tu as interrogé, et ils devront le deviner.",
+           "Les règles : pose tes trois questions naturellement, une à la fois, à des moments différents. Si la personne n’a pas envie de répondre, tu laisses tomber, sans insister. "
+           "Pas de carnet ni de téléphone sous le nez : tout se retient de tête. Ce qu’on te confie reste dans le groupe.",
+           ANNE % "ne sait pas qui tu interroges ni quelles questions tu poses"],
 }
 FOOT = {   # petit texte sous la mission ("" : aucun)
     "w1": "Au dîner de Noël, chacun devine son gorille, puis les gorilles avouent.",
     "w2": "",
     "w3": "À l’heure du dîner, la révélation s’affiche sur l’appli, puis chacun avoue à table : qui était %s ? Tout s’efface demain matin.",   # %s : la liste des rôles
+    "w4": "Ce soir, chacun raconte les questions posées et les réponses obtenues, sans nommer la personne : les autres devinent. Ne regarde la révélation qu’après les devinettes.",
 }
 
 QUIPS = [
@@ -131,4 +140,18 @@ def sim_payloads():
                 "cols": ["Joueur", "Rôle"],
                 "rows": [["Mangue", "Le ventilateur"], ["Litchi", "Le glaçon"], ["Durian", "Le tuk-tuk"], ["Ramboutan", "Le palmier"]]},
     }
-    return {"w1": w1, "w2": w2, "w3": w3}
+    w4 = {
+        "m": ["boop"], "kick": "Vague 4 · Les questions de Boop", "chut": CHUT["w4"], "intro": INTRO["w4"],
+        "title": "Ta personne : Litchi.",
+        "say": [["boop", "Ceci est une simulation : de fausses questions, pour de faux. Une question, ça ne mord pas."]],
+        "items": ["Quel est le fruit que tu manges le plus vite ?",
+                  "Quelle est la dernière chose que tu as perdue et jamais retrouvée ?",
+                  "Quel petit objet de voyage ne quitte jamais ton sac ?",
+                  "Pose-les à des moments différents, naturellement, et retiens les réponses : ce soir, tu raconteras les questions et les réponses aux autres."],
+        "foot": FOOT["w4"],
+        "rev": {"title": "Qui interrogeait qui",
+                "say": [["boop", "À table ! Racontez vos questions et vos réponses, et devinez qui était interrogé. Boop, qui écoute de loin (merci le Wi-Fi), prend des notes."]],
+                "cols": ["Enquêteur", "Personne interrogée"],
+                "rows": [["Mangue", "Litchi"], ["Litchi", "Durian"], ["Durian", "Ramboutan"], ["Ramboutan", "Mangue"]]},
+    }
+    return {"w1": w1, "w2": w2, "w3": w3, "w4": w4}

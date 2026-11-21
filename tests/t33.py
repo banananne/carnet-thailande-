@@ -110,10 +110,10 @@ with sync_playwright() as p:
     hold(pg)
     check("B16 maintenir une seconde ouvre la mission", pane(pg) == "card", pane(pg))
     check("B17 titre de la mission", sp(pg.inner_text("#card-title")).lower() == "tu es le gorille de litchi.", pg.inner_text("#card-title"))
-    check("B18 trois attentions", pg.locator("#card-items li").count() == 3)
+    check("B18 quatre jours, deux attentions chacun, tout ouvert dans l’essai", pg.locator("#card-items li.env-day").count() == 4 and pg.locator("#card-items li.act").count() == 8 and pg.locator("#card-items button.env-chk").count() == 8)
     check("B19 Boop parle dans la mission", pg.locator('#card-say img[src$="doudou_boop.webp"]').count() == 1 and "simulation" in pg.inner_text("#card-say"))
     intro = sp(pg.inner_text("#card-intro"))
-    check("B20 le contexte explique le jeu, ses dates et ses règles", vis(pg, "#card-ctx") and "Du 20 au 25 décembre" in intro and "« la cacahuète »" in intro and "chambre" in intro and "100 bahts" in intro, intro)
+    check("B20 le contexte explique le jeu, ses dates et ses règles", vis(pg, "#card-ctx") and "Du 22 au 25 décembre" in intro and "« la cacahuète »" in intro and "chambre" in intro and "100 bahts" in intro, intro)
     check("B20b même Anne ne sait pas", "Même Anne, qui a organisé le voyage, ne sait pas qui est le gorille de qui" in intro and "à l’aveugle" in intro, intro)
     check("B20c le petit texte du bas parle du dîner de Noël", "dîner de Noël" in sp(pg.inner_text("#card-foot")), pg.inner_text("#card-foot"))
     ys = pg.evaluate("""() => { const r = s => document.querySelector(s).getBoundingClientRect(); return {ctx: r('#card-ctx').bottom, sub: r('.env-sub2').top, title: r('#card-title').top, items: r('#card-items').bottom, fin: r('#card-fin').top, finb: r('#card-fin').bottom, btn: r('#card-close').top}; }""")
@@ -141,7 +141,7 @@ with sync_playwright() as p:
     type_code(pg, "essai-0000")
     check("B28c avec le bon code : le serment, à CHAQUE ouverture", pane(pg) == "chut", pane(pg))
     hold(pg)
-    check("B28d puis la mission", pane(pg) == "card" and pg.locator("#card-items li").count() == 3, pane(pg))
+    check("B28d puis la mission", pane(pg) == "card" and pg.locator("#card-items li").count() == 12, pane(pg))
     pg.click("#env-x"); pg.wait_for_timeout(250)
     check("B29 la croix ferme tout", not vis(pg, "#env") and vis(pg, "#sim-env-btn"))
     check("B30 le point clignotant a disparu du bouton", not vis(pg, "#sim-env-btn .dot"))
@@ -276,8 +276,8 @@ with sync_playwright() as p:
     check("L1 serment de Boop", pane(pg) == "chut" and pg.locator('#chut-pics img[src$="doudou_boop.webp"]').count() == 1, pane(pg))
     hold(pg)
     intro = sp(pg.inner_text("#card-intro"))
-    check("L2 contexte : les questions de Boop, une personne, trois questions, le récit du soir", pane(pg) == "card" and "questions de Boop" in intro and "trois questions" in intro.lower() and "ce soir" in intro.lower() and "Même Anne" in intro, intro)
-    check("L3 trois questions et un rappel, pas de liste de mots", pg.locator("#card-items li").count() == 4 and not vis(pg, "#env-dock"))
+    check("L2 contexte : les questions de Boop, une personne, trois questions, le récit du soir", pane(pg) == "card" and "questions de Boop" in intro and "quatre questions" in intro.lower() and "ce soir" in intro.lower() and "Même Anne" in intro, intro)
+    check("L3 trois questions et un rappel, pas de liste de mots", pg.locator("#card-items li").count() == 5 and not vis(pg, "#env-dock"))
     fin = pg.evaluate("() => [...document.querySelectorAll('#card-fin small, #card-fin b, #card-fin strong')].map(e => e.textContent)")
     check("L4 encadré : lundi 28 décembre, 20 h", len(fin) == 3 and sp(fin[1]) == "lundi 28 décembre" and sp(fin[2]) == "20 h", fin)
     pg.screenshot(path=OUT + "env_w4_mission.png")
@@ -306,7 +306,7 @@ with sync_playwright() as p:
     # ───── F. l'accueil : rien ne change tant que le vrai jeu n'est pas publié ─────
     ctx, pg = newctx(b)
     pg.goto(BASE, wait_until="load"); pg.wait_for_timeout(500)
-    check("F1 accueil : pas d'enveloppe avant le 20 décembre (le vrai jeu est scellé dans la page)", not vis(pg, "#env-btn") and pg.evaluate("JSON.parse(document.getElementById('env-data').textContent).real") is not None)
+    check("F1 accueil : pas d'enveloppe avant le 22 décembre (le vrai jeu est scellé dans la page)", not vis(pg, "#env-btn") and pg.evaluate("JSON.parse(document.getElementById('env-data').textContent).real") is not None)
     pg.click('#who button[data-n="Anne"]'); pg.wait_for_timeout(900)
     check("F2 choisir son prénom marche toujours", vis(pg, "#who-bar") and "Anne" in pg.inner_text("#who-hi"))
     check("F3 le bandeau et la rangée du prénom sont alignés", pg.evaluate("document.querySelector('.who-row').getBoundingClientRect().width > 300"))
@@ -321,7 +321,7 @@ with sync_playwright() as p:
     # ───── G. enveloppes illisibles dans les fichiers publiés ─────
     page = open("/home/claude/site_en_ligne/web/index.html", encoding="utf-8").read()
     for needle in ["Fais apparaître une banane", "kangourou", "trottinette", "cornichon", "Le glaçon", "le glaçon, le tuk-tuk, le palmier", "Le palmier", "brassais l’air", "Brouille les pistes", "sans voix",
-                   "Même Anne", "à l’aveugle", "tiré au sort sans elle", "ne connaît ni ta cible", "Tu as de quoi jouer", "personne n’est éliminé"]:
+                   "Remplis le verre d’eau de Litchi", "Dessine une scène du jour", "Garde à Litchi la dernière part", "Quelle est la chose la plus bizarre que tu fais chez toi", "Même Anne", "à l’aveugle", "tiré au sort sans elle", "ne connaît ni ta cible", "Tu as de quoi jouer", "personne n’est éliminé"]:
         check("G1 « %s » n'est pas en clair dans index.html" % needle, needle not in page)
     m = re.search(r'<script type="application/json" id="env-data">(.*?)</script>', page, re.S)
     d = json.loads(m.group(1))

@@ -25,7 +25,7 @@ ITERATIONS = 150000          # PBKDF2-SHA256 : ~0,2 à 0,6 s sur un téléphone,
 
 # (identifiant, apparition, révélation, effacement) en heure locale du téléphone : (année, mois, jour, heure, minute)
 WINDOWS = [
-    ("w1", (2026, 12, 20, 7, 0), (2026, 12, 25, 20, 0), (2026, 12, 26, 4, 0)),    # la cacahuète (Boop) : dîner de Noël
+    ("w1", (2026, 12, 22, 7, 0), (2026, 12, 25, 20, 0), (2026, 12, 26, 4, 0)),    # la cacahuète (Boop) : du 22 au dîner de Noël (4 jours)
     ("w2", (2026, 12, 27, 7, 0), (2026, 12, 27, 20, 0), (2026, 12, 28, 4, 0)),    # le killer sans victime (Minou) : une journée
     ("w4", (2026, 12, 28, 7, 0), (2026, 12, 28, 20, 0), (2026, 12, 29, 4, 0)),    # les questions de Boop : une journée
     ("w3", (2026, 12, 31, 7, 0), (2026, 12, 31, 20, 0), (2027, 1, 1, 6, 0)),      # un rôle à jouer (Moomoo et Aftonsparv) : réveillon
@@ -47,9 +47,9 @@ CHUT = {
 # « Le jeu » : lu avant la mission. Pas de prénom de joueur ici : ces textes sont les mêmes pour tout le monde.
 ANNE = "Même Anne, qui a organisé le voyage, %s : tout a été tiré au sort sans elle. Elle joue à l’aveugle, comme toi."
 INTRO = {
-    "w1": ["Du 20 au 25 décembre, jusqu’au dîner de Noël, nous jouons tous à « la cacahuète ».",
+    "w1": ["Du 22 au 25 décembre, jusqu’au dîner de Noël, nous jouons tous à « la cacahuète ».",
            "Le principe : chacun est le gorille d’une personne du groupe (sa cacahuète) et la cacahuète de quelqu’un d’autre, sans savoir de qui. "
-           "Un gorille veille sur sa cacahuète avec de petites attentions anonymes, sans jamais se faire repérer.",
+           "Un gorille veille sur sa cacahuète avec de petites attentions anonymes, sans jamais se faire repérer. Chaque matin, deux nouvelles attentions s’ouvrent ici (une facile, une plus malicieuse) : coche-les au fur et à mesure.",
            "Les règles : chaque attention coûte moins de 100 bahts. Tu peux la déposer dans la chambre de ta cacahuète, mais tu ne fouilles rien et "
            "tu ne demandes pas de clé à la réception. Brouille les pistes avec une gentillesse pour quelqu’un d’autre, de temps en temps. "
            "Si on te soupçonne, nie avec panache.",
@@ -63,9 +63,9 @@ INTRO = {
            "Les autres doivent deviner qui joue quoi. Ce n’est pas facile, et c’est fait exprès. Tu as de quoi jouer : la mer, la chaleur, les repas, les départs…",
            ANNE % "ne sait pas quel rôle tu joues, ni ceux des autres"],
     "w4": ["Aujourd’hui, toute la journée jusqu’au dîner, nous jouons tous aux « questions de Boop ».",
-           "Le principe : chacun interroge en secret une personne du groupe et lui pose trois questions, un peu piquantes mais bienveillantes, glissées dans la conversation au fil de la journée. "
+           "Le principe : chacun interroge en secret une personne du groupe et lui pose quatre questions (deux simples, deux un peu plus gênantes, toujours bienveillantes), glissées dans la conversation au fil de la journée. "
            "Retiens ses réponses : ce soir, tu raconteras aux autres les questions posées et les réponses obtenues, sans dire qui tu as interrogé, et ils devront le deviner.",
-           "Les règles : pose tes trois questions naturellement, une à la fois, à des moments différents. Si la personne n’a pas envie de répondre, tu laisses tomber, sans insister. "
+           "Les règles : pose tes quatre questions naturellement, une à la fois, à des moments différents. Si la personne n’a pas envie de répondre, tu laisses tomber, sans insister. "
            "Pas de carnet ni de téléphone sous le nez : tout se retient de tête. Ce qu’on te confie reste dans le groupe.",
            ANNE % "ne sait pas qui tu interroges ni quelles questions tu poses"],
 }
@@ -96,9 +96,10 @@ def sim_payloads():
         "m": ["boop"], "kick": "Vague 1 · La cacahuète", "chut": CHUT["w1"], "intro": INTRO["w1"],
         "title": "Tu es le gorille de Litchi.",
         "say": [["boop", "Ceci est une simulation : rien n’est vrai ici, mais tout fonctionne. Allez, tout le monde dans le tuk-tuk !"]],
-        "items": ["Fais apparaître une banane devant Litchi, sans dire d’où elle vient.",
-                  "Garde à Litchi la meilleure place à table.",
-                  "Laisse un petit mot gentil, sans signature, dans les affaires de Litchi."],
+        "days": [{"d": "2026-12-22", "l": "Mardi 22 décembre", "a": ["Garde à Litchi la meilleure part du plat à partager.", "Fais apparaître une banane devant Litchi, sans dire d’où elle vient."]},
+                 {"d": "2026-12-23", "l": "Mercredi 23 décembre", "a": ["Laisse passer Litchi en premier : la porte, le buffet.", "Laisse un petit mot gentil, sans signature, dans les affaires de Litchi."]},
+                 {"d": "2026-12-24", "l": "Jeudi 24 décembre", "a": ["Remplis le verre d’eau de Litchi dès qu’il est vide.", "Dessine une scène du jour et laisse-la où Litchi la trouvera."]},
+                 {"d": "2026-12-25", "l": "Vendredi 25 décembre", "a": ["Garde à Litchi la dernière part, sans dire que c’est exprès.", "Avant le dîner de Noël, dépose un fruit dans la chambre de Litchi, sans rien fouiller."]}],
         "foot": FOOT["w1"],
         "rev": {"title": "Les gorilles et leurs cacahuètes",
                 "say": [["boop", "Allez, tout le monde à table : c’est l’heure des aveux ! Cacahuètes, devinez votre gorille. Gorilles, préparez vos excuses. Boop, qui vous voit de loin (merci le Wi-Fi)."]],
@@ -147,6 +148,7 @@ def sim_payloads():
         "items": ["Quel est le fruit que tu manges le plus vite ?",
                   "Quelle est la dernière chose que tu as perdue et jamais retrouvée ?",
                   "Quel petit objet de voyage ne quitte jamais ton sac ?",
+                  "Quelle est la chose la plus bizarre que tu fais chez toi, sans aucun témoin ?",
                   "Pose-les à des moments différents, naturellement, et retiens les réponses : ce soir, tu raconteras les questions et les réponses aux autres."],
         "foot": FOOT["w4"],
         "rev": {"title": "Qui interrogeait qui",

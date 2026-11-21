@@ -31,7 +31,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
 
     # ───── A. l'accueil : cinq pastilles, la dernière est « Je suis invité·e » ─────
-    ctx, pg = newctx(b, at(2026, 12, 21, 10, 0))
+    ctx, pg = newctx(b, at(2026, 12, 22, 10, 0))
     pg.goto(BASE, wait_until="load"); pg.wait_for_timeout(600)
     btns = pg.locator("#who button")
     check("A1 cinq pastilles : Arthur, Daphne, Flo, Anne, invité·e", btns.count() == 5 and [btns.nth(i).get_attribute("data-n") for i in range(5)] == ["Arthur", "Daphne", "Flo", "Anne", "Invité"], btns.count())
@@ -52,7 +52,7 @@ with sync_playwright() as p:
     check("B2 mémoire : carnet.who = Invité", pg.evaluate("localStorage.getItem('carnet.who')") == "Invité")
     check("B3 le bandeau replié dit bonjour à l'invité·e", vis(pg, "#who-bar") and "bienvenue" in pg.inner_text("#who-hi").lower(), pg.inner_text("#who-hi"))
     check("B4 message d'accueil : enveloppes et rôles réservés aux voyageurs", "réservés aux voyageurs" in sp(pg.evaluate("document.querySelector('#who-box').textContent")), "")
-    check("B5 AUCUNE enveloppe sur l'accueil (même pendant une fenêtre de jeu, le 21 décembre)", not vis(pg, "#env-btn"))
+    check("B5 AUCUNE enveloppe sur l'accueil (même pendant une fenêtre de jeu, le 22 décembre)", not vis(pg, "#env-btn"))
     check("B6 pas d'horoscope du jour pour l'invité·e", not vis(pg, "#hsd"))
     check("B7 les rubriques du site restent là (Jours, Hôtels, Métro, Cartes taxi)", pg.locator("#v-home .tile, #v-home a.tile, #v-home [data-go]").count() >= 4 or pg.locator("#v-home a[href^='#/']").count() >= 4)
     pg.evaluate("location.hash = '#/defi'"); pg.wait_for_timeout(500)
@@ -76,7 +76,7 @@ with sync_playwright() as p:
     ctx.close()
 
     # ───── C. depuis la page « rôles du jour » : choix du prénom avec invité·e ─────
-    ctx, pg = newctx(b, at(2026, 12, 21, 10, 0))
+    ctx, pg = newctx(b, at(2026, 12, 22, 10, 0))
     pg.goto(BASE + "#/defi", wait_until="load"); pg.wait_for_timeout(600)
     wp = pg.locator(".whopick button")
     check("C1 sur la page du défi, aussi : « Je suis invité·e »", wp.count() >= 5 and pg.locator('.whopick button[data-wp="Invité"]').count() >= 1, wp.count())
@@ -122,10 +122,10 @@ with sync_playwright() as p:
     ctx.close()
 
     # ───── F. rien de secret en clair, pas de clé ─────
-    ctx, pg = newctx(b, at(2026, 12, 21, 10, 0))
+    ctx, pg = newctx(b, at(2026, 12, 22, 10, 0))
     pg.goto(BASE, wait_until="load"); pg.wait_for_timeout(500)
     pg.evaluate("localStorage.setItem('carnet.who','Anne')"); pg.reload(wait_until="load"); pg.wait_for_timeout(700)
-    check("F1 Anne, le 21 décembre : l'enveloppe est là (code à taper)", vis(pg, "#env-btn"))
+    check("F1 Anne, le 22 décembre : l'enveloppe est là (code à taper)", vis(pg, "#env-btn"))
     pg.click("#env-btn"); pg.wait_for_timeout(500)
     check("F2 l'écran demande le code, sans aide d'essai", vis(pg, "#env-in") and not vis(pg, "#env-simhint"))
     pg.click("#env-x"); pg.wait_for_timeout(300)

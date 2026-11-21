@@ -178,7 +178,7 @@ def view_essai():
     from build_site import icon
     seg_w = "".join(
         '<button type="button" data-sw="%d" aria-pressed="false"><i class="sn">%d</i><span><b>%s</b>%s</span></button>' % (i, i, txt(t), txt(s))
-        for i, t, s in [(1, "La cacahuète", "Boop · du 20 au 25 décembre"), (2, "Le killer sans victime", "Minou · le 27 décembre"),
+        for i, t, s in [(1, "La cacahuète", "Boop · du 22 au 25 décembre"), (2, "Le killer sans victime", "Minou · le 27 décembre"),
                         (3, "Un rôle à jouer", "Moomoo et Aftonsparv · le 31 décembre"),
                         (4, "Les questions de Boop", "Boop · le 28 décembre")])
     seg_t = "".join(

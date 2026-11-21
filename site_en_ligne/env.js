@@ -92,7 +92,7 @@
     function wipe(c) {   /* à la fin de chaque vague : le score et les traces s'effacent */
       if (!c.data) return;
       WAVES.forEach(function (w) {
-        if (c.phase(w) === 3) names(c).forEach(function (n) { ["h", "o", "r", "v"].forEach(function (k) { LS.del(c.ns + "." + k + "." + n + "." + w); }); });
+        if (c.phase(w) === 3) names(c).forEach(function (n) { ["h", "o", "r", "v", "c"].forEach(function (k) { LS.del(c.ns + "." + k + "." + n + "." + w); }); });
       });
     }
     sweep("carnet.env.k."); sweep("carnet.sim.k.");   /* une ancienne version gardait la clé tirée du code : plus aucune clé ne reste sur le téléphone */
@@ -153,10 +153,15 @@
     }
     /* la révélation est mise de côté sur le téléphone quand la mission a été ouverte : à l'heure dite, plus besoin de retaper le code.
        (Le téléphone d'une personne qui n'a jamais ouvert son enveloppe redemande le code.) Ce n'est pas un coffre-fort : le tableau n'est affiché qu'à l'heure de la révélation. */
+    function totOf(p) { var t = 0; (p && p.days || []).forEach(function (d) { t += (d.a || []).length; }); return t; }
+    function ckey() { return ctx.ns + ".c." + nm + "." + wave; }
+    function cget() { try { var a = JSON.parse(LS.get(ckey(), "[]")); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+    function cset(a) { try { LS.set(ckey(), JSON.stringify(a)); } catch (e) {} }
+    function todayKey() { return ctx.sim ? "9999-12-31" : nowKey().slice(0, 10); }
     function vkey(c, n, w) { return c.ns + ".v." + n + "." + w; }
     function stash(p) {
       if (!p || !p.rev) return;
-      try { LS.set(vkey(ctx, nm, wave), btoa(unescape(encodeURIComponent(JSON.stringify({ rev: p.rev, hunt: !!p.hunt }))))); } catch (e) {}
+      try { LS.set(vkey(ctx, nm, wave), btoa(unescape(encodeURIComponent(JSON.stringify({ rev: p.rev, hunt: !!p.hunt, tot: totOf(p) }))))); } catch (e) {}
     }
     function stashed(c, n, w) {
       try {
@@ -226,12 +231,32 @@
       paintSay(el.cardSay, p.say); el.cardTitle.textContent = nb(p.title || "");
       el.cardItems.textContent = "";
       (p.items || []).forEach(function (t) { el.cardItems.appendChild(mk("li", "", t)); });
+      if (p.days) paintDays(p);
       el.cardFoot.textContent = nb(p.foot || ""); el.cardFoot.hidden = !p.foot;
       var fin = finOf(wave); el.cardFin.hidden = !fin;
       if (fin) { el.cardFinD.textContent = nb(fin.day); el.cardFinH.textContent = nb(fin.hour); }
       LS.set(ctx.ns + ".o." + nm + "." + wave, "1");
       if (p.hunt) dockPaint("");
       pane("card"); armIdle();
+    }
+    function paintDays(p) {   /* la cacahuète : deux attentions par jour, ouvertes le matin ; on coche « fait » au fil de la journée */
+      var today = todayKey(), done = cget();
+      p.days.forEach(function (d, i) {
+        var open = d.d <= today;
+        el.cardItems.appendChild(mk("li", "env-day" + (open ? "" : " off"), open ? d.l : d.l + " : à découvrir le matin même"));
+        if (!open) return;
+        (d.a || []).forEach(function (t, j) {
+          var id = i + "." + j, li = mk("li", "act"), b = mk("button", "env-chk");
+          b.type = "button"; b.textContent = nb("fait ✓");
+          var on = done.indexOf(id) >= 0; b.setAttribute("aria-pressed", on ? "true" : "false");
+          b.addEventListener("click", function () {
+            var a = cget(), k = a.indexOf(id);
+            if (k >= 0) a.splice(k, 1); else a.push(id);
+            cset(a); b.setAttribute("aria-pressed", k >= 0 ? "false" : "true"); armIdle();
+          });
+          li.appendChild(mk("span", "", t)); li.appendChild(b); el.cardItems.appendChild(li);
+        });
+      });
     }
     function showSealed() {
       ph = ctx.phase(wave);
@@ -263,7 +288,10 @@
       });
       el.revTbl.appendChild(tb);
       if (cur.hunt) { var s = hget(); el.revScore.textContent = nb("Ton score : " + s.n + (s.n > 1 ? " mots dits" : " mot dit") + ". À toi de l’annoncer à table !"); el.revScore.hidden = false; }
-      else { el.revScore.hidden = true; el.revScore.textContent = ""; }
+      else if (cur.tot || (cur.days && totOf(cur))) {
+        var tt = cur.tot || totOf(cur), nn = cget().length;
+        el.revScore.textContent = nb("Tu as coché " + nn + " attention" + (nn > 1 ? "s" : "") + " sur " + tt + ". À toi de le dire à table !"); el.revScore.hidden = false;
+      } else { el.revScore.hidden = true; el.revScore.textContent = ""; }
       LS.set(ctx.ns + ".r." + nm + "." + wave, "1");
       pane("rev"); clearTimeout(idleT);
       try { Confetti.burst(); } catch (e) {}
@@ -360,10 +388,10 @@
     /* ── la page d'essai (#/essai) : faux prénom, faux mots, faux code, heure choisie ── */
     var sv = $("#v-essai"), simBtn = $("#sim-env-btn");
     var SIM_W = {
-      1: "Tu es Mangue, le gorille de Litchi : trois petites attentions à lui glisser sans te faire repérer. À l’heure des aveux, Boop dévoile tous les gorilles.",
+      1: "Tu es Mangue, le gorille de Litchi : deux petites attentions par jour, du 22 au 25 décembre, à lui glisser sans te faire repérer (ici, tous les jours sont ouverts). Coche « fait ✓ » quand c’est fait. À l’heure des aveux, Boop dévoile tous les gorilles.",
       2: "Tu dois faire dire un mot à Litchi sans que la personne s’en doute. Chaque fois que c’est fait, touche « Mot dit ! » : un autre mot arrive. Essaie aussi « Passer ce mot » et « Annuler le dernier ». Qui en fait dire le plus gagne.",
       3: "Tu joues un rôle toute la journée sans jamais le dire (ici, le ventilateur : on est au chaud, après tout). Au dîner du réveillon, tout le monde devine qui jouait quoi.",
-      4: "Tu interroges Litchi en secret : trois petites questions à lui poser dans la journée, sans qu’il ou elle s’en doute. Le soir, tu racontes les questions et les réponses aux autres, qui devinent qui tu as interrogé."
+      4: "Tu interroges Litchi en secret : quatre petites questions à lui poser dans la journée, sans qu’il ou elle s’en doute. Le soir, tu racontes les questions et les réponses aux autres, qui devinent qui tu as interrogé."
     };
     function simTime() {
       var h = hhmm("w" + simSel.w);

@@ -58,28 +58,28 @@ with sync_playwright() as p:
 
     # ───── A. avant le jeu, et le mode essai n'ouvre rien ─────
     ctx, pg = start(b, at(2026, 12, 19, 12, 0))
-    check("A1 avant le 20 décembre : pas d'enveloppe sur l'accueil", not banner(pg) and vis(pg, "#who-bar"))
+    check("A1 avant le 22 décembre : pas d'enveloppe sur l'accueil", not banner(pg) and vis(pg, "#who-bar"))
     check("A2 le fichier contient bien les quatre personnes", pg.evaluate("Object.keys(JSON.parse(document.getElementById('env-data').textContent).real.b).sort().join()") == "Anne,Arthur,Daphne,Flo")
     pg.evaluate("localStorage.setItem('carnet.open','1')"); pg.reload(wait_until="load"); pg.wait_for_timeout(500)
     check("A3 le mot secret du mode essai n'ouvre PAS l'enveloppe", not banner(pg))
     pg.evaluate("location.hash = '#/jeux'"); pg.wait_for_timeout(300); pg.evaluate("location.hash = '#/'"); pg.wait_for_timeout(300)
     check("A4 même après un tour par les jeux ouverts", not banner(pg))
     ctx.close()
-    ctx, pg = start(b, at(2026, 12, 21, 10, 0), who=None)
+    ctx, pg = start(b, at(2026, 12, 22, 10, 0), who=None)
     check("A5 sans prénom choisi : pas d'enveloppe", not banner(pg) and vis(pg, "#who-box"))
     pg.click('#who button[data-n="Anne"]'); pg.wait_for_timeout(900)
     check("A6 dès qu'on choisit son prénom, l'enveloppe apparaît", banner(pg))
     ctx.close()
 
     # ───── B. l'heure du téléphone décide (minute près, fuseau local) ─────
-    ctx, pg = start(b, at(2026, 12, 20, 6, 59, "Europe/Paris"), tz="Europe/Paris")
-    check("B1 20 décembre 6 h 59 (heure du téléphone) : rien", not banner(pg))
-    set_time(pg, at(2026, 12, 20, 7, 0, "Europe/Paris"))
-    check("B2 20 décembre 7 h 00 : l'enveloppe apparaît", banner(pg))
+    ctx, pg = start(b, at(2026, 12, 22, 6, 59, "Europe/Paris"), tz="Europe/Paris")
+    check("B1 22 décembre 6 h 59 (heure du téléphone) : rien", not banner(pg))
+    set_time(pg, at(2026, 12, 22, 7, 0, "Europe/Paris"))
+    check("B2 22 décembre 7 h 00 : l'enveloppe apparaît", banner(pg))
     ctx.close()
 
     # ───── C. vague 1, Anne ─────
-    ctx, pg = start(b, at(2026, 12, 21, 10, 0))
+    ctx, pg = start(b, at(2026, 12, 22, 10, 0))
     check("C1 pendant la vague 1 : le bandeau est là, avec son point", banner(pg) and vis(pg, "#env-btn .dot") and "Une enveloppe t’attend" in btxt(pg), btxt(pg))
     pg.screenshot(path=OUT + "env_r1_accueil.png")
     pg.click("#env-btn"); pg.wait_for_timeout(300)
@@ -96,7 +96,7 @@ with sync_playwright() as p:
           keys(pg, "carnet.env.k.") == [] and keys(pg, "carnet.sim.") == [] and keys(pg, "carnet.env.") == ["carnet.env.o.Anne.w1", "carnet.env.v.Anne.w1"]
           and "test-delta" not in pg.evaluate("JSON.stringify(Object.assign({}, localStorage))"), keys(pg, "carnet.env."))
     intro = sp(pg.inner_text("#card-intro"))
-    check("C7b contexte de la vague 1 et « même Anne »", "Du 20 au 25 décembre" in intro and "Même Anne, qui a organisé le voyage" in intro, intro)
+    check("C7b contexte de la vague 1 et « même Anne »", "Du 22 au 25 décembre" in intro and "Même Anne, qui a organisé le voyage" in intro, intro)
     fin = pg.evaluate("() => [...document.querySelectorAll('#card-fin small, #card-fin b, #card-fin strong')].map(e => e.textContent)")
     check("C7c encadré : fin de la mission, vendredi 25 décembre, 20 h", len(fin) == 3 and sp(fin[0]).startswith("Fin de la mission") and sp(fin[1]) == "vendredi 25 décembre" and sp(fin[2]) == "20 h", fin)
     pg.click("#env-x"); pg.wait_for_timeout(250)
@@ -113,6 +113,13 @@ with sync_playwright() as p:
     try: dec = _b64.b64decode(raw).decode("utf-8")
     except Exception: pass
     check("C9b3 la révélation est mise de côté (sans la mission, sans le code)", raw != "" and "Mission secrète de" not in dec and "test-delta" not in dec and "anne-mot" not in dec and "cols" in dec, dec[:80])
+    # ── les attentions du jour : seul le 22 est ouvert, on coche, le téléphone s'en souvient ──
+    check("C9d 22 décembre 10 h : un seul jour ouvert (2 attentions), les 3 autres jours annoncés sans contenu",
+          pg.locator("#card-items li.act").count() == 2 and pg.locator("#card-items li.env-day").count() == 4 and pg.locator("#card-items li.env-day.off").count() == 3
+          and "Mercredi 23 décembre" in pg.inner_text("#card-items") and "Vendredi 25 décembre" in pg.inner_text("#card-items"), pg.inner_text("#card-items")[:300])
+    check("C9e les boutons « fait ✓ » sont là, non cochés", pg.locator("#card-items button.env-chk").count() == 2 and pg.locator('#card-items button.env-chk[aria-pressed="true"]').count() == 0)
+    pg.locator("#card-items button.env-chk").first.click(); pg.wait_for_timeout(150)
+    check("C9f cocher : le bouton s'allume et le téléphone le retient", pg.locator('#card-items button.env-chk[aria-pressed="true"]').count() == 1 and ls(pg, "carnet.env.c.Anne.w1") == '["0.0"]', ls(pg, "carnet.env.c.Anne.w1"))
     pg.evaluate("document.querySelector('#card-close').click()"); pg.wait_for_timeout(250)
     pg.click("#sealed-open"); pg.wait_for_timeout(300)
     check("C9c refermer puis rouvrir : encore le code", pane(pg) == "code" and pg.input_value("#env-in") == "", pane(pg))
@@ -128,7 +135,7 @@ with sync_playwright() as p:
     check("D3 le code d'Anne ne marche pas avec le prénom de Daphne", pane(pg) == "code")
     type_code(pg, CODES["Daphne"]); hold(pg)
     check("D4 mission de Daphne", pane(pg) == "card" and "mission secrète de daphne (w1)" in sp(pg.inner_text("#card-title")).lower(), pg.inner_text("#card-title"))
-    check("D5 aucune clé gardée, même avec deux prénoms", keys(pg, "carnet.env.k.") == [] and sorted(keys(pg, "carnet.env.")) == ["carnet.env.o.Anne.w1", "carnet.env.o.Daphne.w1", "carnet.env.v.Anne.w1", "carnet.env.v.Daphne.w1"], keys(pg, "carnet.env."))
+    check("D5 aucune clé gardée, même avec deux prénoms", keys(pg, "carnet.env.k.") == [] and sorted(keys(pg, "carnet.env.")) == ["carnet.env.c.Anne.w1", "carnet.env.o.Anne.w1", "carnet.env.o.Daphne.w1", "carnet.env.v.Anne.w1", "carnet.env.v.Daphne.w1"], keys(pg, "carnet.env."))
     pg.click("#env-x"); pg.wait_for_timeout(200)
 
     # ───── E. l'heure de la révélation (vague 1) ─────
@@ -142,6 +149,7 @@ with sync_playwright() as p:
     check("E3 et le code n'a pas été redemandé", pane(pg) == "rev", pane(pg))
     check("E4 quatre lignes, celle d'Anne en valeur", pg.locator("#rev-tbl tbody tr").count() == 4 and pg.locator("#rev-tbl tr.me").count() == 1 and "Anne" in pg.inner_text("#rev-tbl tr.me"))
     check("E5 voix de Boop", "aveux" in pg.inner_text("#rev-say") and pg.locator('#rev-say img[src$="doudou_boop.webp"]').count() == 1)
+    check("E4b la révélation affiche le décompte des attentions cochées : 1 sur 8", "1 attention sur 8" in sp(pg.inner_text("#rev-score")) and vis(pg, "#rev-score"), pg.inner_text("#rev-score"))
     pg.screenshot(path=OUT + "env_r2_revelation.png")
     pg.click("#rev-close"); pg.wait_for_timeout(200)
     check("E6 une fois vue : « La révélation », sans point", "La révélation" in btxt(pg) and not vis(pg, "#env-btn .dot"), btxt(pg))
@@ -264,7 +272,7 @@ with sync_playwright() as p:
     page = open("/tmp/claude-0/-home-claude/508b3527-b55f-5958-8651-8d8ffebe2ce6/scratchpad/web34/index.html", encoding="utf-8").read()
     for needle in ["Mission secrète de", "anne-mot1", "test-delta", "test-alpha", "Fais apparaître une banane", "Même Anne", "tiré au sort sans elle", "brassais l’air"]:
         check("J1 « %s » absent du fichier publié" % needle, needle not in page)
-    ctx, pg = start(b, at(2026, 12, 21, 10, 0))
+    ctx, pg = start(b, at(2026, 12, 22, 10, 0))
     pg.evaluate("location.hash = '#/essai'"); pg.wait_for_timeout(300)
     check("J2 la page d'essai marche aussi avec le vrai jeu présent", vis(pg, "#sim-env-btn"))
     pg.click("#sim-env-btn"); pg.wait_for_timeout(300)
@@ -272,7 +280,7 @@ with sync_playwright() as p:
     ctx.close()
 
     # ───── K. une ancienne clé gardée par une version précédente est effacée, et ne remplace pas le code ─────
-    ctx, pg = start(b, at(2026, 12, 21, 10, 0), extra=["localStorage.setItem('carnet.env.k.Anne', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=')"])
+    ctx, pg = start(b, at(2026, 12, 22, 10, 0), extra=["localStorage.setItem('carnet.env.k.Anne', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=')"])
     check("K1 l'ancienne clé est effacée au chargement", keys(pg, "carnet.env.k.") == [], keys(pg, "carnet.env."))
     pg.click("#env-btn"); pg.wait_for_timeout(300)
     check("K2 et l'enveloppe demande le code", pane(pg) == "code")

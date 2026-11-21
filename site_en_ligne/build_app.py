@@ -215,6 +215,7 @@ def day_html(i, d):
         out += '<p class="pen">%s<span>Dans le carnet papier : le labyrinthe du tuk-tuk</span></p>' % icon("pen")
     if d.get("quiz"):
         out += BG.quiz_cta()
+    out += BG.song_html(d["id"])
     cards = D.facts_for(d)
     if cards:
         out += '<h3 class="sech">Fun facts</h3>' + "".join(fact_card(c) for c in cards)

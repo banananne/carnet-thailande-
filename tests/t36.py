@@ -105,6 +105,21 @@ with sync_playwright() as p:
     check("C5 un autre jour : retour au 23", pg.evaluate("location.hash") == "#/jours/2026-12-23", pg.evaluate("location.hash"))
     ctx.close()
     # ───── D. le mot de Boop ─────
+    # ───── E. la chanson du jour : une par page de jour, avec son code Spotify ─────
+    ctx, pg = newctx(b, clock=ms(2026, 12, 21, 10, 0))
+    pg.goto(BASE, wait_until="load"); pg.wait_for_timeout(500)
+    n = pg.evaluate("document.querySelectorAll('.day .song').length")
+    check("E1 une chanson du jour sur chacune des 17 pages de jour", n == 17, n)
+    exp = {"2026-12-18": "Holiday", "2026-12-24": "Last Christmas", "2026-12-27": "Bicycle Race", "2027-01-02": "One Night in Bangkok", "2027-01-03": "Beanie"}
+    for day, ti in exp.items():
+        t_ = pg.evaluate("d => document.querySelector('#d-' + d + ' .song-t b').textContent", day)
+        check("E2 %s : %s" % (day, ti), t_ == ti, t_)
+    pg.evaluate("location.hash = '#/jours/2026-12-26'"); pg.wait_for_timeout(500)
+    pg.locator("#d-2026-12-26 .song").scroll_into_view_if_needed(); pg.wait_for_timeout(500)
+    check("E3 images chargées (pochette et code)", pg.evaluate("[...document.querySelectorAll('#d-2026-12-26 .song img')].every(i => i.complete && i.naturalWidth > 10)"))
+    check("E4 le code a un texte alternatif", "Code Spotify" in pg.get_attribute("#d-2026-12-26 .song-code", "alt"))
+    check("E5 pas de débordement", not overflow(pg))
+    ctx.close()
     page = open("/home/claude/site_en_ligne/web/index.html", encoding="utf-8").read()
     check("D1 « Hola que tal, ça boum les frères ? » est parmi les mots des mascottes", "Hola que tal, ça boum les frères ?" in page)
 

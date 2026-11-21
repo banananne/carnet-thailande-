@@ -356,13 +356,31 @@ def guide_html(day_id):
             % (d["bg"], dd_img(key, "guide-img"), txt(d["short"]), "" if TRAVEL[key] else " · de la maison", txt("« %s »" % text)))
 
 
+def song_html(day_id):
+    """La chanson du jour : pochette, titre, artiste et code Spotify à scanner."""
+    t = G.SONGS.get(day_id)
+    if not t:
+        return ""
+    k = day_id[5:].replace("-", "")
+    for fn in ("song_%s_cover.webp" % k, "song_%s_code.webp" % k):
+        assert os.path.exists(os.path.join(ROOT, "img", fn)), fn
+    return ('<section class="song" aria-label="La chanson du jour">'
+            '<img class="song-cover" src="img/song_%s_cover.webp" width="200" height="200" alt="" loading="lazy" decoding="async">'
+            '<p class="song-t"><small>La chanson du jour</small><b>%s</b><span>%s</span></p>'
+            '<img class="song-code" src="img/song_%s_code.webp" width="800" height="193" alt="%s" loading="lazy" decoding="async">'
+            '<p class="song-hint">%s</p></section>'
+            % (k, txt(t[0]), txt(t[1]), k, esc("Code Spotify de « %s », %s" % t),
+               txt("Dans l’appli Spotify : Recherche, puis l’icône appareil photo, et scanne ce code sur l’écran d’un autre téléphone.")))
+
+
 def day_stamp_html(day_id):
     return ('<div class="dstamp" data-day="%s"><button class="btn sm alt" type="button" data-stamp-day="%s">%s <span>Tamponner ce jour</span></button>'
             '<span class="dstamp-svg"></span></div>' % (day_id, day_id, icon("stamp")))
 
 
 def home_quip_html():
-    key, text = G.HOME_QUIPS[9]   # Moomoo, « Cinq minutes de plus ? » : première phrase affichée, le reste est tiré au hasard
+    key, text = ("moomoo", "Cinq minutes de plus ?")   # première phrase affichée (la page est la même pour tous) ; le reste est tiré au hasard
+    assert (key, text) in G.HOME_QUIPS
     d = DD[key]
     data = esc(json.dumps([[k, t] for k, t in G.HOME_QUIPS], ensure_ascii=False, separators=(",", ":")))
     imgs = {k: "img/" + DD[k]["photo"] for k in DD}

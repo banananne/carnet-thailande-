@@ -36,6 +36,27 @@ HOME_QUIPS = [
     ("moomoo", "Je pilote, Aftonsparv navigue."),
 ]
 
+# la chanson du jour (playlist du voyage : une chanson par jour, choisie par Anne ; le code Spotify est l'image img/song_MMJJ_code.webp)
+SONGS = {
+    "2026-12-18": ("Holiday", "Madonna"),
+    "2026-12-19": ("Be Young, Be Foolish, Be Happy", "The Tams"),
+    "2026-12-20": ("Someday We Will Dream About Today", "The Sways"),
+    "2026-12-21": ("Jungle Boogie", "Kool & The Gang"),
+    "2026-12-22": ("Eye of the Tiger", "Survivor"),
+    "2026-12-23": ("Born to Be Wild", "Steppenwolf"),
+    "2026-12-24": ("Last Christmas", "Wham!"),
+    "2026-12-25": ("Underneath the Tree", "Kelly Clarkson"),
+    "2026-12-26": ("Come Fly with Me", "Frank Sinatra"),
+    "2026-12-27": ("Bicycle Race", "Queen"),
+    "2026-12-28": ("Baby Elephant Walk", "Henry Mancini"),
+    "2026-12-29": ("On the Road Again", "Willie Nelson"),
+    "2026-12-30": ("Kokomo", "The Beach Boys"),
+    "2026-12-31": ("Celebration", "Kool & The Gang"),
+    "2027-01-01": ("What a View", "DeWolff & Dawn Brothers"),
+    "2027-01-02": ("One Night in Bangkok", "Murray Head"),
+    "2027-01-03": ("Beanie", "Chezile"),
+}
+
 # un doudou « guide » par jour (jamais un indice du quiz du 26 décembre)
 DAY_QUIPS = {
     "2026-12-18": ("moomoo", "Un siège, un plaid, un plateau-repas : le voyage commence très bien."),

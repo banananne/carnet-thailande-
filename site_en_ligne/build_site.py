@@ -9,7 +9,7 @@ Le fichier index.html à la racine (site_en_ligne/index.html) est la copie publi
 import re, os, shutil, subprocess, time
 
 ROOT = "/home/claude/site_en_ligne"
-WEB = os.path.join(ROOT, "web")
+WEB = os.environ.get("CARNET_WEB") or os.path.join(ROOT, "web")     # CARNET_WEB : dossier de sortie des essais (le vrai reste web/)
 STK = "/home/claude/lexique/out/stickers_playlist"
 NM = os.path.join(ROOT, "_dev", "node_modules", "@fontsource")
 

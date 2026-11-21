@@ -616,10 +616,11 @@ window.CarnetGames = (function () {
   /* ───────────── étape 4 : défi du jour, mot du jour, bingo, carnet gourmand, prix, horoscope de l'accueil ───────────── */
 /*@GAMES2@*/
 /*@TRANS@*/
+/*@ENV@*/
 
   /* tout repeindre (mot secret saisi, retour dans l'appli un autre jour, cadenas remis) */
   function refreshAll() {
-    Lock.paint(); Gates.paintHub(); HomeHoro.paint();
+    Lock.paint(); Gates.paintHub(); HomeHoro.paint(); Env.paint();
     if (curName) api.enter(curName);
   }
 
@@ -629,6 +630,7 @@ window.CarnetGames = (function () {
       Gates.paintHub();
       var open = Gates.paintView(name);
       HomeHoro.paint();
+      Env.enter(name);
       if (name === "jeux") Test.reset();            /* met à jour la tuile du test (cadenas, ou « Ta mascotte : … ») */
       if (name === "quiz") Quiz.reset();
       else if (name === "test") Test.reset();

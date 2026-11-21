@@ -128,7 +128,7 @@ document.documentElement.classList.remove("has-who");
 var NAMES = { "": "home", jours: "days", hotels: "hotels", utile: "utile", metro: "metro", lexique: "lexique", taxi: "taxi", convertisseur: "convert", "good-to-know": "gtk",
   jeux: "jeux", quiz: "quiz", "test-doudou": "test", personnalite: "test", doudous: "doudous", mascottes: "doudous", "blind-test": "blind", "mots-meles": "mots", horoscope: "horo", passeport: "pass",
   defi: "defi", "mot-du-jour": "mot", mot: "mot", bingo: "bingo", gourmand: "gourmand", prix: "prix",
-  traduire: "trad", traducteur: "trad" };
+  traduire: "trad", traducteur: "trad", essai: "essai" };
 var NAV_OF = { home: "home", days: "days", hotels: "hotels", utile: "utile", metro: "utile", lexique: "utile", taxi: "utile", convert: "utile", gtk: "utile",
   jeux: "jeux", quiz: "jeux", test: "jeux", doudous: "jeux", blind: "jeux", mots: "jeux", horo: "jeux", pass: "jeux",
   defi: "jeux", mot: "jeux", bingo: "jeux", gourmand: "jeux", prix: "jeux", trad: "utile" };
@@ -137,7 +137,7 @@ var TITLES = { home: "Carnet Thaïlande 2026", days: "Jours · Carnet Thaïlande
   jeux: "Jeux · Carnet Thaïlande", quiz: "Quiz · Carnet Thaïlande", test: "Test de personnalité · Carnet Thaïlande", doudous: "Les mascottes · Carnet Thaïlande",
   blind: "Blind test · Carnet Thaïlande", mots: "Mots mêlés · Carnet Thaïlande", horo: "Horoscope · Carnet Thaïlande", pass: "Passeport · Carnet Thaïlande",
   defi: "Défi du jour · Carnet Thaïlande", mot: "Mot du jour · Carnet Thaïlande", bingo: "Bingo · Carnet Thaïlande", gourmand: "Carnet gourmand · Carnet Thaïlande", prix: "Prix du voyage · Carnet Thaïlande",
-  trad: "Traducteur · Carnet Thaïlande" };
+  trad: "Traducteur · Carnet Thaïlande", essai: "Essai des enveloppes · Carnet Thaïlande" };
 var days = $$(".day").map(function (a) { return a.getAttribute("data-id"); });
 var curDay = null, curName = "";
 
@@ -157,6 +157,7 @@ function route() {
   var h = (location.hash || "").replace(/^#\/?/, "");
   var parts = h.split("/");
   var name = NAMES[parts[0]] || "home";
+  if (!document.getElementById("v-" + name)) name = "home";     /* une page absente (l'essai des enveloppes, une fois retiré) ramène à l'accueil */
   var target = null, first = curDay === null;
   if (name === "days") {
     var id = parts[1];

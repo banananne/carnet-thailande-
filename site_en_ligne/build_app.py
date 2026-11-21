@@ -541,13 +541,14 @@ def view_home(version):
            '<button class="stk stk-tuk" id="tuk" type="button" aria-label="Le tuk-tuk démarre">%s</button>'
            '</div></header><div class="wrap">'
            % (sticker("elephant"), sticker("tuktuk")))
-    out += ('<section class="sec" id="who-sec" aria-labelledby="h-who">'
+    import build_env as BE
+    out += ('<section class="sec" id="who-sec" aria-labelledby="h-who"><div class="who-row">'
             '<button class="who-bar" id="who-bar" type="button" aria-expanded="false" aria-controls="who-box" hidden>'
             '<span class="who-av" id="who-av" aria-hidden="true"></span><span class="who-hi" id="who-hi"></span>'
-            '<span class="who-chg">Changer<span class="who-chv">%s</span></span></button>'
+            '<span class="who-chg">Changer<span class="who-chv">%s</span></span></button>%s</div>'
             '<div id="who-box"><h2 id="h-who">Qui es-tu ?</h2>'
             '<p class="sub">Ton prénom reste sur ce téléphone.</p><div class="who" id="who" role="group" aria-label="Choisis ton prénom">'
-            % icon("chevr"))
+            % (icon("chevr"), BE.home_btn()))
     for n, bg, fg in who:
         out += ('<button type="button" data-n="%s" aria-pressed="false"><span class="ini" style="background:%s;color:%s">%s</span>%s</button>'
                 % (n, bg, fg, n[0], n))
@@ -593,16 +594,17 @@ def nav_html():
 
 
 def css_text():
-    s = "\n".join(open(os.path.join(ROOT, f), encoding="utf-8").read() for f in ("app.css", "games.css", "days.css", "trad.css"))
+    s = "\n".join(open(os.path.join(ROOT, f), encoding="utf-8").read() for f in ("app.css", "games.css", "days.css", "trad.css", "env.css"))
     s = re.sub(r"/\*.*?\*/", "", s, flags=re.S)
     return "\n".join(ln.strip() for ln in s.splitlines() if ln.strip())
 
 
 def render(version, head_meta):
+    import build_env as BE
     import build_games as BG
     import build_trad as BT
     body = (view_home(version) + view_days() + view_hotels() + view_utile() + BT.view_trad() + view_metro() + view_lexique() + view_taxi()
-            + view_convert() + view_gtk() + BG.all_views() + nav_html() + show_overlay()
+            + view_convert() + view_gtk() + BG.all_views() + BE.view_essai() + nav_html() + show_overlay() + BE.overlay_html()
             + '<div id="toast" role="status" aria-live="polite"></div>'
             + '<div id="upd" hidden><span>Une nouvelle version est prête.</span><button class="btn sm" type="button" id="upd-btn">Actualiser</button></div>')
     js = open(os.path.join(ROOT, "app.js"), encoding="utf-8").read()
@@ -612,9 +614,11 @@ def render(version, head_meta):
     games = games.replace("/*@GAMES2@*/", open(os.path.join(ROOT, "games2.js"), encoding="utf-8").read())
     assert "/*@TRANS@*/" in games
     games = games.replace("/*@TRANS@*/", open(os.path.join(ROOT, "trans.js"), encoding="utf-8").read())
+    assert "/*@ENV@*/" in games
+    games = games.replace("/*@ENV@*/", open(os.path.join(ROOT, "env.js"), encoding="utf-8").read())
     js = js.replace("/*@GAMES@*/", games)
     assert "</script" not in js
     # prénom déjà choisi : on masque « Qui es-tu ? » dès le premier affichage (pas de clignotement avant que le script du bas ne s'exécute)
     early = '<script>try{if(localStorage.getItem("carnet.who"))document.documentElement.classList.add("has-who")}catch(e){}</script>'
-    return ('<!doctype html><html lang="fr" data-v="%s"><head>%s%s<title>Carnet Thaïlande 2026</title>%s<style>%s</style></head><body>%s<script>%s</script></body></html>\n'
-            % (esc(version), head_meta, early, font_css(), css_text(), body, js))
+    return ('<!doctype html><html lang="fr" data-v="%s"><head>%s%s<title>Carnet Thaïlande 2026</title>%s<style>%s</style></head><body>%s%s<script>%s</script></body></html>\n'
+            % (esc(version), head_meta, early, font_css(), css_text(), body, BE.data_script(), js))

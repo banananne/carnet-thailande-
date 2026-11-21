@@ -32,6 +32,19 @@ def txt(s):
     return esc(typo(s))
 
 
+_MARKUP = re.compile(r"(<script\b.*?</script>|<style\b.*?</style>|<svg\b.*?</svg>|<[^>]*>)", re.S | re.I)
+
+
+def nbsp_pass(page):
+    """Dernier passage sur la page entière : espace insécable avant : ; ? ! » et après « dans le texte de TOUTES les pièces,
+    y compris celles qui ne passent pas par txt() (gabarit, pages des jours, écrans « Pas encore ! »).
+    Ne touche ni aux balises ni aux attributs, ni aux scripts, aux styles et aux dessins."""
+    parts = _MARKUP.split(page)
+    for i in range(0, len(parts), 2):      # indices pairs = texte entre deux balises
+        parts[i] = typo(parts[i])
+    return "".join(parts)
+
+
 def rich(s):
     """Texte avec « **gras** » → HTML."""
     out = []

@@ -3,7 +3,7 @@
 Cette branche ne sert qu'à garder une copie des fichiers qui fabriquent le site. Le site publié
 est sur la branche `main` (GitHub Pages) : ne rien publier ici.
 
-Dernière mise à jour : 21 novembre 2026, 3 h 35. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
+Dernière mise à jour : 21 novembre 2026, 3 h 59. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
 cartes taxi, convertisseur, Good to know) et étape 3 (jeux : quiz, test de personnalité, blind test, mots mêlés,
 horoscope, mascottes, passeport de tampons), publiées ensemble à 22 h 24 (commit 34db76e), puis vague 1 des
 améliorations (accueil allégé à quatre rubriques, « Qui es-tu ? » qui se replie, « doudous » devenus « mascottes »,
@@ -17,7 +17,11 @@ Puis le cadenas du test de personnalité (ouvert le 29 décembre, ou avec un mot
 Puis l'étape 4 : calendrier d'ouverture des jeux, cinq jeux exclusifs au site (défi photo et rôles du jour, mot du jour, bingo,
 carnet gourmand, prix du voyage), horoscope du jour sur l'accueil, mascottes qui voyagent (Aftonsparv et Moomoo) ou écrivent
 de loin (Boop et Minou), passeport à 28 tampons, traducteur français ⇄ thaï dans Utile, publiés le 21 novembre à 3 h 34
-(branche `main`, commit f470d1a, version de construction 20261121-032325). Ces sources correspondent à ce qui est publié.
+(branche `main`, commit f470d1a, version de construction 20261121-032325).
+Puis un correctif publié le 21 novembre à 3 h 57 (branche `main`, commit 037f970, version de construction 20261121-034731) : le traducteur
+n'affiche plus la « prononciation » de Google (translittération savante à diacritiques, illisible : on écoute avec « Écouter »),
+la transcription « suay » est écrite pareil partout (recueil, mot du jour, carnet imprimé), et `build_app.nbsp_pass` pose
+l'espace insécable avant : ; ? ! » et après « dans tout le texte de la page. Ces sources correspondent à ce qui est publié.
 
 ## Reconstruire le site
 1. Remettre `site_en_ligne/` dans `/home/claude/site_en_ligne/` et les autocollants de `stickers/`
@@ -56,7 +60,9 @@ de loin (Boop et Minou), passeport à 28 tampons, traducteur français ⇄ thaï
   `trans.js` (collé dans `games.js` au repère `/*@TRANS@*/` ; Google Traduction puis MyMemory pour une phrase libre, seul
   endroit du site qui envoie un texte à l'extérieur), `trad.css` (ajouté à `app.css`). Clés : `carnet.trad`, `carnet.trad.dir`.
 - `build_app.py` : fabrique les pages HTML (accueil, jours, hôtels, utile, métro, lexique, cartes taxi,
-  convertisseur, Good to know, fenêtre « montrer en grand »).
+  convertisseur, Good to know, fenêtre « montrer en grand »). `nbsp_pass` est le dernier passage sur la page entière :
+  espace insécable avant : ; ? ! » et après « dans le texte (jamais dans les balises, attributs, scripts, styles ni dessins) ;
+  il est appelé par `build_site.build_web`.
 - `build_games.py` : pages des jeux (hub, quiz, test de personnalité, mascottes, blind test, mots mêlés, horoscope,
   passeport, tampons en SVG), importé par `build_app.py`. Le mot « doudou » reste dans les noms internes (clé de
   mémoire `carnet.doudou`, tampon `doudou`, fichiers `img/doudou_*.webp`, ids `v-doudous`) pour que ceux qui ont
@@ -95,6 +101,7 @@ légendée montrée à Anne (à partir des fichiers de `t21.py`), `t26.py` texte
 identifiants uniques, remise à zéro ; `t27neg.py` contrôle négatif du test de rognage.
 Étape 4 : `t30.py` calendrier à dates simulées (horloge de Playwright), mot secret, horoscope du jour, rôles, défi, mot, bingo,
 gourmand, prix, 28 tampons, mascottes, mise en page ; `t31.py` traducteur (réseau SIMULÉ : le serveur local ne joint aucun vrai
-service) ; `run_srv.sh` lance le serveur local le temps d'une série (`./run_srv.sh t31 t30 …`, résumé dans `summary.log`) ; `run_all.sh`
+service) ; `t32.py` espaces insécables du texte de la page (balises, scripts et styles intacts) et transcription « suay » ;
+`run_srv.sh` lance le serveur local le temps d'une série (`./run_srv.sh t31 t30 …`, résumé dans `summary.log`) ; `run_all.sh`
 enchaîne les séries. Les tests t12, t14, t15, t18, t22, t26, t27 et t29 posent `carnet.open` = « 1 » et comptent 28 tampons.
 `test_photo_0..4.jpg` : petites photos pour tester la photo du jour. Les chemins de captures (variable `OUT`) sont à adapter.

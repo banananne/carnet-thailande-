@@ -50,15 +50,13 @@
     }
     function unent(s) { var t = document.createElement("textarea"); t.innerHTML = String(s).replace(/</g, "&lt;"); return t.value; }
     function viaGoogle(text, d) {
-      var url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&dt=rm&sl=" + (d === "fr" ? "fr&tl=th" : "th&tl=fr") + "&q=" + encodeURIComponent(text);
+      /* pas de « dt=rm » : la transcription de Google pour le thaï est une translittération savante à diacritiques (ex. « S̄wạs̄dī »),
+         illisible pour un francophone ; la prononciation d'une traduction en ligne s'écoute avec « Écouter » */
+      var url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=" + (d === "fr" ? "fr&tl=th" : "th&tl=fr") + "&q=" + encodeURIComponent(text);
       return getJson(url).then(function (j) {
-        var segs = j && j[0] instanceof Array ? j[0] : [], t = "", rom = [];
-        segs.forEach(function (s) {
-          if (!(s instanceof Array)) return;
-          if (typeof s[0] === "string") t += s[0];
-          else { var r = d === "fr" ? s[2] : s[3]; if (typeof r === "string" && r.trim()) rom.push(r.trim()); }   /* la ligne de prononciation (écriture latine du thaï) */
-        });
-        return { text: t.trim(), rom: rom.join(" "), via: "Google Traduction" };
+        var segs = j && j[0] instanceof Array ? j[0] : [], t = "";
+        segs.forEach(function (s) { if (s instanceof Array && typeof s[0] === "string") t += s[0]; });
+        return { text: t.trim(), rom: "", via: "Google Traduction" };
       });
     }
     function viaMyMemory(text, d) {

@@ -65,9 +65,9 @@ class Net:
         J = dict(status=200, headers=CORS, content_type="application/json")
         if m == "ok":
             if sl == "fr":
-                body = [[["ขอบคุณมาก", text, None, None, 10], [None, None, "khop khun mak", text]], None, "fr"]
+                body = [[["ขอบคุณมาก", text, None, None, 10], [None, None, "K̄hxbkhuṇ māk", text]], None, "fr"]
             else:
-                body = [[["Je voudrais manger du riz sauté", text, None, None, 10], [None, None, "Je voudrais manger", "chan yak kin khao phat"]], None, "th"]
+                body = [[["Je voudrais manger du riz sauté", text, None, None, 10], [None, None, "Je voudrais manger", "C̄hạn yāk kin k̄hâw p̄hạd"]], None, "th"]
             self._send(route, body=json.dumps(body), **J)
         elif m == "500": self._send(route, status=500, headers=CORS, content_type="text/plain", body="oups")
         elif m == "html": self._send(route, status=200, headers=CORS, content_type="text/html", body="<html>unusual traffic from your network</html>")
@@ -273,13 +273,14 @@ with sync_playwright() as p:
     net.hold = False; net.release(); pg.wait_for_timeout(500)
     check("D2 une seule requête, au bon service", len(net.g) == 1 and len(net.m) == 0, (len(net.g), len(net.m)))
     u = urlparse(net.g[0]); qq = parse_qs(u.query)
-    check("D3 l'adresse : Google, français vers thaï, texte tapé", u.hostname == "translate.googleapis.com" and qq["sl"] == ["fr"] and qq["tl"] == ["th"] and qq["q"] == [FREE], qq)
+    check("D3 l'adresse : Google, français vers thaï, texte tapé, texte seulement (pas de translittération demandée)", u.hostname == "translate.googleapis.com" and qq["sl"] == ["fr"] and qq["tl"] == ["th"] and qq["q"] == [FREE] and qq["dt"] == ["t"], qq)
     check("D4 aucune adresse de page envoyée (pas de Referer)", net.refs == [None], net.refs)
-    check("D5 résultat : thaï, prononciation, texte tapé", vis(pg, "#tr-out") and pg.text_content("#tr-th") == "ขอบคุณมาก" and pg.text_content("#tr-rom") == "khop khun mak" and pg.text_content("#tr-fr") == FREE)
-    check("D6 source : Google Traduction ; avertissement visible", "google traduction" in low(pg.text_content("#tr-src")) and vis(pg, "#tr-warn") and "se tromper" in low(pg.text_content("#tr-warn")))
+    check("D5 résultat : thaï et texte tapé ; pas de prononciation écrite (celle de Google est illisible) et aucun signe savant à l'écran", vis(pg, "#tr-out") and pg.text_content("#tr-th") == "ขอบคุณมาก" and not vis(pg, "#tr-rom") and pg.text_content("#tr-rom") == "" and pg.text_content("#tr-fr") == FREE
+          and not re.search("[\u0300-\u036f\u1e00-\u1eff]", pg.inner_text("#v-trad")), pg.text_content("#tr-rom"))
+    check("D6 source : Google Traduction ; avertissement visible, avec le renvoi vers « Écouter »", "google traduction" in low(pg.text_content("#tr-src")) and vis(pg, "#tr-warn") and "se tromper" in low(pg.text_content("#tr-warn")) and "écouter" in low(pg.text_content("#tr-warn")))
     check("D7 bouton de nouveau libre, message « Traduit »", not pg.is_disabled("#tr-go") and "traduit" in low(pg.text_content("#tr-st")))
     check("D8 Écouter/Montrer : sans petit mot poli (data-np), thaï du résultat", pg.get_attribute("#tr-say", "data-np") is not None and pg.get_attribute("#tr-say", "data-th") == "ขอบคุณมาก"
-          and pg.get_attribute("#tr-show", "data-rom") == "khop khun mak" and pg.get_attribute("#tr-show", "data-fr") == FREE)
+          and pg.get_attribute("#tr-show", "data-rom") == "" and pg.get_attribute("#tr-show", "data-fr") == FREE)
     pg.click("#tr-show"); pg.wait_for_timeout(300)
     check("D9 « Montrer en grand » : thaï seul, pastilles du petit mot poli cachées", pg.text_content("#show-th") == "ขอบคุณมาก" and not vis(pg, "#show-pol"))
     pg.click(".show-x"); pg.wait_for_timeout(250)
@@ -350,8 +351,8 @@ with sync_playwright() as p:
     check("F5 en sens thaï → français, le français est au-dessus", yf)
     translate(pg, "ฉันอยากกินข้าวผัด", 600)
     check("F6 thaï libre → Google (th vers fr)", len(net.g) == 1 and parse_qs(urlparse(net.g[0]).query)["sl"] == ["th"] and parse_qs(urlparse(net.g[0]).query)["tl"] == ["fr"])
-    check("F7 résultat : français du service, thaï tapé, prononciation du thaï",
-          pg.text_content("#tr-fr") == "Je voudrais manger du riz sauté" and pg.text_content("#tr-th") == "ฉันอยากกินข้าวผัด" and pg.text_content("#tr-rom") == "chan yak kin khao phat", (pg.text_content("#tr-fr"), pg.text_content("#tr-rom")))
+    check("F7 résultat : français du service, thaï tapé, pas de prononciation écrite ni de signes savants",
+          pg.text_content("#tr-fr") == "Je voudrais manger du riz sauté" and pg.text_content("#tr-th") == "ฉันอยากกินข้าวผัด" and not vis(pg, "#tr-rom") and not re.search("[\u0300-\u036f\u1e00-\u1eff]", pg.inner_text("#v-trad")), (pg.text_content("#tr-fr"), pg.text_content("#tr-rom")))
     pg.click("#tr-copy"); pg.wait_for_timeout(250)
     check("F8 « Copier » : en sens thaï → français, on copie le français", pg.evaluate("navigator.clipboard.readText()") == "Je voudrais manger du riz sauté")
     pg.click("#tr-say"); pg.wait_for_timeout(200)       # ne doit pas planter (pas de voix dans le conteneur : un message s'affiche)

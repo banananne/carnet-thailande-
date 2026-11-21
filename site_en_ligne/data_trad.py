@@ -61,7 +61,7 @@ BOOK = [
         ("Je suis allergique aux cacahuètes.", "phae thua li-song", "แพ้ถั่วลิสง", False),
         ("Je suis allergique aux crevettes.", "phae kung", "แพ้กุ้ง", False),
         ("Je suis allergique aux fruits de mer.", "phae a-han tha-le", "แพ้อาหารทะเล", False),
-        ("Du riz blanc, s’il vous plaît.", "kho khao suai", "ขอข้าวสวย", False),
+        ("Du riz blanc, s’il vous plaît.", "kho khao suay", "ขอข้าวสวย", False),
         ("Une bière, s’il vous plaît.", "kho bia nueng khuat", "ขอเบียร์หนึ่งขวด", False),
         ("Encore un, s’il vous plaît.", "kho ik nueng", "ขออีกหนึ่ง", False),
         ("À emporter, s’il vous plaît.", "kho ho klap", "ขอห่อกลับ", False),
@@ -82,7 +82,7 @@ BOOK = [
         ("Ça ouvre à quelle heure ?", "poet ki mong ?", "เปิดกี่โมง", False),
         ("Ça ferme à quelle heure ?", "pit ki mong ?", "ปิดกี่โมง", False),
         ("Combien coûte l’entrée ?", "kha khao thao rai ?", "ค่าเข้าเท่าไหร่", False),
-        ("C’est magnifique !", "suai mak", "สวยมาก", False),
+        ("C’est magnifique !", "suay mak", "สวยมาก", False),
     ]),
     ("Santé et urgences", [
         ("Au secours !", "chuai duai", "ช่วยด้วย", True),

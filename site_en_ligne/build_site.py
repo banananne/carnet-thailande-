@@ -262,7 +262,7 @@ def build_web():
                 shutil.copy(os.path.join(imgdir, fn), os.path.join(WEB, "img", fn))
 
     version = time.strftime("%Y%m%d-%H%M%S")
-    index = build_app.render(version, APP_META)
+    index = build_app.nbsp_pass(build_app.render(version, APP_META))
     open(os.path.join(WEB, "index.html"), "w", encoding="utf-8").write(index)
     open(os.path.join(WEB, "test.html"), "w", encoding="utf-8").write(build_test())
     open(os.path.join(WEB, "manifest.webmanifest"), "w", encoding="utf-8").write(MANIFEST)

@@ -52,7 +52,7 @@ def view_trad():
             '<button class="btn" type="button" id="tr-say" data-say data-th="" data-q="0">%s <span>Écouter</span></button>'
             '<button class="btn alt" type="button" id="tr-show" data-show data-th="" data-rom="" data-fr="" data-q="0">%s <span>Montrer en grand</span></button>'
             '<button class="btn alt" type="button" id="tr-copy">%s <span>Copier</span></button></div>'
-            '<p class="tr-warn" id="tr-warn" hidden>Traduction automatique : elle peut se tromper. Pour une chose importante, garde des phrases simples et courtes, et montre l’écran à la personne.</p>'
+            '<p class="tr-warn" id="tr-warn" hidden>Traduction automatique : elle peut se tromper. Pour une chose importante, garde des phrases simples et courtes, et montre l’écran à la personne. La prononciation s’écoute avec « Écouter ».</p>'
             '</section>' % (icon("speaker"), icon("fit"), icon("copy")))
     # ── les dernières traductions (gardées sur le téléphone, lisibles sans réseau) ──
     out += ('<details class="bubble rose trs" id="tr-recent" hidden><summary><span><b>Mes dernières traductions</b><small>Gardées sur ce téléphone, lisibles sans réseau</small></span>%s</summary>'

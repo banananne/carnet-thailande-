@@ -27,6 +27,7 @@ HOME_QUIPS = [
     ("boop", "Allez, tout le monde dans le tuk-tuk !"),
     ("boop", "Photo de groupe ! Tout le monde se serre !"),
     ("boop", "Rapportez-moi des mangues !"),
+    ("boop", "Hola que tal, ça boum les frères ?"),
     ("minou", "Je ne boude pas, je règne."),
     ("minou", "Il y a de la clim ? Sinon, je reste ici."),
     ("minou", "Réveillez-moi pour le dîner."),

@@ -145,7 +145,7 @@ var TITLES = { home: "Carnet Thaïlande 2026", days: "Jours · Carnet Thaïlande
   defi: "Défi du jour · Carnet Thaïlande", mot: "Mot du jour · Carnet Thaïlande", bingo: "Bingo · Carnet Thaïlande", gourmand: "Carnet gourmand · Carnet Thaïlande", prix: "Prix du voyage · Carnet Thaïlande",
   trad: "Traducteur · Carnet Thaïlande", essai: "Essai des enveloppes · Carnet Thaïlande" };
 var days = $$(".day").map(function (a) { return a.getAttribute("data-id"); });
-var curDay = null, curName = "";
+var curDay = null, curName = "", fromDays = false;
 
 function centerChip(id, smooth) {
   var ol = $(".strip ol"), c = $('.chip[data-day="' + id + '"]');
@@ -165,6 +165,7 @@ function route() {
   var name = NAMES[parts[0]] || "home";
   if (!document.getElementById("v-" + name)) name = "home";     /* une page absente (l'essai des enveloppes, une fois retiré) ramène à l'accueil */
   var target = null, first = curDay === null;
+  if (name === "days") fromDays = false; else if (curName === "days") fromDays = true; else if (curName !== name) fromDays = false;
   if (name === "days") {
     var id = parts[1];
     if (days.indexOf(id) < 0) {
@@ -210,6 +211,13 @@ if (photoTile) photoTile.addEventListener("click", function (e) {
   e.preventDefault();
   var id = LS.get("carnet.day", ""); if (days.indexOf(id) < 0) id = days[0];
   location.hash = "#/jours/" + id + "/photo";
+});
+/* « Retour » d'une page ouverte depuis un jour (le défi du jour, par exemple) : on revient à ce jour, pas à l'accueil des jeux */
+document.addEventListener("click", function (e) {
+  var b = e.target.closest ? e.target.closest(".vhead .back") : null;
+  if (!b || !fromDays || history.length < 2) return;
+  e.preventDefault(); fromDays = false;
+  try { history.back(); } catch (x) { location.hash = "#/jours/" + (LS.get("carnet.day", "") || days[0]); }
 });
 document.addEventListener("click", function (e) {
   var t = e.target.closest ? e.target.closest("[data-go-day]") : null;

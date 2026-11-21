@@ -73,6 +73,7 @@
     }
 
     /* ── deux contextes : le vrai jeu (prénom de l'accueil, heure du téléphone) et l'essai (Mangue, heure choisie sur la page d'essai) ── */
+    var simDay = Math.max(0, Math.min(3, parseInt(LS.get("carnet.sim.day", "0"), 10) || 0));   /* essai du jeu 1 : jour simulé (22 au 25 décembre) */
     var simSel = (function () {
       var s = String(LS.get("carnet.sim.sel", "1:1")).split(":"), w = +s[0], t = +s[1];
       return { w: w >= 1 && w <= 4 ? w : 1, t: t >= 0 && t <= 3 ? t : 1 };
@@ -157,7 +158,7 @@
     function ckey() { return ctx.ns + ".c." + nm + "." + wave; }
     function cget() { try { var a = JSON.parse(LS.get(ckey(), "[]")); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
     function cset(a) { try { LS.set(ckey(), JSON.stringify(a)); } catch (e) {} }
-    function todayKey() { return ctx.sim ? "9999-12-31" : nowKey().slice(0, 10); }
+    function todayKey() { return ctx.sim ? ["2026-12-22", "2026-12-23", "2026-12-24", "2026-12-25"][simDay] : nowKey().slice(0, 10); }
     function vkey(c, n, w) { return c.ns + ".v." + n + "." + w; }
     function stash(p) {
       if (!p || !p.rev) return;
@@ -217,7 +218,7 @@
     el.hold.addEventListener("click", function (e) { if (e.detail === 0 && cur) { holdReset(); showCard(); } });   /* clavier ou lecteur d'écran : un appui suffit */
     function showChut() {
       pics(el.chutPics, cur.m || []);
-      el.chutKick.textContent = nb(cur.kick || ""); el.chutTxt.textContent = nb(cur.chut || "");
+      el.chutKick.textContent = nb(String(cur.kick || "").replace(/\s*·.*$/, "") + " · Mission secrète");   /* le nom du jeu n'est dévoilé qu'après le serment */ el.chutTxt.textContent = nb(cur.chut || "");
       holdReset(); pane("chut"); armIdle();
     }
 
@@ -388,7 +389,7 @@
     /* ── la page d'essai (#/essai) : faux prénom, faux mots, faux code, heure choisie ── */
     var sv = $("#v-essai"), simBtn = $("#sim-env-btn");
     var SIM_W = {
-      1: "Tu es Mangue, le gorille de Litchi : deux petites attentions par jour, du 22 au 25 décembre, à lui glisser sans te faire repérer (ici, tous les jours sont ouverts). Coche « fait ✓ » quand c’est fait. À l’heure des aveux, Boop dévoile tous les gorilles.",
+      1: "Tu es Mangue, le gorille de Litchi : deux petites attentions par jour, du 22 au 25 décembre, à lui glisser sans te faire repérer (comme pour de vrai, seul le jour en cours est ouvert : choisis le jour plus bas). Coche « fait ✓ » quand c’est fait. À l’heure des aveux, Boop dévoile tous les gorilles.",
       2: "Tu dois faire dire un mot à Litchi sans que la personne s’en doute. Chaque fois que c’est fait, touche « Mot dit ! » : un autre mot arrive. Essaie aussi « Passer ce mot » et « Annuler le dernier ». Qui en fait dire le plus gagne.",
       3: "Tu joues un rôle toute la journée sans jamais le dire (ici, le ventilateur : on est au chaud, après tout). Au dîner du réveillon, tout le monde devine qui jouait quoi.",
       4: "Tu interroges Litchi en secret : quatre petites questions à lui poser dans la journée, sans qu’il ou elle s’en doute. Le soir, tu racontes les questions et les réponses aux autres, qui devinent qui tu as interrogé."
@@ -404,6 +405,8 @@
       if (!sv) return;
       $$("[data-sw]", sv).forEach(function (b) { b.setAttribute("aria-pressed", +b.getAttribute("data-sw") === simSel.w ? "true" : "false"); });
       $$("[data-st]", sv).forEach(function (b) { b.setAttribute("aria-pressed", +b.getAttribute("data-st") === simSel.t ? "true" : "false"); });
+      $$("[data-sd]", sv).forEach(function (b) { b.setAttribute("aria-pressed", +b.getAttribute("data-sd") === simDay ? "true" : "false"); });
+      var sdBox = $("#sim-day"); if (sdBox) sdBox.hidden = simSel.w !== 1;
       wipe(SIM); paintBtn(simBtn, SIM);
       $("#sim-w-desc").textContent = nb(SIM_W[simSel.w]);
       $("#sim-t-desc").textContent = nb(simTime());
@@ -411,13 +414,14 @@
     }
     if (sv) {
       sv.addEventListener("click", function (e) {
-        var b = e.target.closest ? e.target.closest("[data-sw],[data-st]") : null; if (!b) return;
+        var b = e.target.closest ? e.target.closest("[data-sw],[data-st],[data-sd]") : null; if (!b) return;
+        if (b.hasAttribute("data-sd")) { simDay = +b.getAttribute("data-sd"); LS.set("carnet.sim.day", String(simDay)); simPaint(); return; }
         if (b.hasAttribute("data-sw")) simSel.w = +b.getAttribute("data-sw"); else simSel.t = +b.getAttribute("data-st");
         LS.set("carnet.sim.sel", simSel.w + ":" + simSel.t); simPaint();
       });
       simBtn.addEventListener("click", function () { start(SIM); });
       twoTap($("#sim-reset"), "Touche encore pour tout effacer", function () {
-        sweep("carnet.sim."); simSel.w = 1; simSel.t = 1; LS.set("carnet.sim.sel", "1:1"); simPaint(); toast("Essai remis à zéro");
+        sweep("carnet.sim."); simSel.w = 1; simSel.t = 1; simDay = 0; LS.set("carnet.sim.sel", "1:1"); simPaint(); toast("Essai remis à zéro");
       });
     }
 

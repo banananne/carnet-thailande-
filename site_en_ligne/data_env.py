@@ -38,9 +38,9 @@ WAVES_LABEL = {"w1": "La cacahuète", "w2": "Le killer sans victime", "w3": "Un 
 
 # Les voix des mascottes (serments et révélations) sont celles du document validé ; le reste est un exemple inventé.
 CHUT = {
-    "w1": "Chut ! Cette enveloppe est pour toi, et seulement pour toi. Pas un mot à ta cacahuète, au groupe, ni au chauffeur de tuk-tuk. Maintiens le doigt une seconde pour jurer.",
+    "w1": "Chut ! Cette enveloppe est pour toi, et seulement pour toi. Pas un mot au groupe, ni au chauffeur de tuk-tuk. Maintiens le doigt une seconde pour jurer.",
     "w2": "Cette enveloppe n’existe pas. Si quelqu’un t’en parle, tu ne vois pas de quoi il s’agit. Maintiens le doigt pour jurer le silence.",
-    "w4": "Chut ! Cette enveloppe est pour toi, et seulement pour toi. Ni ta personne, ni le groupe, ni le serveur du petit-déjeuner ne doivent savoir que tu mènes l’enquête. Maintiens le doigt une seconde pour jurer.",
+    "w4": "Chut ! Cette enveloppe est pour toi, et seulement pour toi. Ni le groupe, ni le serveur du petit-déjeuner ne doivent savoir ce qu’elle contient. Maintiens le doigt une seconde pour jurer.",
     "w3": "Message crypté, niveau galactique. Il s’autodétruit demain matin et, d’ici là, il reste entre toi et ton hamac. Maintiens le doigt pour confirmer.",
 }
 

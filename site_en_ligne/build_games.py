@@ -58,21 +58,24 @@ def dd_img(key, cls="dd-img", lazy=True):
 
 # ───────────────────────── accueil des jeux ─────────────────────────
 # (couleur, adresse, icône, titre, sous-titre, identifiant du sous-titre, clé du cadenas)
-HUB_DAILY = [
+# trois rubriques, rangées par ordre de parution (date d'ouverture) ; à date égale, l'ordre d'avant est gardé
+HUB_EVERYDAY = [
     ("blue", "#/defi", "camera", "Défi du jour", "Une mission photo et un rôle pour chacun", "defi", "defi"),
     ("rose", "#/mot-du-jour", "speech", "Mot du jour", "Un mot de thaï à dire chaque jour", "mot", "mot"),
-    ("mustard", "#/bingo", "bingo", "Bingo", "9 choses à repérer en route", "bingo", "bingo"),
     ("sand", "#/gourmand", "fork", "Carnet gourmand", "Note les plats que tu goûtes", "gourmand", "gourmand"),
     ("sand", "#/passeport", "stamp", "Passeport", "Un tampon par jour", "pass", "pass"),
+]
+HUB_DAILY = [   # « Au fil des jours »
+    ("mustard", "#/bingo", "bingo", "Bingo", "9 choses à repérer en route", "bingo", "bingo"),
     ("rose", "#/mascottes", "paw", "Les mascottes", "Aftonsparv, Boop Boops, Minou, Moomoo", "doudous", "doudous"),
     ("blue", "#/prix", "award", "Prix du voyage", "Le palmarès du 3 janvier", "prix", "prix"),
 ]
-HUB_BOOK = [
-    ("sand", "#/quiz", "question", "Quiz du 26 décembre", "6 questions, un cocktail à la clé", "quiz", "quiz"),
-    ("rose", "#/personnalite", "heart", "Test de personnalité", "Quelle mascotte es-tu ?", "doudou", "test"),
+HUB_BOOK = [    # « Les jeux du carnet » : 18 décembre, puis le quiz (26) et le test (29)
     ("blue", "#/blind-test", "music", "Blind test", "Le tableau des scores", "blind", "blind"),
     ("mustard", "#/mots-meles", "grid", "Mots mêlés", "40 mots à trouver", "mots", "mots"),
     ("blue", "#/horoscope", "star", "Horoscope", "Les astres ont parlé", "horo", "horo"),
+    ("sand", "#/quiz", "question", "Quiz du 26 décembre", "6 questions, un cocktail à la clé", "quiz", "quiz"),
+    ("rose", "#/personnalite", "heart", "Test de personnalité", "Quelle mascotte es-tu ?", "doudou", "test"),
 ]
 
 
@@ -96,7 +99,9 @@ def view_jeux():
     for d in G.DOUDOUS:
         out += dd_img(d["key"], "dd-mini", lazy=False)
     out += '</a>'
-    out += '<h2 class="sech navy">Au fil des jours</h2><div class="list">'
+    out += '<h2 class="sech navy">À faire tous les jours</h2><div class="list">'
+    out += "".join(hub_tile(*row) for row in HUB_EVERYDAY)
+    out += '</div><h2 class="sech navy">Au fil des jours</h2><div class="list">'
     out += "".join(hub_tile(*row) for row in HUB_DAILY)
     out += '</div><h2 class="sech navy">Les jeux du carnet</h2><div class="list">'
     out += "".join(hub_tile(*row) for row in HUB_BOOK)

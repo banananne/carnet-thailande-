@@ -193,6 +193,11 @@ def view_essai():
             % (txt("1. Choisis un jeu"), txt("Choisis un jeu"), seg_w))
     out += ('<section class="bubble blue" aria-labelledby="h-st"><h2 id="h-st">%s</h2><div class="seg" role="group" aria-label="%s">%s</div><p id="sim-t-desc"></p></section>'
             % (txt("2. Choisis l’heure du téléphone"), txt("Choisis l’heure du téléphone"), seg_t))
+    seg_d = "".join('<button type="button" data-sd="%d" aria-pressed="false"><span><b>%s</b></span></button>' % (i, txt(t))
+                    for i, t in enumerate(["Mardi 22", "Mercredi 23", "Jeudi 24", "Vendredi 25"]))
+    out += ('<section class="bubble sand" id="sim-day" hidden aria-labelledby="h-sd"><h2 id="h-sd">%s</h2><div class="seg" role="group" aria-label="%s">%s</div>'
+            '<p>%s</p></section>' % (txt("Jour de la cacahuète"), txt("Jour de la cacahuète"), seg_d,
+                                      txt("Chaque matin, deux attentions s’ouvrent. Change de jour pour voir les suivantes apparaître.")))
     out += ('<section class="bubble rose" aria-labelledby="h-sh"><h2 id="h-sh">%s</h2>'
             '<div class="who-row"><div class="who-bar mock"><span class="who-av"><span class="ini" style="background:#F2A71B;color:#5B1025">M</span></span>'
             '<span class="who-hi">Bonjour <b>Mangue</b> !</span><span class="who-chg">Changer<span class="who-chv">%s</span></span></div>'

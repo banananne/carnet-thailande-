@@ -121,7 +121,7 @@ def overlay_html():
              '<div class="env-bar" aria-hidden="true"><i id="env-bar-i"></i></div>'
              '<button class="env-x" type="button" id="env-x" aria-label="Fermer">%s</button>'
              '<div class="env-scroll" id="env-scroll">' % icon("x"))
-    # 1. le code (une seule fois par téléphone)
+    # 1. le code (retapé à chaque ouverture : le téléphone ne le garde jamais, au cas où quelqu'un attraperait celui d'un autre)
     P.append('<section class="env-p" id="envp-code" hidden><div class="env-seal">%s</div>'
              '<h2 tabindex="-1">%s</h2><p class="env-lead">%s</p>'
              '<form class="env-form" id="env-form" novalidate autocomplete="off"><label for="env-in">%s</label>'
@@ -129,7 +129,7 @@ def overlay_html():
              '<p class="env-err" id="env-err" role="alert"></p>'
              '<div class="env-row"><button class="btn env-go" type="submit" id="env-go">%s</button></div></form>'
              '<p class="env-simhint" id="env-simhint" hidden>%s <b id="env-simcode"></b> <button class="env-fill" type="button" id="env-fill">%s</button></p></section>'
-             % (SEAL, txt("Ton code secret"), txt("Il est écrit sur la carte glissée dans ton carnet. Tu ne le tapes qu’une seule fois."),
+             % (SEAL, txt("Ton code secret"), txt("Il est écrit sur la carte glissée dans ton carnet. Tu le retapes à chaque ouverture : si quelqu’un attrape ton téléphone, il ne verra rien."),
                 txt("Ton code"), txt("Ouvrir"), txt("Essai : le code est"), txt("Le remplir pour moi")))
     # 2. le serment
     P.append('<section class="env-p" id="envp-chut" hidden><div class="env-pics" id="chut-pics"></div>'
@@ -137,15 +137,20 @@ def overlay_html():
              '<button class="env-hold" type="button" id="env-hold" aria-describedby="chut-txt"><span class="env-hold-f" aria-hidden="true"></span>'
              '<span class="env-hold-t">%s</span></button></section>' % txt("Maintiens ici"))
     # 3. la mission
-    P.append('<section class="env-p env-paper" id="envp-card" hidden><p class="env-kick" id="card-kick"></p><div class="env-say" id="card-say"></div>'
+    # (le contexte d'abord, puis la mission, puis le gros encadré de fin ; l'heure de fin est remplie par env.js d'après le calendrier public)
+    P.append('<section class="env-p env-paper" id="envp-card" hidden><p class="env-kick" id="card-kick" tabindex="-1"></p>'
+             '<div class="env-ctx" id="card-ctx" hidden><p class="env-sub">%s</p><div id="card-intro"></div></div>'
+             '<p class="env-sub env-sub2">%s</p><div class="env-say" id="card-say"></div>'
              '<h2 class="env-title" id="card-title" tabindex="-1"></h2><ul class="env-items" id="card-items"></ul><p class="env-foot" id="card-foot"></p>'
-             '<div class="env-row"><button class="btn alt" type="button" id="card-close">%s</button></div></section>' % txt("Refermer l’enveloppe"))
+             '<div class="env-fin" id="card-fin" hidden><small>%s</small><b id="card-fin-d"></b><strong id="card-fin-h"></strong></div>'
+             '<div class="env-row"><button class="btn alt" type="button" id="card-close">%s</button></div></section>'
+             % (txt("Le jeu"), txt("Ta mission"), txt("Fin de la mission :"), txt("Refermer l’enveloppe")))
     # 4. l'enveloppe refermée
     P.append('<section class="env-p" id="envp-sealed" hidden><div class="env-seal big">%s</div><h2 tabindex="-1">%s</h2><p class="env-lead" id="sealed-p"></p>'
              '<div class="env-row"><button class="btn" type="button" id="sealed-open">%s</button><button class="btn" type="button" id="sealed-rev">%s</button></div>'
              '<p class="env-small">%s</p></section>'
              % (SEAL, txt("L’enveloppe est refermée"), txt("Rouvrir mon enveloppe"), txt("Voir la révélation"),
-                txt("Ta mission s’efface de l’écran dès que tu quittes l’appli ou que tu attends trop longtemps.")))
+                txt("Ta mission s’efface de l’écran dès que tu quittes l’appli ou que tu attends trop longtemps. Pour la rouvrir, tu retapes ton code.")))
     # 5. la révélation
     P.append('<section class="env-p env-paper" id="envp-rev" hidden><p class="env-kick">%s</p><div class="env-say" id="rev-say"></div>'
              '<h2 class="env-title" id="rev-title" tabindex="-1"></h2><div class="env-tbl-w"><table class="env-tbl" id="rev-tbl"></table></div>'
@@ -181,7 +186,8 @@ def view_essai():
     out = ('<main class="view" id="v-essai" hidden>' + back_head("Essai des enveloppes", "Faux prénoms, faux mots : rien n’est vrai ici", "#/")
            + '<div class="wrap">')
     out += ('<p class="how">%s</p>' % rich("Voici les trois jeux d’enveloppes, **pour de faux**. Tu joues **Mangue**, avec de fausses missions, de faux mots et un faux code. "
-                                           "Essaie comme si c’était le jour J : rien ne part nulle part, et tout reste sur ton téléphone."))
+                                           "Essaie comme si c’était le jour J : rien ne part nulle part, et tout reste sur ton téléphone. "
+                                           "À chaque ouverture de l’enveloppe, tu retapes le code (le téléphone ne le garde pas)."))
     out += ('<section class="bubble sand" aria-labelledby="h-sw"><h2 id="h-sw">%s</h2><div class="seg col" role="group" aria-label="%s">%s</div><p id="sim-w-desc"></p></section>'
             % (txt("1. Choisis un jeu"), txt("Choisis un jeu"), seg_w))
     out += ('<section class="bubble blue" aria-labelledby="h-st"><h2 id="h-st">%s</h2><div class="seg" role="group" aria-label="%s">%s</div><p id="sim-t-desc"></p></section>'

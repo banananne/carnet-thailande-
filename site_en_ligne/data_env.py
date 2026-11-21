@@ -8,16 +8,20 @@ Forme d'une enveloppe (une par personne et par vague), chiffrée avant d'être p
   m      mascottes du serment (clés : boop, minou, moomoo, aftonsparv)
   kick   petit titre (« Vague 1 · La cacahuète »)
   chut   texte du serment, dit par la mascotte
+  intro  « Le jeu » : le contexte, lu AVANT la mission (durée, principe, règles, « même Anne ne sait pas »), un paragraphe par ligne
   title  titre de la mission
   say    paroles de la mascotte : [["boop", "texte"], …] ; plusieurs mascottes : "moomoo+aftonsparv"
   items  la mission, une ligne par consigne
   foot   petit texte de fin
   hunt   (vague 2) words = les mots à faire dire, dans l'ordre ; quips = petites réactions de Minou ; pass, undo, end = ses réponses
   rev    la révélation : title, say, cols, rows (une ligne par joueur : la première colonne est le prénom)
+L'encadré « Fin de la mission : jour, heure » du bas de la carte n'est pas dans l'enveloppe : le site le tire de WINDOWS (l'heure de la
+révélation), donc il ne peut jamais contredire le calendrier. INTRO et FOOT ci-dessous sont les textes COMMUNS à tous les joueurs d'une vague :
+la simulation et le vrai tirage (script privé) les reprennent tels quels, pour que les vraies cartes soient celles que tu as validées.
 """
 
 SIM_ON = True                # False : la page d'essai et ses fausses données disparaissent du site publié
-ITERATIONS = 150000          # PBKDF2-SHA256 : ~0,2 à 0,6 s sur un téléphone, une seule fois par téléphone
+ITERATIONS = 150000          # PBKDF2-SHA256 : ~0,2 à 0,6 s sur un téléphone, à chaque ouverture de l'enveloppe (le code est retapé, jamais gardé)
 
 # (identifiant, apparition, révélation, effacement) en heure locale du téléphone : (année, mois, jour, heure, minute)
 WINDOWS = [
@@ -28,7 +32,7 @@ WINDOWS = [
 
 # ───────────────────────── simulation : tout est inventé ─────────────────────────
 SIM_WHO = "Mangue"
-SIM_CODE = "essai-demo-0000"
+SIM_CODE = "essai-0000"      # un mot et quatre chiffres : il se retape à chaque ouverture, donc court
 WAVES_LABEL = {"w1": "La cacahuète", "w2": "Le killer sans victime", "w3": "Un rôle à jouer"}
 
 # Les voix des mascottes (serments et révélations) sont celles du document validé ; le reste est un exemple inventé.
@@ -36,6 +40,31 @@ CHUT = {
     "w1": "Chut ! Cette enveloppe est pour toi, et seulement pour toi. Pas un mot à ta cacahuète, au groupe, ni au chauffeur de tuk-tuk. Maintiens le doigt une seconde pour jurer.",
     "w2": "Cette enveloppe n’existe pas. Si quelqu’un t’en parle, tu ne vois pas de quoi il s’agit. Maintiens le doigt pour jurer le silence.",
     "w3": "Message crypté, niveau galactique. Il s’autodétruit demain matin et, d’ici là, il reste entre toi et ton hamac. Maintiens le doigt pour confirmer.",
+}
+
+# « Le jeu » : lu avant la mission. Pas de prénom de joueur ici : ces textes sont les mêmes pour tout le monde.
+ANNE = "Même Anne, qui a organisé le voyage, %s : tout a été tiré au sort sans elle. Elle joue à l’aveugle, comme toi."
+INTRO = {
+    "w1": ["Du 20 au 25 décembre, jusqu’au dîner de Noël, nous jouons tous à « la cacahuète ».",
+           "Le principe : chacun est le gorille d’une personne du groupe (sa cacahuète) et la cacahuète de quelqu’un d’autre, sans savoir de qui. "
+           "Un gorille veille sur sa cacahuète avec de petites attentions anonymes, sans jamais se faire repérer.",
+           "Les règles : chaque attention coûte moins de 100 bahts. Tu peux la déposer dans la chambre de ta cacahuète, mais tu ne fouilles rien et "
+           "tu ne demandes pas de clé à la réception. Brouille les pistes avec une gentillesse pour quelqu’un d’autre, de temps en temps. "
+           "Si on te soupçonne, nie avec panache.",
+           ANNE % "ne sait pas qui est le gorille de qui"],
+    "w2": ["Aujourd’hui, toute la journée jusqu’au dîner, nous jouons tous au « killer sans victime ».",
+           "Le principe : personne n’est éliminé. Chacun a une cible et des mots secrets à lui faire dire, un par un, sans qu’elle s’en doute. "
+           "Qui en fait dire le plus gagne : pas de gage, seulement l’honneur.",
+           ANNE % "ne connaît ni ta cible ni tes mots"],
+    "w3": ["Aujourd’hui, dernier jour de l’année, jusqu’au dîner du réveillon, nous jouons tous un rôle.",
+           "Le principe : chacun reçoit un personnage secret, sans cible ni mot, à jouer toute la journée sans jamais dire que c’est un rôle. "
+           "Les autres doivent deviner qui joue quoi. Ce n’est pas facile, et c’est fait exprès. Tu as de quoi jouer : la mer, la chaleur, les repas, les départs…",
+           ANNE % "ne sait pas quel rôle tu joues, ni ceux des autres"],
+}
+FOOT = {   # petit texte sous la mission ("" : aucun)
+    "w1": "Au dîner de Noël, chacun devine son gorille, puis les gorilles avouent.",
+    "w2": "",
+    "w3": "À l’heure du dîner, la révélation s’affiche sur l’appli, puis chacun avoue à table : qui était %s ? Tout s’efface demain matin.",   # %s : la liste des rôles
 }
 
 QUIPS = [
@@ -55,13 +84,13 @@ SIM_WORDS = ["kangourou", "parapluie", "trottinette", "chandelier", "xylophone",
 def sim_payloads():
     """Une enveloppe d'exemple par jeu, pour le joueur « Mangue »."""
     w1 = {
-        "m": ["boop"], "kick": "Vague 1 · La cacahuète", "chut": CHUT["w1"],
+        "m": ["boop"], "kick": "Vague 1 · La cacahuète", "chut": CHUT["w1"], "intro": INTRO["w1"],
         "title": "Tu es le gorille de Litchi.",
         "say": [["boop", "Ceci est une simulation : rien n’est vrai ici, mais tout fonctionne. Allez, tout le monde dans le tuk-tuk !"]],
         "items": ["Fais apparaître une banane devant Litchi, sans dire d’où elle vient.",
                   "Garde à Litchi la meilleure place à table.",
                   "Laisse un petit mot gentil, sans signature, dans les affaires de Litchi."],
-        "foot": "Chaque attention coûte moins de 100 bahts. Tu peux la déposer dans la chambre de ta cacahuète, mais tu ne fouilles rien et tu ne demandes pas de clé à la réception. Brouille les pistes : une gentillesse pour quelqu’un d’autre, de temps en temps. Si on te soupçonne, nie avec panache. Au dîner de Noël, chacun devine son gorille, puis les gorilles avouent.",
+        "foot": FOOT["w1"],
         "rev": {"title": "Les gorilles et leurs cacahuètes",
                 "say": [["boop", "Allez, tout le monde à table : c’est l’heure des aveux ! Cacahuètes, devinez votre gorille. Gorilles, préparez vos excuses. Boop, qui vous voit de loin (merci le Wi-Fi)."]],
                 "cols": ["Gorille", "Cacahuète", "Style"],
@@ -69,7 +98,7 @@ def sim_payloads():
                          ["Durian", "Ramboutan", "Le gorille de l’ombre"], ["Ramboutan", "Mangue", "Le gorille serviable"]]},
     }
     w2 = {
-        "m": ["minou"], "kick": "Vague 2 · Le killer sans victime", "chut": CHUT["w2"],
+        "m": ["minou"], "kick": "Vague 2 · Le killer sans victime", "chut": CHUT["w2"], "intro": INTRO["w2"],
         "title": "Ta cible : Litchi.",
         "say": [["minou", "Je ne demande pas de la force. Je demande de l’élégance."]],
         "items": ["Fais dire à Litchi, de ce matin jusqu’au dîner, le mot que l’appli te propose, sans que la personne s’en doute.",
@@ -78,7 +107,7 @@ def sim_payloads():
                   "Pas de jeu pendant les trajets à vélo, ni devant un Bouddha.",
                   "Dès que le mot est dit, touche « Mot dit ! » : un autre mot arrive. Qui en fait dire le plus gagne.",
                   "Quelqu’un te traque aussi."],
-        "foot": "",
+        "foot": FOOT["w2"],
         "hunt": {"words": SIM_WORDS, "quips": QUIPS,
                  "pass": "Passer est permis. Le faire sans regret, non.",
                  "undo": "Revenir en arrière ? Soit. Le canapé a tout vu.",
@@ -88,17 +117,18 @@ def sim_payloads():
                 "cols": ["Chasseur", "Cible"],
                 "rows": [["Mangue", "Litchi"], ["Litchi", "Durian"], ["Durian", "Ramboutan"], ["Ramboutan", "Mangue"]]},
     }
+    # Un rôle d'essai doit pouvoir se jouer ici, dans ce décor : il ne pleut presque jamais en décembre, mais il fait chaud (d'où le ventilateur).
     w3 = {
-        "m": ["moomoo", "aftonsparv"], "kick": "Vague 3 · Un rôle à jouer", "chut": CHUT["w3"],
-        "title": "Aujourd’hui, tu es le parapluie.",
-        "say": [["moomoo", "Cinq minutes de plus ?"], ["aftonsparv", "Sur ma planète, ça n’existe pas !"]],
-        "items": ["Dès que quelqu’un dit « il va pleuvoir », réponds « je suis là » et lève le bras.",
-                  "Abrite quelqu’un à chaque pas dehors, même sous un ciel bleu.",
-                  "Au dessert, avoue : « Je suis le parapluie. »"],
-        "foot": "Joue toute la journée sans jamais dire que c’est un rôle. Les autres devinent. À l’heure du dîner, la révélation s’affiche sur l’appli, puis chacun avoue à table. Tout s’efface demain matin.",
+        "m": ["moomoo", "aftonsparv"], "kick": "Vague 3 · Un rôle à jouer", "chut": CHUT["w3"], "intro": INTRO["w3"],
+        "title": "Aujourd’hui, tu es le ventilateur.",
+        "say": [["moomoo", "Il fait chaud ? Je m’en occupe."], ["aftonsparv", "Ça tourne, ça tourne… Ah non, c’est moi qui tourne."]],
+        "items": ["Dès que quelqu’un dit « il fait chaud » (ça va arriver), agite doucement un menu, un livre ou ta main devant son visage, sans un mot.",
+                  "Quand on te parle, tourne lentement la tête de gauche à droite, comme si tu brassais l’air autour de toi. Garde ton sérieux.",
+                  "Au dessert, avoue : « Je suis le ventilateur. » Puis rafraîchis toute la table une dernière fois."],
+        "foot": FOOT["w3"] % "le ventilateur, le glaçon, le tuk-tuk, le palmier",
         "rev": {"title": "Qui était qui",
                 "say": [["moomoo+aftonsparv", "À table ! Moomoo a prévu cinq minutes de plus. Aftonsparv, qui lit la carte à l’envers, demande : qui était qui ?"]],
                 "cols": ["Joueur", "Rôle"],
-                "rows": [["Mangue", "Le parapluie"], ["Litchi", "La lanterne"], ["Durian", "Le tapis volant"], ["Ramboutan", "Le cactus"]]},
+                "rows": [["Mangue", "Le ventilateur"], ["Litchi", "Le glaçon"], ["Durian", "Le tuk-tuk"], ["Ramboutan", "Le palmier"]]},
     }
     return {"w1": w1, "w2": w2, "w3": w3}

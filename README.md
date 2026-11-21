@@ -3,7 +3,7 @@
 Cette branche ne sert qu'à garder une copie des fichiers qui fabriquent le site. Le site publié
 est sur la branche `main` (GitHub Pages) : ne rien publier ici.
 
-Dernière mise à jour : 21 novembre 2026, 11 h 55. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
+Dernière mise à jour : 21 novembre 2026, 13 h 20. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
 cartes taxi, convertisseur, Good to know) et étape 3 (jeux : quiz, test de personnalité, blind test, mots mêlés,
 horoscope, mascottes, passeport de tampons), publiées ensemble à 22 h 24 (commit 34db76e), puis vague 1 des
 améliorations (accueil allégé à quatre rubriques, « Qui es-tu ? » qui se replie, « doudous » devenus « mascottes »,
@@ -23,7 +23,10 @@ n'affiche plus la « prononciation » de Google (translittération savante à di
 la transcription « suay » est écrite pareil partout (recueil, mot du jour, carnet imprimé), et `build_app.nbsp_pass` pose
 l'espace insécable avant : ; ? ! » et après « dans tout le texte de la page.
 Puis les enveloppes secrètes (moteur complet et page d'essai `#/essai` avec de FAUSSES données, aucune vraie enveloppe) publiées le
-21 novembre à 11 h 55 (branche `main`, commit ce1ef3e, version de construction 20261121-114529). Ces sources correspondent à ce qui est publié.
+21 novembre à 11 h 50 (branche `main`, commit ce1ef3e, version de construction 20261121-114529).
+Puis une mise à jour des enveloppes (chaque carte : « Le jeu » avec le contexte, « Ta mission », gros encadré « Fin de la mission » ;
+code retapé à chaque ouverture, plus aucune clé gardée sur le téléphone ; rôle d'essai « ventilateur ») publiée le 21 novembre à 13 h 10
+(branche `main`, commit 7643e2f, version de construction 20261121-130013). Ces sources correspondent à ce qui est publié.
 
 ## Reconstruire le site
 1. Remettre `site_en_ligne/` dans `/home/claude/site_en_ligne/` et les autocollants de `stickers/`
@@ -60,12 +63,14 @@ Puis les enveloppes secrètes (moteur complet et page d'essai `#/essai` avec de 
   `days.css` (ajouté à `app.css`). Clés de mémoire : `carnet.defi`, `carnet.mj`, `carnet.bingo`, `carnet.food`, `carnet.prix`.
 - Enveloppes secrètes (missions en cachette sur les téléphones : la cacahuète, le killer sans victime, un rôle à jouer) :
   `data_env.py` (fenêtres de dates PUBLIQUES `WINDOWS` : apparition, révélation sur l'appli à l'heure du dîner, effacement, en heure
-  locale du téléphone ; réglages `SIM_ON` et `ITERATIONS` ; données de SIMULATION inventées : faux prénom Mangue, faux code,
-  faux mots ; `sim_payloads()` documente la forme d'une enveloppe), `build_env.py` (chiffrement à la fabrication : PBKDF2-SHA256
+  locale du téléphone ; réglages `SIM_ON` et `ITERATIONS` ; textes COMMUNS à tous les joueurs d'une vague, `INTRO` (« Le jeu » : dates,
+  principe, règles, « même Anne joue à l'aveugle ») et `FOOT`, repris tels quels par le vrai tirage ; données de SIMULATION inventées :
+  faux prénom Mangue, faux code, faux mots ; `sim_payloads()` documente la forme d'une enveloppe), `build_env.py` (chiffrement à la fabrication : PBKDF2-SHA256
   150 000 tours + AES-GCM, une clé par personne et un vecteur par personne et par vague ; bandeau de l'accueil, fenêtre `#env`,
-  page d'essai `view_essai()`), `env.js` (collé dans `games.js` au repère `/*@ENV@*/` ; WebCrypto, fenêtres de dates, serment,
-  carte qui se cache, révélation, compteur de mots du killer), `env.css` (ajouté à `app.css`). Clés de mémoire `carnet.env.*`
-  (vrai jeu) et `carnet.sim.*` (essai). **Les vraies enveloppes ne sont ni dans ces sources ni en clair sur `main`** : elles viennent
+  page d'essai `view_essai()`), `env.js` (collé dans `games.js` au repère `/*@ENV@*/` ; WebCrypto, fenêtres de dates, serment (une seule fois par jeu),
+  carte qui se cache après une minute, encadré « Fin de la mission » tiré de `WINDOWS`, révélation, compteur de mots du killer ;
+  le code se retape à chaque ouverture : ni code ni clé ne sont gardés, les anciennes clés sont effacées au chargement), `env.css` (ajouté à `app.css`). Clés de mémoire `carnet.env.*`
+  (vrai jeu : seulement « vu », score) et `carnet.sim.*` (essai). **Les vraies enveloppes ne sont ni dans ces sources ni en clair sur `main`** : elles viennent
   d'un fichier privé `/home/claude/prive/env_public.json` (ou de la variable `ENV_REAL_JSON`), fabriqué par un script privé (tirage au
   hasard, codes, vrais textes) et gardé hors de `site_en_ligne/` et hors de ce dépôt. Sans ce fichier, l'accueil n'affiche aucune enveloppe ;
   la page `#/essai` n'existe que si `SIM_ON = True` (à passer à `False` avant de donner le lien aux autres). Le mode essai
@@ -116,7 +121,7 @@ identifiants uniques, remise à zéro ; `t27neg.py` contrôle négatif du test d
 Étape 4 : `t30.py` calendrier à dates simulées (horloge de Playwright), mot secret, horoscope du jour, rôles, défi, mot, bingo,
 gourmand, prix, 28 tampons, mascottes, mise en page ; `t31.py` traducteur (réseau SIMULÉ : le serveur local ne joint aucun vrai
 service) ; `t32.py` espaces insécables du texte de la page (balises, scripts et styles intacts) et transcription « suay » ;
-Enveloppes : `t33.py` page d'essai (3 jeux, 4 heures simulées, code, serment, 45 s d'inactivité, compteur du killer, hors réseau) ;
+Enveloppes : `t33.py` page d'essai (3 jeux, 4 heures simulées, contexte et encadré de fin, code retapé à chaque ouverture, serment une seule fois, 1 minute d'inactivité, compteur du killer, hors réseau) ;
 `t34.py` vrai chemin avec un FAUX jeu (4 prénoms, codes `test-…`) fabriqué par `mkfix.py` et construit à part
 (`CARNET_WEB=… ENV_REAL_JSON=… python3 -I build.py`), servi par `serve_any.py PORT DOSSIER` : heures d'ouverture, de révélation et d'effacement,
 un code par personne, deux prénoms sur un téléphone, mode essai sans effet ;

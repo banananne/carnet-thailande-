@@ -92,11 +92,22 @@ with sync_playwright() as p:
     check("C5 le code d'Anne mène au serment", pane(pg) == "chut", pane(pg))
     hold(pg)
     check("C6 la mission est celle d'Anne", pane(pg) == "card" and "mission secrète de anne (w1)" in sp(pg.inner_text("#card-title")).lower(), pg.inner_text("#card-title"))
-    check("C7 la clé est gardée sous « carnet.env », rien sous « carnet.sim »", keys(pg, "carnet.env.k.") == ["carnet.env.k.Anne"] and keys(pg, "carnet.sim.") == [], keys(pg, "carnet.sim."))
+    check("C7 rien de secret n'est gardé : ni clé ni code (seulement « vu » sous « carnet.env »), rien sous « carnet.sim »",
+          keys(pg, "carnet.env.k.") == [] and keys(pg, "carnet.sim.") == [] and keys(pg, "carnet.env.") == ["carnet.env.o.Anne.w1"]
+          and "test-delta" not in pg.evaluate("JSON.stringify(Object.assign({}, localStorage))"), keys(pg, "carnet.env."))
+    intro = sp(pg.inner_text("#card-intro"))
+    check("C7b contexte de la vague 1 et « même Anne »", "Du 20 au 25 décembre" in intro and "Même Anne, qui a organisé le voyage" in intro, intro)
+    fin = pg.evaluate("() => [...document.querySelectorAll('#card-fin small, #card-fin b, #card-fin strong')].map(e => e.textContent)")
+    check("C7c encadré : fin de la mission, vendredi 25 décembre, 19 h", len(fin) == 3 and sp(fin[0]).startswith("Fin de la mission") and sp(fin[1]) == "vendredi 25 décembre" and sp(fin[2]) == "19 h", fin)
     pg.click("#env-x"); pg.wait_for_timeout(250)
     check("C8 le bandeau change de texte une fois l'enveloppe ouverte", banner(pg) and "Ton enveloppe secrète" in btxt(pg) and not vis(pg, "#env-btn .dot"), btxt(pg))
     pg.click("#env-btn"); pg.wait_for_timeout(500)
-    check("C9 rouvrir : plus de code, on repasse par le serment", pane(pg) == "chut", pane(pg))
+    check("C9 rouvrir : le code est redemandé, champ vide", pane(pg) == "code" and pg.input_value("#env-in") == "", pane(pg))
+    type_code(pg, CODES["Anne"])
+    check("C9b avec le bon code : la mission, sans refaire le serment", pane(pg) == "card" and "mission secrète de anne (w1)" in sp(pg.inner_text("#card-title")).lower(), pane(pg))
+    pg.evaluate("document.querySelector('#card-close').click()"); pg.wait_for_timeout(250)
+    pg.click("#sealed-open"); pg.wait_for_timeout(300)
+    check("C9c refermer puis rouvrir : encore le code", pane(pg) == "code" and pg.input_value("#env-in") == "", pane(pg))
     pg.click("#env-x"); pg.wait_for_timeout(200)
 
     # ───── D. un autre prénom sur le même téléphone ─────
@@ -104,12 +115,12 @@ with sync_playwright() as p:
     pg.click('#who button[data-n="Daphne"]'); pg.wait_for_timeout(900)
     check("D1 autre prénom : le bandeau est de nouveau « neuf »", banner(pg) and "Une enveloppe t’attend" in btxt(pg), btxt(pg))
     pg.click("#env-btn"); pg.wait_for_timeout(300)
-    check("D2 le code est redemandé (la clé d'Anne ne sert pas à Daphne)", pane(pg) == "code", pane(pg))
+    check("D2 le code est demandé", pane(pg) == "code", pane(pg))
     type_code(pg, CODES["Anne"])
     check("D3 le code d'Anne ne marche pas avec le prénom de Daphne", pane(pg) == "code")
     type_code(pg, CODES["Daphne"]); hold(pg)
     check("D4 mission de Daphne", pane(pg) == "card" and "mission secrète de daphne (w1)" in sp(pg.inner_text("#card-title")).lower(), pg.inner_text("#card-title"))
-    check("D5 deux clés gardées, une par prénom", keys(pg, "carnet.env.k.") == ["carnet.env.k.Anne", "carnet.env.k.Daphne"])
+    check("D5 aucune clé gardée, même avec deux prénoms", keys(pg, "carnet.env.k.") == [] and sorted(keys(pg, "carnet.env.")) == ["carnet.env.o.Anne.w1", "carnet.env.o.Daphne.w1"], keys(pg, "carnet.env."))
     pg.click("#env-x"); pg.wait_for_timeout(200)
 
     # ───── E. l'heure de la révélation (vague 1) ─────
@@ -119,18 +130,20 @@ with sync_playwright() as p:
     set_time(pg, at(2026, 12, 25, 19, 0))
     check("E2 25 décembre 19 h 00 : « L'heure des aveux »", banner(pg) and "L’heure des aveux" in btxt(pg) and vis(pg, "#env-btn .dot"), btxt(pg))
     pg.click("#env-btn"); pg.wait_for_timeout(500)
-    check("E3 la révélation s'ouvre directement (la clé est déjà là)", pane(pg) == "rev", pane(pg))
+    check("E3a la révélation demande aussi le code", pane(pg) == "code", pane(pg))
+    type_code(pg, CODES["Anne"])
+    check("E3 puis la révélation s'ouvre directement", pane(pg) == "rev", pane(pg))
     check("E4 quatre lignes, celle d'Anne en valeur", pg.locator("#rev-tbl tbody tr").count() == 4 and pg.locator("#rev-tbl tr.me").count() == 1 and "Anne" in pg.inner_text("#rev-tbl tr.me"))
     check("E5 voix de Boop", "aveux" in pg.inner_text("#rev-say") and pg.locator('#rev-say img[src$="doudou_boop.webp"]').count() == 1)
     pg.screenshot(path=OUT + "env_r2_revelation.png")
     pg.click("#rev-close"); pg.wait_for_timeout(200)
     check("E6 une fois vue : « La révélation », sans point", "La révélation" in btxt(pg) and not vis(pg, "#env-btn .dot"), btxt(pg))
 
-    # ───── F. fin de la vague 1 : tout s'efface, la clé reste (il reste deux vagues) ─────
+    # ───── F. fin de la vague 1 : tout s'efface ─────
     set_time(pg, at(2026, 12, 26, 5, 0))
     check("F1 26 décembre 5 h : plus d'enveloppe", not banner(pg))
     check("F2 les traces de la vague 1 sont effacées", [k for k in keys(pg, "carnet.env.") if k.endswith(".w1")] == [], keys(pg, "carnet.env."))
-    check("F3 la clé reste pour les vagues suivantes", "carnet.env.k.Anne" in keys(pg, "carnet.env."))
+    check("F3 toujours aucune clé sur le téléphone", keys(pg, "carnet.env.k.") == [])
     set_time(pg, at(2026, 12, 29, 12, 0))
     check("F4 29 décembre : entre deux vagues, rien", not banner(pg))
 
@@ -139,18 +152,22 @@ with sync_playwright() as p:
     set_time(pg, at(2026, 12, 27, 9, 0))
     check("G1 27 décembre : l'enveloppe du killer", banner(pg) and "Une enveloppe t’attend" in btxt(pg))
     pg.click("#env-btn"); pg.wait_for_timeout(500)
-    check("G2 la clé gardée évite de retaper le code : serment de Minou", pane(pg) == "chut" and pg.locator('#chut-pics img[src$="doudou_minou.webp"]').count() == 1, pane(pg))
+    check("G1b le code est demandé (jamais gardé)", pane(pg) == "code", pane(pg))
+    type_code(pg, CODES["Anne"])
+    check("G2 puis le serment de Minou", pane(pg) == "chut" and pg.locator('#chut-pics img[src$="doudou_minou.webp"]').count() == 1, pane(pg))
     hold(pg)
+    fin = pg.evaluate("() => [...document.querySelectorAll('#card-fin small, #card-fin b, #card-fin strong')].map(e => e.textContent)")
+    check("G2b encadré du killer : dimanche 27 décembre, 19 h", len(fin) == 3 and sp(fin[1]) == "dimanche 27 décembre" and sp(fin[2]) == "19 h", fin)
     check("G3 mots propres à Anne", pane(pg) == "card" and sp(pg.inner_text("#ed-word")) == "anne-mot1", pg.inner_text("#ed-word"))
     pg.click("#ed-ok"); pg.click("#ed-ok"); pg.wait_for_timeout(150)
     check("G4 deux mots dits", pg.inner_text("#ed-n") == "2" and sp(pg.inner_text("#ed-word")) == "anne-mot3")
     check("G5 score gardé sous « carnet.env.h »", ls(pg, "carnet.env.h.Anne.w2") is not None and keys(pg, "carnet.sim.") == [])
     pg.reload(wait_until="load"); pg.wait_for_timeout(600)
-    pg.click("#env-btn"); pg.wait_for_timeout(500); hold(pg)
-    check("G6 après un rechargement : même mot, même score", pane(pg) == "card" and sp(pg.inner_text("#ed-word")) == "anne-mot3" and pg.inner_text("#ed-n") == "2", pg.inner_text("#ed-word"))
+    pg.click("#env-btn"); pg.wait_for_timeout(500); type_code(pg, CODES["Anne"])
+    check("G6 après un rechargement et le code retapé : même mot, même score", pane(pg) == "card" and sp(pg.inner_text("#ed-word")) == "anne-mot3" and pg.inner_text("#ed-n") == "2", pg.inner_text("#ed-word"))
     pg.click("#env-x"); pg.wait_for_timeout(200)
     set_time(pg, at(2026, 12, 27, 19, 30))
-    pg.click("#env-btn"); pg.wait_for_timeout(500)
+    pg.click("#env-btn"); pg.wait_for_timeout(500); type_code(pg, CODES["Anne"])
     check("G7 19 h 30 : la révélation, avec mon score", pane(pg) == "rev" and "Ton score : 2 mots dits" in sp(pg.inner_text("#rev-score")), pg.inner_text("#rev-score") if vis(pg, "#rev-score") else pane(pg))
     pg.click("#rev-close"); pg.wait_for_timeout(200)
     set_time(pg, at(2026, 12, 28, 5, 0))
@@ -158,8 +175,10 @@ with sync_playwright() as p:
 
     # ───── H. vague 3 : le réveillon (la révélation à 20 h) ─────
     set_time(pg, at(2026, 12, 31, 8, 0))
-    pg.click("#env-btn"); pg.wait_for_timeout(500); hold(pg)
+    pg.click("#env-btn"); pg.wait_for_timeout(500); type_code(pg, CODES["Anne"]); hold(pg)
     check("H1 mission du réveillon, deux mascottes", pane(pg) == "card" and pg.locator("#card-say .env-sp").count() == 2 and "(w3)" in pg.inner_text("#card-title").lower())
+    fin = pg.evaluate("() => [...document.querySelectorAll('#card-fin small, #card-fin b, #card-fin strong')].map(e => e.textContent)")
+    check("H1b encadré du réveillon : jeudi 31 décembre, 20 h", len(fin) == 3 and sp(fin[1]) == "jeudi 31 décembre" and sp(fin[2]) == "20 h", fin)
     pg.click("#env-x"); pg.wait_for_timeout(200)
     set_time(pg, at(2026, 12, 31, 19, 59))
     check("H2 19 h 59 le 31 : pas encore les aveux", "Ton enveloppe secrète" in btxt(pg), btxt(pg))
@@ -170,7 +189,7 @@ with sync_playwright() as p:
     check("H4 1er janvier 5 h 59 : la révélation est encore là", banner(pg))
     set_time(pg, at(2027, 1, 1, 6, 0))
     check("H5 1er janvier 6 h : fini, plus rien sur l'accueil", not banner(pg))
-    check("H6 le téléphone a tout oublié : plus de clé, plus de score", keys(pg, "carnet.env.") == [], keys(pg, "carnet.env."))
+    check("H6 le téléphone a tout oublié : plus de score, plus aucune trace", keys(pg, "carnet.env.") == [], keys(pg, "carnet.env."))
     ctx.close()
 
     # ───── I. l'heure passe pendant la lecture (horloge simulée : le minuteur de l'appli tourne) ─────
@@ -189,7 +208,9 @@ with sync_playwright() as p:
     pg.clock.run_for(21000); pg.wait_for_timeout(250)
     check("I2 à 20 h : l'enveloppe se referme et propose la révélation", pane(pg) == "sealed" and vis(pg, "#sealed-rev") and not vis(pg, "#sealed-open") and pg.inner_text("#card-items").strip() == "", pane(pg))
     pg.click("#sealed-rev"); pg.wait_for_timeout(500)
-    check("I3 « Voir la révélation » ouvre la révélation", pane(pg) == "rev" and pg.locator("#rev-tbl tbody tr").count() == 4, pane(pg))
+    check("I3a « Voir la révélation » redemande le code", pane(pg) == "code" and pg.input_value("#env-in") == "", pane(pg))
+    type_code(pg, CODES["Anne"])
+    check("I3 puis ouvre la révélation", pane(pg) == "rev" and pg.locator("#rev-tbl tbody tr").count() == 4, pane(pg))
     ctx.close()
     ctx, pg = clocked(at(2026, 12, 26, 3, 59).replace(second=40))
     pg.click("#env-btn"); pg.wait_for_timeout(300); type_code(pg, CODES["Anne"])
@@ -200,13 +221,20 @@ with sync_playwright() as p:
 
     # ───── J. rien de lisible dans le site publié de test ─────
     page = open("/tmp/claude-0/-home-claude/508b3527-b55f-5958-8651-8d8ffebe2ce6/scratchpad/web34/index.html", encoding="utf-8").read()
-    for needle in ["Mission secrète de", "anne-mot1", "test-delta", "test-alpha", "Fais apparaître une banane"]:
+    for needle in ["Mission secrète de", "anne-mot1", "test-delta", "test-alpha", "Fais apparaître une banane", "Même Anne", "tiré au sort sans elle", "brassais l’air"]:
         check("J1 « %s » absent du fichier publié" % needle, needle not in page)
     ctx, pg = start(b, at(2026, 12, 21, 10, 0))
     pg.evaluate("location.hash = '#/essai'"); pg.wait_for_timeout(300)
     check("J2 la page d'essai marche aussi avec le vrai jeu présent", vis(pg, "#sim-env-btn"))
     pg.click("#sim-env-btn"); pg.wait_for_timeout(300)
     check("J3 l'essai reste séparé : il demande son propre code", pane(pg) == "code" and vis(pg, "#env-simhint"))
+    ctx.close()
+
+    # ───── K. une ancienne clé gardée par une version précédente est effacée, et ne remplace pas le code ─────
+    ctx, pg = start(b, at(2026, 12, 21, 10, 0), extra=["localStorage.setItem('carnet.env.k.Anne', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=')"])
+    check("K1 l'ancienne clé est effacée au chargement", keys(pg, "carnet.env.k.") == [], keys(pg, "carnet.env."))
+    pg.click("#env-btn"); pg.wait_for_timeout(300)
+    check("K2 et l'enveloppe demande le code", pane(pg) == "code")
     ctx.close()
 
     b.close()

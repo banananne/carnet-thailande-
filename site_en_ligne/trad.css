@@ -1,0 +1,54 @@
+/* ───── Traducteur français ⇄ thaï (onglet Utile) ───── */
+.lx[hidden],.trg[hidden],.tr-out[hidden],.trs[hidden],.tr-none[hidden],.tr-rom[hidden],.tr-warn[hidden]{display:none}
+.tr-box h2{margin-top:0}
+.tr-dir{margin-top:.8rem}
+.tr-dir button{min-height:60px}
+.tr-lab{display:block;margin:1rem 0 .4rem;font:700 .92rem/1.25 var(--font-body);color:var(--ink)}
+.tr-in{display:block;width:100%;min-height:104px;padding:12px 14px;border:0;border-radius:16px;background:var(--white);box-shadow:inset 0 0 0 2px var(--blue-d);color:var(--ink);font:600 1.1rem/1.45 var(--font-body);resize:vertical;-webkit-appearance:none;appearance:none}
+.tr-in:lang(th){font-family:var(--font-thai);font-size:1.25rem}
+.tr-in:focus-visible,.tr-q:focus-visible{outline:3px solid var(--mustard);outline-offset:1px}
+.tr-in::placeholder,.tr-q::placeholder{color:var(--muted);font-weight:400}
+.tr-box .status{min-height:1.3em}
+.tr-priv{margin-top:.8rem;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.62);font-size:.88rem;line-height:1.4;color:var(--ink)}
+.tr-priv b{display:block;margin-bottom:2px;color:var(--wine)}
+
+/* le résultat : le thaï et le français, celui qu'on veut lire en gros */
+.tr-out{display:flex;flex-direction:column;margin-top:1.1rem}
+.tr-src{order:-2;font:700 .72rem/1.3 var(--font-body);letter-spacing:.13em;text-transform:uppercase;color:var(--bordeaux)}
+.tr-blk{margin-top:.9rem}
+.tr-blk small{display:block;font:700 .66rem/1.2 var(--font-body);letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.tr-th{margin-top:.15rem;font:600 2.1rem/1.5 var(--font-thai);color:var(--ink);overflow-wrap:anywhere}
+.tr-rom{font:italic 600 1.1rem/1.3 var(--font-body);color:var(--bordeaux);overflow-wrap:anywhere}
+.tr-fr{margin-top:.15rem;font:600 1.15rem/1.35 var(--font-body);color:var(--ink);overflow-wrap:anywhere}
+.tr-out[data-dir="th"] .tr-f{order:-1}
+.tr-out[data-dir="th"] .tr-fr{font-size:1.6rem;line-height:1.25}
+.tr-out[data-dir="th"] .tr-th{font-size:1.4rem}
+.tr-acts{order:5}
+.tr-warn{order:6;margin-top:.9rem;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.72);font-size:.9rem;line-height:1.4;color:var(--wine)}
+
+/* les dernières traductions */
+.trs{padding:0}
+.trs summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:58px;padding:10px 16px;list-style:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.trs summary::-webkit-details-marker{display:none}
+.trs summary b{font:700 1.1rem/1.15 var(--font-body);color:var(--bordeaux)}
+.trs summary small{display:block;margin-top:1px;color:var(--ink);font-size:.85rem}
+.trs summary svg{flex:none;transition:transform .2s}
+.trs[open] summary svg{transform:rotate(90deg)}
+.trs .lxl{margin:0 12px}
+.trs .acts{margin:.4rem 12px 14px}
+
+/* le recueil de phrases toutes prêtes */
+.tr-h{margin-top:1.8rem}
+.tr-find{margin-top:.9rem}
+.tr-find label{display:block;margin-bottom:.35rem;font:600 .9rem/1.2 var(--font-body);color:var(--ink)}
+.tr-q{display:block;width:100%;height:48px;padding:0 14px;border:0;border-radius:14px;background:var(--white);box-shadow:inset 0 0 0 2px var(--blue-d);color:var(--ink);font:600 1.05rem var(--font-body);-webkit-appearance:none;appearance:none}
+.trg{padding:0}
+.trg>summary{display:flex;align-items:center;gap:10px;min-height:56px;padding:6px 14px;list-style:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.trg>summary::-webkit-details-marker{display:none}
+.trg>summary h2{flex:1;min-width:0;padding-left:0}
+.trg-n{flex:none;min-width:26px;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.75);font:700 .8rem/1.2 var(--font-body);color:var(--bordeaux);text-align:center}
+.trg>summary svg{flex:none;transition:transform .2s}
+.trg[open]>summary svg{transform:rotate(90deg)}
+.trg>.lxl{margin:0 12px 10px}
+.tr-none{margin-top:1rem;padding:12px 14px;border-radius:16px;background:var(--rose);color:var(--wine);font-weight:600;font-size:.95rem;line-height:1.4}
+@media (prefers-reduced-motion:reduce){.trs summary svg,.trg>summary svg{transition:none}}

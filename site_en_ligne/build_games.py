@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Étape 3 : les jeux du carnet (pages écrites en HTML ici ; logique dans games.js ; styles dans games.css).
 Données : data_test_doudou.json, data_horoscope.json, data_motsmeles.json (extraits du PDF), site_data.QUIZ, data_games.py."""
-import json, os, re, unicodedata
+import functools, json, os, re, unicodedata
 
 import site_data as D
 import stamps as ST
@@ -42,6 +42,7 @@ def fnv(w):
     return h
 
 
+@functools.lru_cache(maxsize=None)
 def photo_dims(fn):
     from PIL import Image
     with Image.open(os.path.join(ROOT, "img", fn)) as im:
@@ -56,32 +57,52 @@ def dd_img(key, cls="dd-img", lazy=True):
 
 
 # ───────────────────────── accueil des jeux ─────────────────────────
-HUB = [
-    ("sand", "#/quiz", "question", "Quiz du 26 décembre", "6 questions, un cocktail à la clé", "quiz"),
-    ("rose", "#/personnalite", "heart", "Test de personnalité", "Quelle mascotte es-tu ?", "doudou"),
-    ("blue", "#/blind-test", "music", "Blind test", "Le tableau des scores", "blind"),
-    ("mustard", "#/mots-meles", "grid", "Mots mêlés", "40 mots à trouver", "mots"),
-    ("blue", "#/horoscope", "star", "Horoscope", "Les astres ont parlé", "horo"),
-    ("sand", "#/passeport", "stamp", "Passeport", "Un tampon par jour", "pass"),
-    ("rose", "#/mascottes", "paw", "Les mascottes", "Aftonsparv, Boop Boops, Minou, Moomoo", "doudous"),
+# (couleur, adresse, icône, titre, sous-titre, identifiant du sous-titre, clé du cadenas)
+HUB_DAILY = [
+    ("blue", "#/defi", "camera", "Défi du jour", "Une mission photo et un rôle pour chacun", "defi", "defi"),
+    ("rose", "#/mot-du-jour", "speech", "Mot du jour", "Un mot de thaï à dire chaque jour", "mot", "mot"),
+    ("mustard", "#/bingo", "bingo", "Bingo", "9 choses à repérer en route", "bingo", "bingo"),
+    ("sand", "#/gourmand", "fork", "Carnet gourmand", "Note les plats que tu goûtes", "gourmand", "gourmand"),
+    ("sand", "#/passeport", "stamp", "Passeport", "Un tampon par jour", "pass", "pass"),
+    ("rose", "#/mascottes", "paw", "Les mascottes", "Aftonsparv, Boop Boops, Minou, Moomoo", "doudous", "doudous"),
+    ("blue", "#/prix", "award", "Prix du voyage", "Le palmarès du 3 janvier", "prix", "prix"),
+]
+HUB_BOOK = [
+    ("sand", "#/quiz", "question", "Quiz du 26 décembre", "6 questions, un cocktail à la clé", "quiz", "quiz"),
+    ("rose", "#/personnalite", "heart", "Test de personnalité", "Quelle mascotte es-tu ?", "doudou", "test"),
+    ("blue", "#/blind-test", "music", "Blind test", "Le tableau des scores", "blind", "blind"),
+    ("mustard", "#/mots-meles", "grid", "Mots mêlés", "40 mots à trouver", "mots", "mots"),
+    ("blue", "#/horoscope", "star", "Horoscope", "Les astres ont parlé", "horo", "horo"),
 ]
 
 
+def hub_tile(col, href, ic, t, sub, hid, gk):
+    import build_days as BD
+    import data_days as X
+    opens = X.GATES[gk][1] if gk in X.GATES else G.TEST_OPEN_TXT
+    # chaque tuile a son icône normale et un cadenas ; la classe « is-locked » (posée par le script) choisit
+    pic = icon(ic).replace('class="i"', 'class="i ic-open"') + icon("lock").replace('class="i"', 'class="i ic-lock"')
+    return ('<a class="tile %s gated%s" href="%s" data-gate="%s" data-opens="%s"><span class="ic">%s</span><span><b>%s</b><small data-hub="%s" data-def="%s">%s</small></span></a>'
+            % (col, " lockable" if gk == "test" else "", href, gk, esc(opens), pic, txt(t), hid, esc(sub), txt(sub)))
+
+
 def view_jeux():
-    out = ('<main class="view" id="v-jeux" hidden>'
+    import build_days as BD
+    import data_days as X
+    out = ('<main class="view" id="v-jeux" data-gates="%s" data-k="%s" data-first="%s" data-last="%s" hidden>'
            '<header class="vhead"><div class="wrap"><div><h1 tabindex="-1">Jeux</h1><p>Pour la piscine, la route et les files d’attente</p></div></div></header>'
-           '<div class="wrap"><a class="ddrow" href="#/mascottes" aria-label="Voir les quatre mascottes">')
+           '<div class="wrap"><a class="ddrow" href="#/mascottes" aria-label="Voir les quatre mascottes">'
+           % (BD.gates_json(), BD.hashes(), X.DAY1, X.DAYN))
     for d in G.DOUDOUS:
         out += dd_img(d["key"], "dd-mini", lazy=False)
-    out += '</a><div class="list">'
-    for col, href, ic, t, sub, hid in HUB:
-        pic, cls = icon(ic), ""
-        if hid == "doudou":      # le cœur et le cadenas sont tous deux dans la page ; la classe « tlock » de <html> choisit
-            pic = icon(ic).replace('class="i"', 'class="i ic-open"') + icon("lock").replace('class="i"', 'class="i ic-lock"')
-            cls = " lockable"
-        out += ('<a class="tile %s%s" href="%s"><span class="ic">%s</span><span><b>%s</b><small data-hub="%s" data-def="%s">%s</small></span></a>'
-                % (col, cls, href, pic, txt(t), hid, esc(sub), txt(sub)))
-    return out + "</div></div></main>"
+    out += '</a>'
+    out += '<h2 class="sech navy">Au fil des jours</h2><div class="list">'
+    out += "".join(hub_tile(*row) for row in HUB_DAILY)
+    out += '</div><h2 class="sech navy">Les jeux du carnet</h2><div class="list">'
+    out += "".join(hub_tile(*row) for row in HUB_BOOK)
+    out += ('</div><p class="hub-try" id="hub-try" hidden><span>Mode essai : tout est ouvert sur ce téléphone.</span> '
+            '<button class="lk-link" type="button" data-relock="1">Remettre les cadenas</button></p>')
+    return out + "</div></main>"
 
 
 # ───────────────────────── quiz du 26 décembre ─────────────────────────
@@ -124,12 +145,22 @@ def split_title(t):
     return name, epithet
 
 
+TRAVEL = {"aftonsparv": True, "moomoo": True, "boop": False, "minou": False}
+
+
+def where_tag(key):
+    """Seuls Aftonsparv et Moomoo voyagent ; Boop Boops et Minou restent à la maison."""
+    if TRAVEL[key]:
+        return '<span class="dd-where in">%s Dans la valise</span>' % icon("check")
+    return '<span class="dd-where out">%s À la maison, écrit de loin</span>' % icon("home")
+
+
 def dd_card(key):
     d = DD[key]
     c = TEST["cards"][key]
     name, epithet = split_title(c["title"])
-    out = ('<article class="dd-card" id="dd-%s" data-who="%s" style="--dd:%s"><div class="dd-top">%s<div><p class="dd-kick">%s</p><h2>%s</h2></div></div>'
-           '<p class="dd-body">%s</p><dl class="dd-facts">' % (key, key, d["bg"], dd_img(key), txt(name), txt(epithet[:1].upper() + epithet[1:]), txt(c["body"])))
+    out = ('<article class="dd-card" id="dd-%s" data-who="%s" style="--dd:%s"><div class="dd-top">%s<div><p class="dd-kick">%s</p><h2>%s</h2>%s</div></div>'
+           '<p class="dd-body">%s</p><dl class="dd-facts">' % (key, key, d["bg"], dd_img(key), txt(name), txt(epithet[:1].upper() + epithet[1:]), where_tag(key), txt(c["body"])))
     for lab in ("SUPER-POUVOIR", "POINT FAIBLE", "ALLIÉ", "TON ENDROIT DU VOYAGE"):
         out += "<div><dt>%s</dt><dd>%s</dd></div>" % (txt(lab.capitalize()), txt(c[lab]))
     out += '</dl><p class="dd-quote">%s</p></article>' % txt(c["quote"])
@@ -137,8 +168,9 @@ def dd_card(key):
 
 
 def view_doudous():
-    out = ('<main class="view" id="v-doudous" hidden>' + back_head("Les mascottes", "Elles voyagent avec vous", "#/jeux")
-           + '<div class="wrap"><p class="how">Quatre mascottes, quatre caractères. Elles ont leur avis sur tout, et elles vous guident jour après jour.</p>'
+    out = ('<main class="view" id="v-doudous" hidden>' + back_head("Les mascottes", "Deux voyagent, deux écrivent de loin", "#/jeux")
+           + '<div class="wrap"><p class="how">Quatre mascottes, quatre caractères. <b>Aftonsparv</b> et <b>Moomoo</b> voyagent avec vous. '
+             '<b>Boop Boops</b> et <b>Minou</b> restent à la maison et vous écrivent de loin.</p>'
            '<div class="acts dd-go"><a class="btn" href="#/personnalite">%s Quelle est la mienne ?</a></div>'
            '<p class="how dd-wait">%s Le test pour trouver ta mascotte s’ouvre le %s.</p><div class="ddlist">' % (icon("heart"), icon("lock"), G.TEST_OPEN_TXT))
     for d in G.DOUDOUS:
@@ -315,7 +347,8 @@ def guide_html(day_id):
         return ""
     key, text = q
     d = DD[key]
-    return ('<a class="guide" href="#/mascottes" style="--dd:%s">%s<p><b>%s</b>%s</p></a>' % (d["bg"], dd_img(key, "guide-img"), txt(d["short"]), txt("« %s »" % text)))
+    return ('<a class="guide" href="#/mascottes" style="--dd:%s">%s<p><b>%s%s</b>%s</p></a>'
+            % (d["bg"], dd_img(key, "guide-img"), txt(d["short"]), "" if TRAVEL[key] else " · de la maison", txt("« %s »" % text)))
 
 
 def day_stamp_html(day_id):
@@ -336,4 +369,7 @@ def home_quip_html():
 
 
 def all_views():
-    return (view_jeux() + view_quiz() + view_test() + view_doudous() + view_blind() + view_mots() + view_horo() + view_pass() + INK_FILTER)
+    import build_days as BD
+    g = BD.gate
+    return (view_jeux() + g("quiz", view_quiz()) + view_test() + g("doudous", view_doudous()) + g("blind", view_blind()) + g("mots", view_mots())
+            + g("horo", view_horo()) + g("pass", view_pass()) + BD.all_views() + INK_FILTER)

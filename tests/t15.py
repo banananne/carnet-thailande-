@@ -9,6 +9,7 @@ def ok(cond, msg):
 with sync_playwright() as p:
     b=p.chromium.launch()
     ctx=b.new_context(viewport={"width":390,"height":844},device_scale_factor=2,is_mobile=True,has_touch=True,service_workers="block")
+    ctx.add_init_script("try{localStorage.setItem('carnet.open','1')}catch(e){}")  # les jeux sont tous ouverts (mot secret déjà tapé)
     pg=ctx.new_page()
     pg.on("pageerror", lambda e: errs.append(str(e)))
     pg.on("console", lambda m: errs.append(m.text) if m.type=="error" else None)
@@ -59,7 +60,7 @@ with sync_playwright() as p:
     # ── hub : sous-titres
     go("#/jeux")
     print("hub passeport:", pg.inner_text('[data-hub="pass"]'))
-    ok("sur 23" in pg.inner_text('[data-hub="pass"]'), "compteur passeport dans le hub")
+    ok("sur 28" in pg.inner_text('[data-hub="pass"]'), "compteur passeport dans le hub")
     go("#/"); ok(pg.locator("[data-pass-count]").count() == 0, "l'accueil n'a plus la tuile Passeport (compteur dans le hub Jeux)")
     # ── passeport complet (via LS) + two-tap reset
     go("#/passeport")

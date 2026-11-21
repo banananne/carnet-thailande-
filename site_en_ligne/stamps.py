@@ -106,6 +106,20 @@ P = {
     "b_etoiles": ('<path d="%s"/>' % _star(24, 25, 15, 6.4) + '<path d="%s%s"/>' % (_spark(39, 7, 3), _spark(8, 39, 3))),
     "b_photo": ('<rect x="6" y="15" width="36" height="25" rx="5"/><path d="M16.5 15L19.5 9.5H28.5L31.5 15"/>'
                 '<circle cx="24" cy="27.5" r="8"/><circle cx="24" cy="27.5" r="3.3"/>' + _dot(36, 21, 1.5)),
+    # ── les jeux exclusifs au site ──
+    "b_defi": ('<rect x="8" y="6" width="29" height="36" rx="3.5"/><rect x="12.5" y="10.5" width="20" height="19" rx="1.5"/>'
+               '<path d="M12.5 29.5L21 21L26 26L29 23L32.5 27.5"/><path d="M16 36.5H29"/>' + _dot(18.5, 16, 1.8)
+               + '<path d="%s"/>' % _spark(41, 9, 3.2)),
+    "b_bingo": ('<circle cx="24" cy="24" r="17"/><circle cx="24" cy="24" r="9.5"/><path d="%s"/>' % _star(24, 24.5, 5.4, 2.4)
+                + '<path d="%s%s"/>' % (_spark(7.5, 8, 2.6), _spark(41, 40.5, 2.6))),
+    "b_mot": ('<path d="M10 10H38A4 4 0 0 1 42 14V28A4 4 0 0 1 38 32H26L16.5 41V32H10A4 4 0 0 1 6 28V14A4 4 0 0 1 10 10Z"/>'
+              '<path d="M13.5 18.5H34.5M13.5 24.5H26.5"/>'),
+    "b_gourmand": ('<path d="M6 25H42C42 35 34 41.5 24 41.5C14 41.5 6 35 6 25Z"/><path d="M17.5 45.5H30.5"/>'
+                   '<path d="M13 19Q10.5 15.5 13 12M20 19Q17.5 15.5 20 12M27 19Q24.5 15.5 27 12"/>'
+                   '<path d="M34 23L43 5M39 24.5L46.5 9"/>'),
+    "b_prix": ('<path d="M15 6H33V18C33 24.5 29 28.5 24 28.5C19 28.5 15 24.5 15 18Z"/><path d="M15 10H9.5Q9 20 16.5 21.5M33 10H38.5Q39 20 31.5 21.5"/>'
+               '<path d="M24 28.5V34.5"/><path d="M18 34.5H30V41.5H18Z"/><path d="M14 41.5H34"/>'
+               '<path d="%s"/>' % _star(24, 16.5, 4.2, 1.9)),
 }
 
 
@@ -146,6 +160,12 @@ BONUS_SPEC = {
     "blind": ("banner", WINE, "b_blind"),
     "etoiles": ("arch", NAVY, "b_etoiles"),
     "photos": ("rect", OCHRE, "b_photo"),
+    # jeux exclusifs au site : jamais deux cases voisines (3 par ligne) avec le même cadre ni la même encre
+    "defi": ("hex", TEAL, "b_defi"),
+    "bingo": ("round", WINE, "b_bingo"),
+    "mot": ("octagon", PLUM, "b_mot"),
+    "gourmand": ("arch", OCHRE, "b_gourmand"),
+    "prix": ("postmark", NAVY, "b_prix"),
 }
 
 # ───────────────────────── mise en page ─────────────────────────

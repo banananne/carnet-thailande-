@@ -56,11 +56,13 @@ with sync_playwright() as p:
     check("A11 démarrage forcé refusé : aucune question affichée", pg.locator(".dt-q:visible").count() == 0 and vis(pg, "#dt-lock"))
     go(pg, "#/test-doudou")
     check("A12 ancienne adresse #/test-doudou : même cadenas", vis(pg, "#dt-lock"))
-    # page des mascottes
-    go(pg, "#/mascottes")
-    check("A13 mascottes : le bouton « Quelle est la mienne ? » est caché", not vis(pg, ".dd-go"))
-    check("A14 mascottes : la phrase d'attente est visible avec la date", vis(pg, ".dd-wait") and "29 décembre" in low(pg.inner_text(".dd-wait")), pg.inner_text(".dd-wait"))
-    pg.screenshot(path=OUT + "lk_mascottes_locked.png")
+    # page des mascottes : ouverte dès le 18 décembre, on la regarde donc le 22 (le test lui-même reste fermé jusqu'au 29)
+    ctx2, pg2 = newctx(b, when=ms(2026, 12, 22, 12, 0))
+    pg2.goto(BASE + "#/mascottes", wait_until="load"); pg2.wait_for_timeout(500)
+    check("A13 mascottes : le bouton « Quelle est la mienne ? » est caché", not vis(pg2, ".dd-go"))
+    check("A14 mascottes : la phrase d'attente est visible avec la date", vis(pg2, ".dd-wait") and "29 décembre" in low(pg2.inner_text(".dd-wait")), pg2.inner_text(".dd-wait"))
+    pg2.screenshot(path=OUT + "lk_mascottes_locked.png")
+    ctx2.close()
     # passeport : l'indication du tampon
     how = pg.evaluate("document.querySelector('#v-pass .slot[data-id=\"doudou\"]').getAttribute('data-how')")
     check("A15 passeport : « dès le 29 décembre » dans l'indication du tampon", "dès le 29 décembre" in low(how), how)

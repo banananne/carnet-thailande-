@@ -7,7 +7,15 @@ window.CarnetGames = (function () {
   function jget(k, d) { try { var v = LS.get(k, null); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }
   function jset(k, v) { LS.set(k, JSON.stringify(v)); }
   function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
-  function hub(id, text) { var e = $('[data-hub="' + id + '"]'); if (e) e.textContent = text || e.getAttribute("data-def"); }
+  /* sous-titre d'une tuile des Jeux : le texte du jeu, ou « À partir du … » tant que la tuile est fermée */
+  var hubTxt = {};
+  function hub(id, text) { hubTxt[id] = text || ""; hubPaint(id); }
+  function hubPaint(id) {
+    var e = $('[data-hub="' + id + '"]'); if (!e) return;
+    var t = e.closest ? e.closest("[data-gate]") : null;
+    if (t && !Cal.isOpen(t.getAttribute("data-gate"))) { e.textContent = "À partir du " + (t.getAttribute("data-opens") || ""); return; }
+    e.textContent = hubTxt[id] || e.getAttribute("data-def");
+  }
   function nb(s) { return String(s).replace(/ ([:;?!»])/g, "\u00a0$1").replace(/(«) /g, "$1\u00a0"); }
   /* bouton qui demande une deuxième touche avant d'effacer (le libellé est dans un <span>) */
   function twoTap(btn, armed, fn) {
@@ -67,6 +75,73 @@ window.CarnetGames = (function () {
       } catch (e) {}
     }
     return { burst: burst };
+  })();
+
+  /* ───────────── calendrier : la date du téléphone décide de ce qui est ouvert ─────────────
+     Le mot secret (gardé sur ce téléphone) ouvre tout d'un coup : c'est le « mode essai » pour tester avant le départ. */
+  var Cal = (function () {
+    var KEY = "carnet.open", box = $("#v-jeux"), OPEN = {}, HASH = [];
+    try { OPEN = JSON.parse(box.getAttribute("data-gates") || "{}"); } catch (e) {}
+    HASH = (box.getAttribute("data-k") || "").split(",").map(Number);
+    var FIRST = box.getAttribute("data-first") || "", LAST = box.getAttribute("data-last") || "";
+    function today() { var d = new Date(); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+    function master() { return LS.get(KEY, "") === "1"; }
+    function setMaster(on) { if (on) LS.set(KEY, "1"); else LS.del(KEY); }
+    function isOpen(key) { var o = OPEN[key]; return !o || master() || today() >= o; }
+    function norm(w) {
+      var t = String(w);
+      try { t = t.normalize("NFD"); } catch (e) {}
+      return t.replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    }
+    function fnv(w) { var h = 0x811c9dc5; for (var i = 0; i < w.length; i++) h = Math.imul(h ^ w.charCodeAt(i), 16777619) >>> 0; return h; }
+    function good(w) { var n = norm(w); return !!n && HASH.indexOf(fnv(n)) >= 0; }
+    /* les 17 jours du voyage (mêmes identifiants que les pages de jour) */
+    function inTrip() { var t = today(); return t >= FIRST && t <= LAST; }
+    function idxToday() {
+      var t = today(); if (t <= FIRST) return 0; if (t >= LAST) return days.length - 1;
+      for (var i = days.length - 1; i >= 0; i--) if (days[i] <= t) return i;
+      return 0;
+    }
+    function maxOpen() { return master() ? days.length - 1 : (today() < FIRST ? -1 : idxToday()); }
+    function trying() { return master() && today() < LAST; }
+    return { today: today, master: master, setMaster: setMaster, isOpen: isOpen, good: good, inTrip: inTrip, idxToday: idxToday, maxOpen: maxOpen, trying: trying };
+  })();
+
+  /* ───────────── cadenas : un écran « Pas encore ! » par jeu fermé, et les tuiles des Jeux ───────────── */
+  var Gates = (function () {
+    function paintView(name) {
+      var v = $("#v-" + name);
+      if (!v || !v.hasAttribute("data-gate")) return true;
+      var p = $(".lkv", v), b = $(".gbody", v);
+      if (!p || !b) return true;
+      var lk = !Cal.isOpen(v.getAttribute("data-gate"));
+      if (lk && p.hidden) {     /* vient de se fermer : le formulaire repart replié */
+        var f = $(".lk-form", p); f.hidden = true; $('[data-lkv="ask"]', p).hidden = false; $(".lk-err", p).textContent = "";
+      }
+      p.hidden = !lk; b.hidden = lk;
+      return !lk;
+    }
+    function paintHub() {
+      $$("#v-jeux a.tile[data-gate]").forEach(function (t) { t.classList.toggle("is-locked", !Cal.isOpen(t.getAttribute("data-gate"))); });
+      $$("#v-jeux [data-hub]").forEach(function (e) { hubPaint(e.getAttribute("data-hub")); });
+      var tr = $("#hub-try"); if (tr) tr.hidden = !Cal.trying();
+    }
+    document.addEventListener("click", function (e) {
+      var t = e.target.closest ? e.target.closest("[data-lkv],[data-relock]") : null; if (!t) return;
+      if (t.hasAttribute("data-relock")) { Lock.close(); refreshAll(); toast("Cadenas remis"); return; }
+      var p = t.closest(".lkv"), f = $(".lk-form", p);
+      t.hidden = true; f.hidden = false; try { $("input", f).focus(); } catch (x) {}
+    });
+    document.addEventListener("submit", function (e) {
+      var f = e.target; if (!f || !f.classList || !f.classList.contains("lkv-form")) return;
+      e.preventDefault();
+      var i = $("input", f), err = $(".lk-err", f), p = f.closest(".lkv");
+      if (Cal.good(i.value)) { i.value = ""; err.textContent = ""; Lock.open(); refreshAll(); toast("Tout est ouvert sur ce téléphone"); Confetti.burst(null, null, 50); return; }
+      err.textContent = "Ce n’est pas le bon mot."; buzz(40);
+      p.classList.remove("no"); void p.offsetWidth; p.classList.add("no"); try { i.select(); } catch (x) {}
+    });
+    document.addEventListener("animationend", function (e) { if (e.target.classList && e.target.classList.contains("lkv")) e.target.classList.remove("no"); });
+    return { paintView: paintView, paintHub: paintHub };
   })();
 
   /* ───────────── passeport : les tampons ───────────── */
@@ -227,30 +302,20 @@ window.CarnetGames = (function () {
   /* ───────────── cadenas : le test de personnalité s'ouvre le 29 décembre (heure du téléphone),
      ou plus tôt avec le mot secret d'Anne (gardé sur ce téléphone). La classe « tlock » de <html> allume les cadenas. ───────────── */
   var Lock = (function () {
-    var root = $("#dt"), KEY = "carnet.open";
+    var root = $("#dt");
     var OPEN = root.getAttribute("data-open") || "";
-    var HASH = (root.getAttribute("data-k") || "").split(",").map(Number);
-    function pad(n) { return (n < 10 ? "0" : "") + n; }
-    function today() { var d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
-    function byDate() { return !OPEN || today() >= OPEN; }
-    function byWord() { return LS.get(KEY, "") === "1"; }
+    function byDate() { return !OPEN || Cal.today() >= OPEN; }
+    function byWord() { return Cal.master(); }
     function locked() { return !byDate() && !byWord(); }
-    function norm(w) {
-      var t = String(w);
-      try { t = t.normalize("NFD"); } catch (e) {}
-      return t.replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
-    }
-    function fnv(w) { var h = 0x811c9dc5; for (var i = 0; i < w.length; i++) h = Math.imul(h ^ w.charCodeAt(i), 16777619) >>> 0; return h; }
-    function good(w) { var n = norm(w); return !!n && HASH.indexOf(fnv(n)) >= 0; }
     function paint() {
       document.documentElement.classList.toggle("tlock", locked());
       var rl = $("#lk-relock"); if (rl) rl.hidden = !(byWord() && !byDate());   /* « remettre le cadenas » : seulement si ouvert avec le mot, avant la date */
     }
-    function open() { LS.set(KEY, "1"); paint(); }
-    function close() { LS.del(KEY); paint(); }
-    document.addEventListener("visibilitychange", function () { if (!document.hidden) paint(); });
+    function open() { Cal.setMaster(true); paint(); }
+    function close() { Cal.setMaster(false); paint(); }
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) refreshAll(); });
     paint();
-    return { locked: locked, paint: paint, good: good, open: open, close: close };
+    return { locked: locked, paint: paint, good: Cal.good, open: open, close: close };
   })();
 
   /* ───────────── test de personnalité (mascottes) ───────────── */
@@ -265,7 +330,7 @@ window.CarnetGames = (function () {
     function paintLast() {
       var k = last(), box = $("#dt-last");
       box.hidden = !k; if (k) $("#dt-lastn").textContent = NAME[k];
-      hub("doudou", Lock.locked() ? "À partir du " + OPEN_TXT : k ? "Ta mascotte : " + NAME[k] : "");
+      hub("doudou", k ? "Ta mascotte : " + NAME[k] : "");
     }
     function reset() {
       cur = 0; ans = []; Lock.paint();
@@ -548,18 +613,35 @@ window.CarnetGames = (function () {
     show(pick());
   })();
 
-  /* tuile « Passeport » de l'accueil : même chose que la tuile photo, avec son compteur déjà géré par Stamps.paint() */
+  /* ───────────── étape 4 : défi du jour, mot du jour, bingo, carnet gourmand, prix, horoscope de l'accueil ───────────── */
+/*@GAMES2@*/
+/*@TRANS@*/
 
-  return {
+  /* tout repeindre (mot secret saisi, retour dans l'appli un autre jour, cadenas remis) */
+  function refreshAll() {
+    Lock.paint(); Gates.paintHub(); HomeHoro.paint();
+    if (curName) api.enter(curName);
+  }
+
+  var api = {
     enter: function (name) {
       Lock.paint();
+      Gates.paintHub();
+      var open = Gates.paintView(name);
+      HomeHoro.paint();
       if (name === "jeux") Test.reset();            /* met à jour la tuile du test (cadenas, ou « Ta mascotte : … ») */
       if (name === "quiz") Quiz.reset();
       else if (name === "test") Test.reset();
       else if (name === "blind") Blind.paint();
-      else if (name === "mots") Mots.enter();
+      else if (name === "mots") { if (open) Mots.enter(); }
       else if (name === "pass") Stamps.paint();
-      if (name === "horo") Horo.enter(); else Horo.leave();
+      else if (name === "defi") Defi.enter();
+      else if (name === "mot") Mot.enter();
+      else if (name === "bingo") Bingo.enter();
+      else if (name === "gourmand") Gourmand.enter();
+      else if (name === "prix") Prix.enter();
+      else if (name === "trad") Trad.enter();
+      if (name === "horo" && open) Horo.enter(); else Horo.leave();
     },
     photo: function (id) {
       if (Stamps.day(id)) toast("Photo gardée : le tampon du jour est dans ton passeport");
@@ -567,4 +649,7 @@ window.CarnetGames = (function () {
       if (n >= 5) Stamps.bonus("photos");
     }
   };
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) refreshAll(); });
+  Gates.paintHub();
+  return api;
 })();

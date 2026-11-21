@@ -18,6 +18,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     for (vw, vh) in ((390, 844), (320, 640)):
         ctx = b.new_context(viewport={"width": vw, "height": vh}, device_scale_factor=2, is_mobile=True, has_touch=True, service_workers="block")
+        ctx.add_init_script("try{localStorage.setItem('carnet.open','1')}catch(e){}")  # les jeux sont tous ouverts (mot secret déjà tapé)
         pg = ctx.new_page()
         pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.on("console", lambda m: errs.append(m.text) if m.type == "error" else None)

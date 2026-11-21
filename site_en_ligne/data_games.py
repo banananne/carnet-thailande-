@@ -26,7 +26,7 @@ HOME_QUIPS = [
     ("aftonsparv", "Un panneau en thaï ! Je le lis jusqu’au bout."),
     ("boop", "Allez, tout le monde dans le tuk-tuk !"),
     ("boop", "Photo de groupe ! Tout le monde se serre !"),
-    ("boop", "Je connais déjà le vendeur de mangues."),
+    ("boop", "Rapportez-moi des mangues !"),
     ("minou", "Je ne boude pas, je règne."),
     ("minou", "Il y a de la clim ? Sinon, je reste ici."),
     ("minou", "Réveillez-moi pour le dîner."),
@@ -38,22 +38,22 @@ HOME_QUIPS = [
 # un doudou « guide » par jour (jamais un indice du quiz du 26 décembre)
 DAY_QUIPS = {
     "2026-12-18": ("moomoo", "Un siège, un plaid, un plateau-repas : le voyage commence très bien."),
-    "2026-12-19": ("boop", "Premier jour, premier marché, premiers copains : je suis déjà en mode tuk-tuk !"),
+    "2026-12-19": ("boop", "Sawasdee de ma part à tout Bangkok ! Je reste à la maison, mais mon cœur est déjà dans le tuk-tuk."),
     "2026-12-20": ("aftonsparv", "Un bateau, des klongs, un coucher de soleil sur un temple : sur ma planète, ça n’existe pas !"),
     "2026-12-21": ("aftonsparv", "Des temples en briques rouges et des Bouddhas sans tête… Je prends des notes pour le quiz."),
-    "2026-12-22": ("boop", "Un train au milieu des étals, des barques-boutiques… et ce soir, boxe thaï ! Je crie le plus fort."),
-    "2026-12-23": ("boop", "Ce soir, street food en tuk-tuk. Allez, tout le monde dans le tuk-tuk !"),
-    "2026-12-24": ("boop", "Chatuchak ! Je négocie, je discute, et je repars avec trois porte-clés et un nouvel ami."),
-    "2026-12-25": ("minou", "Noël au parc Lumpini : les varans me regardent, je les regarde. Personne ne cligne."),
+    "2026-12-22": ("boop", "Un train au milieu des étals, des barques-boutiques… et ce soir, boxe thaï ! Je crie le plus fort, depuis le canapé."),
+    "2026-12-23": ("boop", "Ce soir, street food en tuk-tuk. Allez, tout le monde dans le tuk-tuk (moi, je garde la maison) !"),
+    "2026-12-24": ("boop", "Chatuchak ! Négociez bien, et rapportez-moi un porte-clés. Un seul. Enfin, trois."),
+    "2026-12-25": ("minou", "Joyeux Noël depuis la maison. Les varans du parc Lumpini ? Ne clignez pas des yeux : c’est un concours."),
     "2026-12-26": ("moomoo", "Grasse matinée, avion, piscine : cinq minutes de plus, mais ensuite, le quiz !"),
     "2026-12-27": ("moomoo", "À vélo dans les ruines : je pilote, Aftonsparv navigue."),
-    "2026-12-28": ("minou", "Une matinée tranquille à l’hôtel ? Enfin une idée de génie."),
+    "2026-12-28": ("minou", "Une matinée tranquille à l’hôtel ? Enfin une idée de génie. Je vous approuve depuis mon fauteuil."),
     "2026-12-29": ("aftonsparv", "Un avion, puis la route vers la mer. Je regarde par le hublot, au cas où il y aurait des extraterrestres."),
     "2026-12-30": ("moomoo", "Piscine, plage, massage, cocktails. Quelqu’un a vu un hamac ?"),
-    "2026-12-31": ("boop", "Dernier soir de l’année : musique, plage, et tout le monde danse !"),
+    "2026-12-31": ("boop", "Dernier soir de l’année : musique, plage, et tout le monde danse ! Moi aussi, depuis la maison."),
     "2027-01-01": ("minou", "Bonne année. Ne me parlez pas avant midi."),
     "2027-01-02": ("moomoo", "Dernière matinée piscine… Cinq minutes de plus, s’il vous plaît."),
-    "2027-01-03": ("boop", "Merci la Thaïlande ! C’était le plus beau des voyages. On recommence quand ?"),
+    "2027-01-03": ("boop", "Vous rentrez, je vous attends ! C’était le plus beau des voyages. On recommence quand ?"),
 }
 
 # ───────────── quiz du 26 décembre ─────────────
@@ -84,6 +84,12 @@ BONUS_STAMPS = [
     ("blind", "BLIND TEST", "Blind test", "Marquer un point au blind test"),
     ("etoiles", "ÉTOILES", "Horoscope", "Lire l’horoscope du voyage"),
     ("photos", "PHOTOGRAPHE", "Photographe", "Prendre 5 photos du jour"),
+    # jeux exclusifs au site (étape 4)
+    ("defi", "DÉFI", "Défi photo", "Relever 5 défis photo"),
+    ("bingo", "BINGO", "Bingo", "Faire une ligne au bingo"),
+    ("mot", "MOT DU JOUR", "Mot du jour", "Dire 5 mots du jour"),
+    ("gourmand", "GOURMAND", "Gourmand", "Goûter 10 plats ou boissons"),
+    ("prix", "PALMARÈS", "Prix du voyage", "Décerner les prix du voyage"),
 ]
 
 # ───────────── cadenas : le test de personnalité s'ouvre à une date (heure locale du téléphone) ─────────────

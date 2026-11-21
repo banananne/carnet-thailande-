@@ -6,7 +6,8 @@ import stamps as ST
 from playwright.sync_api import sync_playwright
 BASE = "http://127.0.0.1:8765/carnet-thailande-/"
 DAYS = ["2026-12-18","2026-12-19","2026-12-20","2026-12-21","2026-12-22","2026-12-23","2026-12-24","2026-12-25","2026-12-26","2026-12-27","2026-12-28","2026-12-29","2026-12-30","2026-12-31","2027-01-01","2027-01-02","2027-01-03"]
-BON = ["quiz", "doudou", "mots", "blind", "etoiles", "photos"]
+BON = ["quiz", "doudou", "mots", "blind", "etoiles", "photos", "defi", "bingo", "mot", "gourmand", "prix"]
+TOT = len(DAYS) + len(BON)
 bad = []; n = [0]
 def ck(ok, msg):
     n[0] += 1
@@ -17,7 +18,7 @@ for i in range(len(DAYS) - 1):
     ck(spec[i][0] != spec[i + 1][0], "cadre différent entre %s et %s" % (DAYS[i], DAYS[i + 1]))
     ck(spec[i][1] != spec[i + 1][1], "encre différente entre %s et %s" % (DAYS[i], DAYS[i + 1]))
 ck(len({s[2] for s in spec}) == 17, "17 dessins différents pour les 17 jours")
-ck(len({s[2] for s in bsp}) == 6, "6 dessins différents pour les 6 tampons spéciaux")
+ck(len({s[2] for s in bsp}) == len(BON), "%d dessins différents pour les %d tampons spéciaux" % (len(BON), len(BON)))
 ck(not ({s[2] for s in spec} & {s[2] for s in bsp}), "aucun dessin partagé entre jours et spéciaux")
 ck(len({s[0] for s in spec}) >= 10, "au moins 10 cadres différents (%d)" % len({s[0] for s in spec}))
 ck(len({s[1] for s in spec}) >= 5, "au moins 5 encres différentes (%d)" % len({s[1] for s in spec}))
@@ -27,6 +28,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     for vw in (390, 320):
         ctx = b.new_context(viewport={"width": vw, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, service_workers="block")
+        ctx.add_init_script("try{localStorage.setItem('carnet.open','1')}catch(e){}")  # les jeux sont tous ouverts (mot secret déjà tapé)
         pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.on("console", lambda m: errs.append(m.text) if m.type == "error" else None)
         def show(state):
@@ -36,10 +38,10 @@ with sync_playwright() as p:
         pg.goto(BASE)
         # ── plein ──
         show(FULL)
-        ck(pg.locator("#v-pass .slot").count() == 23, "%d px : 23 cases" % vw)
-        ck(pg.locator("#v-pass .slot.on").count() == 23, "%d px : 23 cases tamponnées" % vw)
+        ck(pg.locator("#v-pass .slot").count() == TOT, "%d px : %d cases" % (vw, TOT))
+        ck(pg.locator("#v-pass .slot.on").count() == TOT, "%d px : %d cases tamponnées" % (vw, TOT))
         pg.add_style_tag(content=".nav{display:none!important}")
-        for i in range(23):
+        for i in range(TOT):
             sv = pg.locator("#v-pass .slot").nth(i).locator("svg.stamp")
             sv.scroll_into_view_if_needed(); pg.wait_for_timeout(40)
             bx = sv.bounding_box(); sid = pg.locator("#v-pass .slot").nth(i).get_attribute("data-id")
@@ -52,7 +54,7 @@ with sync_playwright() as p:
         show(None)
         ck(pg.locator("#v-pass .slot.on").count() == 0, "%d px : aucune case tamponnée à vide" % vw)
         ck(pg.locator("#v-pass .slot-ph.d i svg").count() == 17, "%d px : 17 dessins pâles sur les jours" % vw)
-        ck(pg.locator("#v-pass .slot-ph:not(.d) i svg").count() == 6, "%d px : 6 dessins pâles sur les spéciaux" % vw)
+        ck(pg.locator("#v-pass .slot-ph:not(.d) i svg").count() == len(BON), "%d px : %d dessins pâles sur les spéciaux" % (vw, len(BON)))
         hid = pg.evaluate("Array.from(document.querySelectorAll('#v-pass .slot svg.stamp')).every(v=>getComputedStyle(v).display==='none')")
         ck(hid, "%d px : tampons cachés tant que non gagnés" % vw)
         ph = pg.evaluate("""()=>Array.from(document.querySelectorAll('#v-pass .slot-ph.d')).map(e=>{const s=e.closest('.slot').getBoundingClientRect();const b=e.querySelector('b').getBoundingClientRect();const sm=e.querySelector('small').getBoundingClientRect();const i=e.querySelector('i svg').getBoundingClientRect();

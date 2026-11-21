@@ -31,7 +31,7 @@ with sync_playwright() as p:
     # ---- Utile
     tiles = pg.eval_on_selector_all("#v-utile .tile", "els => els.map(e => [e.getAttribute('href'), e.innerText.replace(/\\s+/g,' ')])")
     print(tiles)
-    check("Utile : 5 tuiles", len(tiles) == 5)
+    check("Utile : 6 tuiles (métro, lexique, traducteur, cartes taxi, convertisseur, Good to know)", len(tiles) == 6 and [t[0] for t in tiles] == ["#/metro", "#/lexique", "#/traduire", "#/taxi", "#/convertisseur", "#/good-to-know"], tiles)
     check("Utile : plus de tuile « bientôt »", pg.locator("#v-utile .soon, #v-utile .badge").count() == 0)
     pg.screenshot(path=OUT + "s2_utile.png")
 

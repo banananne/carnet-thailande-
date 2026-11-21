@@ -207,6 +207,8 @@ def day_html(i, d):
         out += '<h3 class="sech">Fun facts</h3>' + "".join(fact_card(c) for c in cards)
     if d.get("lexique"):
         out += lexique_html()
+    import build_days as BD
+    out += BD.day_link_html(d["id"])
     out += snap_html(d)
     out += BG.day_stamp_html(d["id"])
     if d.get("end"):
@@ -279,6 +281,7 @@ def view_hotels():
 def view_utile():
     items = [("rose", "#/metro", "train", "Plan du métro", "Tout le réseau, à zoomer"),
              ("sand", "#/lexique", "book", "Lexique en thaï", "À montrer ou à écouter"),
+             ("blue", "#/traduire", "translate", "Traducteur", "Français ⇄ thaï, à lire et à écouter"),
              ("mustard", "#/taxi", "car", "Cartes taxi", "Les hôtels écrits en thaï"),
              ("blue", "#/convertisseur", "coin", "Convertisseur", "Baht et euro"),
              ("rose", "#/good-to-know", "info", "Good to know", "Histoire, savoir-vivre, urgences")]
@@ -537,6 +540,9 @@ def view_home(version):
                 % (n, bg, fg, n[0], n))
     out += '</div><p class="hello" id="hello" role="status">Appuie sur ton prénom.</p></div></section>'
 
+    import build_days as BD
+    out += BD.horo_home_html()
+
     out += '<section class="bubble blue" aria-labelledby="h-trip"><h2 id="h-trip">Le voyage</h2><div class="trip"><div class="tmap">%s</div><ul class="stages">' % thai_map_svg()
     for s in D.STAGES:
         if s["id"] == "vol":
@@ -574,20 +580,26 @@ def nav_html():
 
 
 def css_text():
-    s = open(os.path.join(ROOT, "app.css"), encoding="utf-8").read() + "\n" + open(os.path.join(ROOT, "games.css"), encoding="utf-8").read()
+    s = "\n".join(open(os.path.join(ROOT, f), encoding="utf-8").read() for f in ("app.css", "games.css", "days.css", "trad.css"))
     s = re.sub(r"/\*.*?\*/", "", s, flags=re.S)
     return "\n".join(ln.strip() for ln in s.splitlines() if ln.strip())
 
 
 def render(version, head_meta):
     import build_games as BG
-    body = (view_home(version) + view_days() + view_hotels() + view_utile() + view_metro() + view_lexique() + view_taxi()
+    import build_trad as BT
+    body = (view_home(version) + view_days() + view_hotels() + view_utile() + BT.view_trad() + view_metro() + view_lexique() + view_taxi()
             + view_convert() + view_gtk() + BG.all_views() + nav_html() + show_overlay()
             + '<div id="toast" role="status" aria-live="polite"></div>'
             + '<div id="upd" hidden><span>Une nouvelle version est prête.</span><button class="btn sm" type="button" id="upd-btn">Actualiser</button></div>')
     js = open(os.path.join(ROOT, "app.js"), encoding="utf-8").read()
     assert "/*@GAMES@*/" in js
-    js = js.replace("/*@GAMES@*/", open(os.path.join(ROOT, "games.js"), encoding="utf-8").read())
+    games = open(os.path.join(ROOT, "games.js"), encoding="utf-8").read()
+    assert "/*@GAMES2@*/" in games
+    games = games.replace("/*@GAMES2@*/", open(os.path.join(ROOT, "games2.js"), encoding="utf-8").read())
+    assert "/*@TRANS@*/" in games
+    games = games.replace("/*@TRANS@*/", open(os.path.join(ROOT, "trans.js"), encoding="utf-8").read())
+    js = js.replace("/*@GAMES@*/", games)
     assert "</script" not in js
     # prénom déjà choisi : on masque « Qui es-tu ? » dès le premier affichage (pas de clignotement avant que le script du bas ne s'exécute)
     early = '<script>try{if(localStorage.getItem("carnet.who"))document.documentElement.classList.add("has-who")}catch(e){}</script>'

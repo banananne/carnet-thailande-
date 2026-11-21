@@ -3,7 +3,7 @@
 Cette branche ne sert qu'à garder une copie des fichiers qui fabriquent le site. Le site publié
 est sur la branche `main` (GitHub Pages) : ne rien publier ici.
 
-Dernière mise à jour : 21 novembre 2026, 0 h 30. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
+Dernière mise à jour : 21 novembre 2026, 3 h 35. Contenu : étape 1 (en ligne depuis 20 h 51), étape 2 (lexique,
 cartes taxi, convertisseur, Good to know) et étape 3 (jeux : quiz, test de personnalité, blind test, mots mêlés,
 horoscope, mascottes, passeport de tampons), publiées ensemble à 22 h 24 (commit 34db76e), puis vague 1 des
 améliorations (accueil allégé à quatre rubriques, « Qui es-tu ? » qui se replie, « doudous » devenus « mascottes »,
@@ -13,7 +13,11 @@ jour, 6 tampons spéciaux) validée par Anne le 20 novembre à 23 h 32 et publi�
 1157c6d, version de construction 20261120-232939), puis nouvelle carte complète du métro (BTS, MRT, Airport Link, SRT) publiée
 le 21 novembre à 0 h 02 (branche `main`, commit b6f517f, version de construction 20261120-235823).
 Puis le cadenas du test de personnalité (ouvert le 29 décembre, ou avec un mot secret) publié le 21 novembre à 0 h 20
-(branche `main`, commit 6b85e54, version de construction 20261121-000925). Ces sources correspondent à ce qui est publié.
+(branche `main`, commit 6b85e54, version de construction 20261121-000925).
+Puis l'étape 4 : calendrier d'ouverture des jeux, cinq jeux exclusifs au site (défi photo et rôles du jour, mot du jour, bingo,
+carnet gourmand, prix du voyage), horoscope du jour sur l'accueil, mascottes qui voyagent (Aftonsparv et Moomoo) ou écrivent
+de loin (Boop et Minou), passeport à 28 tampons, traducteur français ⇄ thaï dans Utile, publiés le 21 novembre à 3 h 34
+(branche `main`, commit f470d1a, version de construction 20261121-032325). Ces sources correspondent à ce qui est publié.
 
 ## Reconstruire le site
 1. Remettre `site_en_ligne/` dans `/home/claude/site_en_ligne/` et les autocollants de `stickers/`
@@ -43,6 +47,14 @@ Puis le cadenas du test de personnalité (ouvert le 29 décembre, ou avec un mot
 - Cadenas du test de personnalité : `data_games.py` (`TEST_OPEN` = date d'ouverture, `TEST_OPEN_TXT`, `TEST_WORDS` = mots secrets ;
   seules leurs empreintes FNV-1a vont dans le site, voir `build_games.fnv`), `games.js` (module `Lock`, classe `tlock` sur `<html>`),
   `games.css` (fin du fichier). Clé de mémoire : `carnet.open` = « 1 » quand le mot secret a été tapé.
+- Étape 4 : `data_days.py` (dates d'ouverture `GATES`, rôles du jour, 17 défis photo, 17 mots du jour, bingo, 24 plats, 8 prix ;
+  seuls Aftonsparv et Moomoo voyagent), `data_horo_days.py` (horoscope du jour : 3 signes × 17 jours ; `SIGN_OF` = signe de
+  chaque prénom), `build_days.py` (pages `v-defi`, `v-mot`, `v-bingo`, `v-gourmand`, `v-prix`, encadré `#hsd` de l'accueil,
+  enveloppe des vues fermées `gate`), `games2.js` (comportement de ces jeux ; collé dans `games.js` au repère `/*@GAMES2@*/`),
+  `days.css` (ajouté à `app.css`). Clés de mémoire : `carnet.defi`, `carnet.mj`, `carnet.bingo`, `carnet.food`, `carnet.prix`.
+- Traducteur (Utile) : `data_trad.py` (86 phrases toutes prêtes, services, longueurs), `build_trad.py` (page `v-trad`),
+  `trans.js` (collé dans `games.js` au repère `/*@TRANS@*/` ; Google Traduction puis MyMemory pour une phrase libre, seul
+  endroit du site qui envoie un texte à l'extérieur), `trad.css` (ajouté à `app.css`). Clés : `carnet.trad`, `carnet.trad.dir`.
 - `build_app.py` : fabrique les pages HTML (accueil, jours, hôtels, utile, métro, lexique, cartes taxi,
   convertisseur, Good to know, fenêtre « montrer en grand »).
 - `build_games.py` : pages des jeux (hub, quiz, test de personnalité, mascottes, blind test, mots mêlés, horoscope,
@@ -53,7 +65,7 @@ Puis le cadenas du test de personnalité (ouvert le 29 décembre, ou avec un mot
 - `app.css`, `app.js` : style et comportement (navigation, photo du jour, copie, plan du métro, voix thaïe,
   lexique, cartes taxi, convertisseur).
 - `stamps.py` (vague 2) : dessins (pictogrammes en traits), cadres (ticket, rond, ovale, arche, hexagone,
-  rectangle, timbre, dentelé, cachet postal, bandeau, octogone) et encres des 23 tampons ; `DAY_SPEC` et `BONUS_SPEC` donnent
+  rectangle, timbre, dentelé, cachet postal, bandeau, octogone) et encres des 28 tampons (17 jours + 11 spéciaux) ; `DAY_SPEC` et `BONUS_SPEC` donnent
   cadre, couleur et dessin de chaque jour et de chaque tampon spécial ; `stamp_svg()` dessine un tampon.
 - `games.js`, `games.css` : comportement et style des jeux. `games.js` est collé dans `app.js` au moment du
   build (repère `/*@GAMES@*/`) et `games.css` est ajouté à `app.css`.
@@ -81,4 +93,8 @@ Vague 2 (tampons) : `t21.py` planches (passeport plein, à moitié rempli, vide 
 légendée montrée à Anne (à partir des fichiers de `t21.py`), `t26.py` texte courbé sur les pages de jour,
 `t27.py` variété des cadres/encres/dessins, tampons non rognés (contrôle des pixels du bord), cases vides, clics,
 identifiants uniques, remise à zéro ; `t27neg.py` contrôle négatif du test de rognage.
+Étape 4 : `t30.py` calendrier à dates simulées (horloge de Playwright), mot secret, horoscope du jour, rôles, défi, mot, bingo,
+gourmand, prix, 28 tampons, mascottes, mise en page ; `t31.py` traducteur (réseau SIMULÉ : le serveur local ne joint aucun vrai
+service) ; `run_srv.sh` lance le serveur local le temps d'une série (`./run_srv.sh t31 t30 …`, résumé dans `summary.log`) ; `run_all.sh`
+enchaîne les séries. Les tests t12, t14, t15, t18, t22, t26, t27 et t29 posent `carnet.open` = « 1 » et comptent 28 tampons.
 `test_photo_0..4.jpg` : petites photos pour tester la photo du jour. Les chemins de captures (variable `OUT`) sont à adapter.

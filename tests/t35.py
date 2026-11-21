@@ -45,7 +45,9 @@ with sync_playwright() as p:
     pg.screenshot(path="/tmp/claude-0/-home-claude/508b3527-b55f-5958-8651-8d8ffebe2ce6/scratchpad/t/g_a_accueil.png")
 
     # ───── B. choisir « invité·e » : tout le site, sans enveloppe, sans horoscope du jour, sans rôles ─────
-    btns.nth(4).click(); pg.wait_for_timeout(900)
+    btns.nth(4).click(); pg.wait_for_timeout(3500)
+    check("B0 3,5 s après : le bloc est encore ouvert, la phrase se lit", vis(pg, "#who-box") and "réservés aux voyageurs" in sp(pg.inner_text("#who-box")) and not vis(pg, "#who-bar"))
+    pg.wait_for_timeout(5000)
     check("B1 la classe is-guest est posée", pg.evaluate("document.documentElement.classList.contains('is-guest')"))
     check("B2 mémoire : carnet.who = Invité", pg.evaluate("localStorage.getItem('carnet.who')") == "Invité")
     check("B3 le bandeau replié dit bonjour à l'invité·e", vis(pg, "#who-bar") and "bienvenue" in pg.inner_text("#who-hi").lower(), pg.inner_text("#who-hi"))

@@ -1,6 +1,6 @@
 /* Service worker du carnet : garde les pages, les polices, les icônes et le plan du métro pour fonctionner sans réseau.
-   Version 20261121-232043 : le build change cette ligne à chaque publication, ce qui force la mise à jour chez tout le monde. */
-const VERSION = "20261121-232043";
+   Version 20261121-235145 : le build change cette ligne à chaque publication, ce qui force la mise à jour chez tout le monde. */
+const VERSION = "20261121-235145";
 const CACHE = "carnet-" + VERSION;
 const CORE = ["./", "index.html", "test.html", "manifest.webmanifest", "assets/metro.svg", "icons/apple-touch-icon.png", "icons/favicon.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "icons/icon.svg", "fonts/barlow-condensed-latin-700-normal.woff2", "fonts/barlow-condensed-latin-800-normal.woff2", "fonts/barlow-latin-400-italic.woff2", "fonts/barlow-latin-400-normal.woff2", "fonts/barlow-latin-500-normal.woff2", "fonts/barlow-latin-600-italic.woff2", "fonts/barlow-latin-600-normal.woff2", "fonts/barlow-latin-700-normal.woff2", "fonts/libre-baskerville-latin-400-italic.woff2", "fonts/noto-sans-thai-thai-500-normal.woff2", "fonts/noto-sans-thai-thai-600-normal.woff2", "img/doudou_aftonsparv.webp", "img/doudou_boop.webp", "img/doudou_minou.webp", "img/doudou_moomoo.webp"];
 

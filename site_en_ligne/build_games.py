@@ -361,7 +361,10 @@ def song_html(day_id):
     t = G.SONGS.get(day_id)
     if not t:
         return ""
-    return ('<p class="song" aria-label="La chanson du jour">%s<span><b>%s</b> · %s</span></p>' % (icon("music"), txt(t[0]), txt(t[1])))
+    k = day_id[5:].replace("-", "")
+    assert os.path.exists(os.path.join(ROOT, "img", "song_%s_cover.webp" % k)), k
+    return ('<p class="song" aria-label="La chanson du jour"><img src="img/song_%s_cover.webp" width="72" height="72" alt="" loading="lazy" decoding="async">'
+            '<span><b>%s</b> · %s</span></p>' % (k, txt(t[0]), txt(t[1])))
 
 
 def day_stamp_html(day_id):

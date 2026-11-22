@@ -117,8 +117,11 @@ with sync_playwright() as p:
     pg.evaluate("location.hash = '#/jours/2026-12-26'"); pg.wait_for_timeout(500)
     r = pg.evaluate("""() => { const s = document.querySelector('#d-2026-12-26 .song'), h = document.querySelector('#d-2026-12-26 h2'); const a = s.getBoundingClientRect(), b = h.getBoundingClientRect();
         return {after: h.nextElementSibling === s, gap: a.top - b.bottom, h: a.height, imgs: s.querySelectorAll('img').length, fs: parseFloat(getComputedStyle(s).fontSize)}; }""")
-    check("E3 la chanson est juste sous la date, sur une petite ligne, sans image", r["after"] and r["gap"] < 14 and r["h"] < 30 and r["imgs"] == 0 and r["fs"] < 15, r)
-    check("E4 plus aucun code Spotify ni pochette dans les fichiers", not [f for f in __import__("os").listdir("/home/claude/site_en_ligne/web/img") if f.startswith("song_")])
+    check("E3 la chanson est juste sous la date, sur une petite ligne, avec sa pochette minuscule", r["after"] and r["gap"] < 14 and r["h"] < 30 and r["imgs"] == 1 and r["fs"] < 15, r)
+    pg.locator("#d-2026-12-26 .song").scroll_into_view_if_needed(); pg.wait_for_timeout(400)
+    im = pg.evaluate("() => { const i = document.querySelector('#d-2026-12-26 .song img'), b = i.getBoundingClientRect(); return {ok: i.complete && i.naturalWidth > 10, w: b.width, h: b.height}; }")
+    check("E4 la pochette est chargée et tient en 22 px", im["ok"] and im["w"] <= 24 and im["h"] <= 24, im)
+    check("E4b seules les pochettes sont dans les fichiers (17), aucun code Spotify", sorted(f for f in __import__("os").listdir("/home/claude/site_en_ligne/web/img") if f.startswith("song_")) == sorted("song_%s_cover.webp" % k for k in "1218 1219 1220 1221 1222 1223 1224 1225 1226 1227 1228 1229 1230 1231 0101 0102 0103".split()))
     check("E5 pas de débordement", not overflow(pg))
     ctx.close()
     # ───── F. carnet gourmand : ajouter ses propres plats ─────

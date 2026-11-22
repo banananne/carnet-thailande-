@@ -36,7 +36,7 @@ HOME_QUIPS = [
     ("moomoo", "Je pilote, Aftonsparv navigue."),
 ]
 
-# la chanson du jour (playlist du voyage : une chanson par jour, choisie par Anne ; un petit texte sous la date de chaque jour)
+# la chanson du jour (playlist du voyage : une chanson par jour, choisie par Anne ; une ligne sous la date de chaque jour, avec la pochette en tout petit : img/song_MMJJ_cover.webp)
 SONGS = {
     "2026-12-18": ("Holiday", "Madonna"),
     "2026-12-19": ("Be Young, Be Foolish, Be Happy", "The Tams"),

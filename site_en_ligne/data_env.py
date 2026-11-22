@@ -20,7 +20,7 @@ révélation), donc il ne peut jamais contredire le calendrier. INTRO et FOOT ci
 la simulation et le vrai tirage (script privé) les reprennent tels quels, pour que les vraies cartes soient celles que tu as validées.
 """
 
-SIM_ON = True                # False : la page d'essai et ses fausses données disparaissent du site publié
+SIM_ON = False               # False : la page d'essai et ses fausses données disparaissent du site publié
 ITERATIONS = 150000          # PBKDF2-SHA256 : ~0,2 à 0,6 s sur un téléphone, à chaque ouverture de l'enveloppe (le code est retapé, jamais gardé)
 
 # (identifiant, apparition, révélation, effacement) en heure locale du téléphone : (année, mois, jour, heure, minute)

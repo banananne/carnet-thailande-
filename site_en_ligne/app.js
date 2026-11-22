@@ -161,8 +161,8 @@ who.addEventListener("click", function (e) {
   var b = e.target.closest ? e.target.closest("button") : null; if (!b) return;
   LS.set("carnet.who", b.getAttribute("data-n")); paintWho();
   clearTimeout(whoT);
-  /* l'invité·e a une phrase à lire : le bloc reste ouvert plus longtemps (8 s) ; ailleurs, une demi-seconde */
-  whoT = setTimeout(function () { whoBar.hidden = false; whoOpen(false); try { whoBar.focus({ preventScroll: true }); } catch (x) {} }, b.getAttribute("data-n") === "Invité" ? 8000 : 550);
+  /* le bloc reste ouvert tant qu'on ne le referme pas : la ligne « Bonjour … Changer » (ou « Bienvenue ») le replie */
+  whoBar.hidden = false; whoOpen(true);
 });
 paintWho();
 if ($('button[aria-pressed="true"]', who)) { whoBar.hidden = false; whoOpen(false); } else whoOpen(true);

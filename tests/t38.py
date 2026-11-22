@@ -30,9 +30,10 @@ with sync_playwright() as p:
     check("A5 pas d'horoscope du jour ni d'enveloppe sur l'accueil invité", not pg.is_visible("#hsd") and not pg.is_visible("#env-btn"))
     pg.screenshot(path="t/gn_avant.png")
     # l'invité·e redevient Anne : la carte disparaît ; puis retour invité·e
-    pg.click("#who-bar"); pg.wait_for_timeout(400); pg.click('#who button[data-n="Anne"]'); pg.wait_for_timeout(700)
+    check("A5b le bloc « Qui es-tu ? » reste ouvert pour l'invité·e", pg.is_visible("#who-box"))
+    pg.click('#who button[data-n="Anne"]'); pg.wait_for_timeout(1200)
     check("A6 un voyageur ne voit pas la carte", not pg.is_visible("#gnow"))
-    pg.click("#who-bar"); pg.wait_for_timeout(400); pg.click('#who button[data-n="Invité"]'); pg.wait_for_timeout(700)
+    pg.click('#who button[data-n="Invité"]'); pg.wait_for_timeout(700)
     check("A7 de retour en invité·e : la carte revient", pg.is_visible("#gnow"))
     ctx.close()
     ctx, pg = open_guest(b, at(2026, 12, 17, 10, 0))

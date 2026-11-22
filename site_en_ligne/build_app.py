@@ -584,7 +584,7 @@ def view_home(version):
     out += BG.home_quip_html()
     out += ('<section class="bubble rose install" id="install-box" hidden aria-labelledby="h-inst"><h2 id="h-inst">Sur ton écran d’accueil</h2>'
             '<p id="install-hint"></p><div class="acts"><button class="btn" type="button" id="install-btn" hidden>Installer l’appli</button></div></section>')
-    out += ('<p class="foot">Carnet Thaïlande 2026 · <a href="test.html">Tester mon téléphone</a><small>version %s</small></p>' % esc(version))
+    out += ('<p class="foot">Carnet Thaïlande 2026<small>version %s</small></p>' % esc(version))
     return out + "</div></main>"
 
 
@@ -622,6 +622,13 @@ def render(version, head_meta):
     js = js.replace("/*@GAMES@*/", games)
     assert "</script" not in js
     # prénom déjà choisi : on masque « Qui es-tu ? » dès le premier affichage (pas de clignotement avant que le script du bas ne s'exécute)
-    early = '<script>try{if(localStorage.getItem("carnet.who"))document.documentElement.classList.add("has-who")}catch(e){}</script>'
+    # Remise à zéro UNIQUE : un téléphone qui n'a pas encore cette « époque » efface tout ce qu'il avait (prénom, tampons, jeux, plats, photos).
+    # Un nouvel arrivant n'a rien à effacer. NE JAMAIS changer EPOCH après le partage du lien : tout le monde perdrait sa progression.
+    # CARNET_NO_RESET=1 (tests uniquement) supprime ce script : les tests posent leurs propres données avant le chargement.
+    EPOCH = "2026-11-22-remise-a-zero"
+    reset = "" if os.environ.get("CARNET_NO_RESET") else (
+        '<script>try{var E="%s";if(localStorage.getItem("carnet.epoch")!==E){var k=[],i,n;for(i=0;i<localStorage.length;i++){n=localStorage.key(i);if(n&&n.indexOf("carnet.")===0)k.push(n)}'
+        'k.forEach(function(n){localStorage.removeItem(n)});localStorage.setItem("carnet.epoch",E);try{indexedDB.deleteDatabase("carnet-thailande")}catch(e){}}}catch(e){}</script>' % EPOCH)
+    early = reset + '<script>try{if(localStorage.getItem("carnet.who"))document.documentElement.classList.add("has-who")}catch(e){}</script>'
     return ('<!doctype html><html lang="fr" data-v="%s"><head>%s%s<title>Carnet Thaïlande 2026</title>%s<style>%s</style></head><body>%s%s<script>%s</script></body></html>\n'
             % (esc(version), head_meta, early, font_css(), css_text(), body, BE.data_script(), js))

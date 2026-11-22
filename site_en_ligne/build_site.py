@@ -271,9 +271,14 @@ def build_web():
             if fn.endswith(".webp"):
                 shutil.copy(os.path.join(imgdir, fn), os.path.join(WEB, "img", fn))
 
-    # reportage photo des invité·e·s : fichiers CHIFFRÉS (voir reportage_tool.py) ; REPORTAGE_DIR : dossier d'essai
+    # reportage photo des invité·e·s (voir reportage_tool.py). Mode « Supabase » : reportage_cfg.json présent → seul c.json (pièce témoin du code) est publié,
+    # les photos vivent chez Supabase, chiffrées. Sinon, mode « fichiers » : m.json + p*.bin publiés tels quels (chiffrés).
     repdir = os.environ.get("REPORTAGE_DIR") or os.path.join(ROOT, "reportage")
-    if os.path.isfile(os.path.join(repdir, "m.json")):
+    cloud = os.path.isfile(os.environ.get("REPORTAGE_CFG") or os.path.join(ROOT, "reportage_cfg.json"))
+    if cloud and os.path.isfile(os.path.join(repdir, "c.json")):
+        os.makedirs(os.path.join(WEB, "reportage"))
+        shutil.copy(os.path.join(repdir, "c.json"), os.path.join(WEB, "reportage", "c.json"))
+    elif not cloud and os.path.isfile(os.path.join(repdir, "m.json")):
         os.makedirs(os.path.join(WEB, "reportage"))
         for fn in sorted(os.listdir(repdir)):
             if fn == "m.json" or re.fullmatch(r"p[0-9a-f]{8}\.bin", fn):

@@ -13,6 +13,7 @@ Usage (depuis /home/claude/site_en_ligne) :
     python3 -I reportage_tool.py list
     python3 -I reportage_tool.py rm   pXXXXXXXX
     python3 -I reportage_tool.py clear            (vide tout le reportage : retire le dossier reportage/)
+    python3 -I reportage_tool.py canary           (mode Supabase : crée reportage/c.json, la « pièce témoin » qui vérifie le code ; une seule fois)
 Options : --dir DOSSIER (défaut reportage/), --code-file FICHIER, --code CODE (essai uniquement).
 """
 import argparse, base64, json, os, re, secrets, shutil, sys, unicodedata
@@ -71,7 +72,7 @@ def save_manifest(d, code, salt, items):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["add", "list", "rm", "clear"])
+    ap.add_argument("cmd", choices=["add", "list", "rm", "clear", "canary"])
     ap.add_argument("files", nargs="*")
     ap.add_argument("--dir", default=DEFAULT_DIR)
     ap.add_argument("--code-file", default=CODE_FILE)
@@ -86,6 +87,22 @@ def main():
         print("reportage vidé :", d)
         return
     code = read_code(args)
+    if args.cmd == "canary":
+        # mode « Supabase » : c.json = petit texte chiffré avec le code ; il sert à vérifier le code (invité·e·s et voyageurs) ; le sel est fixé une fois pour toutes
+        os.makedirs(d, exist_ok=True)
+        p = os.path.join(d, "c.json")
+        if os.path.exists(p):
+            m = json.load(open(p, encoding="utf-8"))
+            salt = base64.b64decode(m["s"])
+            AESGCM(key_for(code, salt)).decrypt(base64.b64decode(m["iv"]), base64.b64decode(m["ct"]), b"rep|c")
+            print("c.json existe déjà et correspond à ce code : rien à faire")
+            return
+        salt = secrets.token_bytes(16)
+        iv = secrets.token_bytes(12)
+        ct = AESGCM(key_for(code, salt)).encrypt(iv, b'{"ok":1}', b"rep|c")
+        json.dump({"v": 2, "it": ITER, "s": b64(salt), "iv": b64(iv), "ct": b64(ct)}, open(p, "w"), separators=(",", ":"))
+        print("c.json créé dans", d)
+        return
     salt, items = load(d, code)
     if args.cmd == "list":
         for it in items:

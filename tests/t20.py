@@ -54,18 +54,19 @@ with sync_playwright() as p:
         ok(pg.locator("#v-home #hq").count() == 1 and pg.inner_text("#hq-q").strip() != "", "[%s] mot de la mascotte présent" % tag)
         ok("mascotte" in pg.inner_text("#v-home .hq").lower() if pg.locator("#v-home .hq").count() else True, "[%s] bloc « mot de la mascotte »" % tag)
         over("accueil 1re visite"); shot("accueil_ouvert")
-        # ── 2) choisir un prénom : « Bonjour Flo ! » puis repli automatique
+        # ── 2) choisir un prénom : « Bonjour Flo ! » ; le bloc RESTE ouvert tant qu'on ne le referme pas
         pg.click('#who button[data-n="Flo"]'); pg.wait_for_timeout(120)
         ok("Flo" in pg.inner_text("#hello") and pg.is_visible("#who-box"), "[%s] juste après le clic : message affiché, bloc encore ouvert" % tag)
-        pg.wait_for_timeout(800)
-        ok(not pg.is_visible("#who-box") and pg.is_visible("#who-bar"), "[%s] repli automatique du bloc" % tag)
-        ok(pg.inner_text("#who-hi").strip() == "Bonjour Flo !", "[%s] ligne repliée : %r" % (tag, pg.inner_text("#who-hi")))
+        pg.wait_for_timeout(2500)
+        ok(pg.is_visible("#who-box") and pg.is_visible("#who-bar"), "[%s] 2,5 s après : toujours ouvert, ligne de repli visible" % tag)
+        ok(pg.inner_text("#who-hi").strip() == "Bonjour Flo !", "[%s] ligne : %r" % (tag, pg.inner_text("#who-hi")))
         ok(pg.inner_text("#who-av").strip() == "F", "[%s] pastille F : %r" % (tag, pg.inner_text("#who-av")))
-        ok(pg.get_attribute("#who-bar", "aria-expanded") == "false", "[%s] aria-expanded=false une fois replié" % tag)
+        ok(pg.get_attribute("#who-bar", "aria-expanded") == "true", "[%s] aria-expanded=true tant qu'il est ouvert" % tag)
         ok(pg.evaluate("localStorage.getItem('carnet.who')") == "Flo", "[%s] prénom enregistré" % tag)
-        ok(pg.evaluate("document.activeElement && document.activeElement.id") == "who-bar", "[%s] le focus passe sur la ligne repliée" % tag)
-        ok(pg.evaluate("window.scrollY") == 0, "[%s] pas de saut de page au repli" % tag)
-        over("accueil replié"); shot("accueil_replie")
+        ok(pg.evaluate("window.scrollY") == 0, "[%s] pas de saut de page" % tag)
+        over("accueil ouvert après choix"); shot("accueil_replie")
+        pg.click("#who-bar"); pg.wait_for_timeout(150)
+        ok(not pg.is_visible("#who-box") and pg.get_attribute("#who-bar", "aria-expanded") == "false", "[%s] la ligne referme le bloc" % tag)
         # ── 3) rouvrir / refermer
         pg.click("#who-bar"); pg.wait_for_timeout(150)
         ok(pg.is_visible("#who-box") and pg.get_attribute("#who-bar", "aria-expanded") == "true", "[%s] la ligne rouvre le bloc" % tag)
@@ -77,8 +78,10 @@ with sync_playwright() as p:
         # ── 4) changer de prénom
         pg.click("#who-bar"); pg.wait_for_timeout(100)
         pg.click('#who button[data-n="Arthur"]'); pg.wait_for_timeout(900)
-        ok(not pg.is_visible("#who-box") and pg.inner_text("#who-hi").strip() == "Bonjour Arthur !" and pg.inner_text("#who-av").strip() == "A",
-           "[%s] changement de prénom → Arthur, replié : %r" % (tag, pg.inner_text("#who-hi")))
+        ok(pg.is_visible("#who-box") and pg.inner_text("#who-hi").strip() == "Bonjour Arthur !" and pg.inner_text("#who-av").strip() == "A",
+           "[%s] changement de prénom → Arthur, bloc ouvert : %r" % (tag, pg.inner_text("#who-hi")))
+        pg.click("#who-bar"); pg.wait_for_timeout(150)
+        ok(not pg.is_visible("#who-box"), "[%s] refermé à la main" % tag)
         ok(pg.evaluate("localStorage.getItem('carnet.who')") == "Arthur", "[%s] prénom Arthur enregistré" % tag)
         # ── 5) clavier : Entrée sur la ligne
         pg.focus("#who-bar"); pg.keyboard.press("Enter"); pg.wait_for_timeout(120)

@@ -5,6 +5,22 @@ from build_site import icon
 import build_app as A
 
 
+def cfg_script():
+    """Mode Supabase : l'adresse du projet et la clé PUBLIQUE (faite pour être dans le site). Refuse toute clé « secrète »."""
+    import base64, json, os
+    path = os.environ.get("REPORTAGE_CFG") or os.path.join(A.ROOT, "reportage_cfg.json")
+    if not os.path.isfile(path):
+        return ""
+    cfg = json.load(open(path, encoding="utf-8"))
+    url, key = cfg["url"].rstrip("/"), cfg["key"].strip()
+    assert url.startswith("https://") or url.startswith("http://127.0.0.1"), "adresse du projet invalide"
+    assert key and not key.startswith("sb_secret_"), "clé secrète refusée : il faut la clé publique"
+    if key.startswith("eyJ"):
+        payload = json.loads(base64.urlsafe_b64decode(key.split(".")[1] + "=="))
+        assert payload.get("role") == "anon", "cette clé n'est pas la clé publique (role=%s) : refusée" % payload.get("role")
+    return '<script type="application/json" id="rep-cfg">%s</script>' % json.dumps({"url": url, "key": key}, separators=(",", ":"))
+
+
 def home_cards():
     """Deux cartes sous les rubriques de l'accueil ; le style n'en montre qu'une, selon le prénom choisi (html.is-trav / html.is-guest)."""
     return ('<a class="phc phc-trav" href="#/photo-invites">%s<span><b>%s</b><small>%s</small></span>%s</a>'
@@ -14,7 +30,7 @@ def home_cards():
 
 
 def view_photoinv():
-    out = ('<main class="view" id="v-photoinv" hidden>' + A.back_head("Photo pour les invités", "Un polaroïd pour ceux qui sont restés", "#/") + '<div class="wrap">')
+    out = (cfg_script() + '<main class="view" id="v-photoinv" hidden>' + A.back_head("Photo pour les invités", "Un polaroïd pour ceux qui sont restés", "#/") + '<div class="wrap">')
     out += ('<section class="bubble sand pi" aria-labelledby="pi-h"><h2 id="pi-h">%s</h2>'
             '<p>%s</p>'
             '<label class="btn pi-pick" for="pi-file">%s%s</label>'
@@ -24,17 +40,25 @@ def view_photoinv():
             '<label class="pi-f"><span>%s</span><input id="pi-cap" type="text" maxlength="70" autocomplete="off" placeholder="%s"></label>'
             '<label class="pi-f"><span>%s</span><input id="pi-date" type="date"></label>'
             '<div class="pi-prev"><canvas id="pi-cv" width="1080" height="1500" aria-label="Aperçu du polaroïd"></canvas></div>'
+            '<div class="pi-pub" id="pi-pub" hidden>'
+            '<button class="btn pi-publish" type="button" id="pi-publish">%s</button>'
+            '<div class="pi-codebox" id="pi-code-box" hidden><label class="pi-f"><span>%s</span>'
+            '<input id="pi-code" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="%s"></label>'
+            '<button class="btn sm" type="button" id="pi-code-ok">%s</button></div>'
+            '<p class="pi-pst" id="pi-pst" role="status"></p></div>'
             '<div class="pi-btns"><button class="btn" type="button" id="pi-share">%s%s</button>'
             '<button class="btn alt" type="button" id="pi-save">%s%s</button></div>'
             '<p class="pi-send" id="pi-send"></p>'
             '<button class="btn sm alt" type="button" id="pi-again">%s</button></div>'
             '</section>'
+            '<section class="bubble sand pi-mine" id="pi-mine" aria-labelledby="pi-mh" hidden><h2 id="pi-mh">%s</h2><ul id="pi-mine-ul"></ul></section>'
             '<a class="pi-rep" href="#/reportage">%s<span>%s</span></a>'
             % (A.txt("Fais un polaroïd"),
                A.txt("Choisis une photo et écris une légende : l’appli fabrique un polaroïd à partager. Tes photos du jour, elles, restent entre vous."),
                icon("camera"), A.txt("Choisir une photo"),
                A.txt("Légende"), A.txt("Ex. Le coucher de soleil au Wat Saket"), A.txt("Date de la photo"),
-               icon("go"), A.txt("Partager"), icon("save"), A.txt("Enregistrer"), A.txt("Une autre photo"),
+               A.txt("Publier chez les invité·e·s"), A.txt("Le code des invité·e·s"), A.txt("Le code"), A.txt("Valider"),
+               icon("go"), A.txt("Partager"), icon("save"), A.txt("Enregistrer"), A.txt("Une autre photo"), A.txt("Mes polaroïds publiés"),
                icon("image"), A.txt("Voir le reportage tel que les invités le voient")))
     return out + '</div></main>'
 

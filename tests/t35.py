@@ -46,8 +46,13 @@ with sync_playwright() as p:
 
     # ───── B. choisir « invité·e » : tout le site, sans enveloppe, sans horoscope du jour, sans rôles ─────
     btns.nth(4).click(); pg.wait_for_timeout(3500)
-    check("B0 3,5 s après : le bloc est encore ouvert, la phrase se lit", vis(pg, "#who-box") and "réservés aux voyageurs" in sp(pg.inner_text("#who-box")) and not vis(pg, "#who-bar"))
+    check("B0 3,5 s après : le bloc est encore ouvert, la phrase se lit, la ligne « Bienvenue » est là pour le refermer", vis(pg, "#who-box") and "réservés aux voyageurs" in sp(pg.inner_text("#who-box")) and vis(pg, "#who-bar"))
     pg.wait_for_timeout(5000)
+    check("B0b 8,5 s après : toujours ouvert (il ne se referme pas tout seul)", vis(pg, "#who-box"))
+    pg.wait_for_timeout(12000)
+    check("B0c 20 s après : toujours ouvert", vis(pg, "#who-box") and vis(pg, "#who-bar"))
+    pg.click("#who-bar"); pg.wait_for_timeout(400)
+    check("B0d il se replie quand l'invité·e touche la ligne « Bienvenue »", not vis(pg, "#who-box") and vis(pg, "#who-bar"))
     check("B1 la classe is-guest est posée", pg.evaluate("document.documentElement.classList.contains('is-guest')"))
     check("B2 mémoire : carnet.who = Invité", pg.evaluate("localStorage.getItem('carnet.who')") == "Invité")
     check("B3 le bandeau replié dit bonjour à l'invité·e", vis(pg, "#who-bar") and "bienvenue" in pg.inner_text("#who-hi").lower(), pg.inner_text("#who-hi"))

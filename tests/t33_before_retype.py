@@ -1,0 +1,329 @@
+# -*- coding: utf-8 -*-
+"""Enveloppes secrètes, SIMULATION (#/essai) : code, serment (1 s), mission, mots de la vague 2, révélation, effacement, remise à zéro.
+Faux téléphone 390×844 et 320×568. Les captures vont dans le dossier des tests pour être regardées."""
+import sys, re, json
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from playwright.sync_api import sync_playwright
+BASE = "http://127.0.0.1:8765/carnet-thailande-/"
+OUT = "/tmp/claude-0/-home-claude/508b3527-b55f-5958-8651-8d8ffebe2ce6/scratchpad/t/"
+ok_n = fail_n = 0
+errs = []
+def check(name, cond, info=""):
+    global ok_n, fail_n
+    if cond: ok_n += 1
+    else:
+        fail_n += 1; print("  ✗", name, info)
+def ms(y, mo, d, h, mi, s=0, tz="Asia/Bangkok"):
+    return datetime(y, mo, d, h, mi, s, tzinfo=ZoneInfo(tz))
+def sp(s): return s.replace("\u00a0", " ").replace("\u202f", " ")
+
+def newctx(b, vw=390, vh=844, clock=None, init=None):
+    ctx = b.new_context(viewport={"width": vw, "height": vh}, device_scale_factor=2, is_mobile=vw < 700, has_touch=True, locale="fr-FR", timezone_id="Asia/Bangkok", service_workers="block")
+    pg = ctx.new_page()
+    pg.on("pageerror", lambda e: errs.append(str(e)))
+    pg.on("console", lambda m: errs.append(m.text) if m.type == "error" else None)
+    if init: pg.add_init_script(init)
+    if clock is not None: pg.clock.install(time=clock)
+    return ctx, pg
+
+def go(pg, h):
+    pg.evaluate("location.hash=%r" % h); pg.wait_for_timeout(250)
+def vis(pg, sel): return pg.is_visible(sel)
+def pane(pg):
+    for p in ("code", "chut", "card", "sealed", "rev", "bad"):
+        if pg.is_visible("#envp-" + p): return p
+    return None
+def ls(pg, k): return pg.evaluate("k => localStorage.getItem(k)", k)
+def keys(pg, prefix): return pg.evaluate("p => Object.keys(localStorage).filter(k => k.indexOf(p) === 0)", prefix)
+def hold(pg, ms_=1250, fake=False):
+    bb = pg.locator("#env-hold").bounding_box()
+    pg.mouse.move(bb["x"] + bb["width"] / 2, bb["y"] + bb["height"] / 2); pg.mouse.down()
+    if fake: pg.clock.run_for(ms_)
+    else: pg.wait_for_timeout(ms_)
+    pg.mouse.up(); pg.wait_for_timeout(150)
+def type_code(pg, code):
+    pg.fill("#env-in", code); pg.click("#env-go"); pg.wait_for_timeout(900)
+def overflow(pg): return pg.evaluate("document.documentElement.scrollWidth > innerWidth + 1")
+def open_sim(pg):
+    pg.click("#sim-env-btn"); pg.wait_for_timeout(250)
+
+with sync_playwright() as p:
+    b = p.chromium.launch()
+
+    # ───── A. la page d'essai ─────
+    ctx, pg = newctx(b)
+    pg.goto(BASE + "#/essai", wait_until="load"); pg.wait_for_timeout(500)
+    check("A1 la page d'essai s'affiche", vis(pg, "#v-essai") and not vis(pg, "#v-home"))
+    check("A2 titre de l'onglet", "essai des enveloppes" in pg.title().lower(), pg.title())
+    check("A3 trois jeux et quatre heures à choisir", pg.locator("[data-sw]").count() == 3 and pg.locator("[data-st]").count() == 4)
+    check("A4 par défaut : jeu 1, « Pendant », enveloppe visible", pg.get_attribute('[data-sw="1"]', "aria-pressed") == "true" and pg.get_attribute('[data-st="1"]', "aria-pressed") == "true" and vis(pg, "#sim-env-btn"))
+    check("A5 le point qui clignote est là (rien d'ouvert encore)", vis(pg, "#sim-env-btn .dot"))
+    check("A6 l'overlay est fermé", not vis(pg, "#env"))
+    check("A7 le code de l'essai est écrit sur la page", "essai-demo-0000" in pg.inner_text("#v-essai"))
+    check("A8 aucun débordement horizontal", not overflow(pg))
+    pg.screenshot(path=OUT + "env_sim_page.png", full_page=True)
+    # avant / après : l'enveloppe disparaît
+    pg.click('[data-st="0"]'); pg.wait_for_timeout(100)
+    check("A9 « Avant » : plus d'enveloppe", not vis(pg, "#sim-env-btn"))
+    pg.click('[data-st="3"]'); pg.wait_for_timeout(100)
+    check("A10 « Après » : plus d'enveloppe", not vis(pg, "#sim-env-btn"))
+    pg.click('[data-st="1"]'); pg.wait_for_timeout(100)
+    check("A11 retour à « Pendant » : l'enveloppe revient", vis(pg, "#sim-env-btn"))
+    pg.reload(wait_until="load"); pg.wait_for_timeout(400)
+    check("A12 le choix est gardé après un rechargement", pg.get_attribute('[data-st="1"]', "aria-pressed") == "true")
+    ctx.close()
+
+    # ───── B. vague 1 : la cacahuète ─────
+    ctx, pg = newctx(b)
+    pg.goto(BASE + "#/essai", wait_until="load"); pg.wait_for_timeout(500)
+    open_sim(pg)
+    check("B1 l'écran secret s'ouvre sur le code", vis(pg, "#env") and pane(pg) == "code")
+    check("B2 l'aide de l'essai donne le code", vis(pg, "#env-simhint") and "essai-demo-0000" in pg.inner_text("#env-simhint"))
+    check("B3 le champ est actif (le clavier s'ouvre)", pg.evaluate("document.activeElement && document.activeElement.id") == "env-in")
+    pg.screenshot(path=OUT + "env_b1_code.png")
+    pg.fill("#env-in", ""); pg.click("#env-go"); pg.wait_for_timeout(300)
+    check("B4 code vide : message", "code de ta carte" in sp(pg.inner_text("#env-err")), pg.inner_text("#env-err"))
+    type_code(pg, "abracadabra")
+    check("B5 mauvais code : message, on reste sur le code", pane(pg) == "code" and "pas le bon code" in sp(pg.inner_text("#env-err")), pg.inner_text("#env-err"))
+    check("B6 mauvais code : rien n'est gardé", keys(pg, "carnet.sim.k.") == [])
+    check("B7 le bouton est de nouveau utilisable", pg.is_enabled("#env-go") and "Ouvrir" in pg.inner_text("#env-go"))
+    pg.screenshot(path=OUT + "env_b2_code_faux.png")
+    pg.click("#env-fill"); pg.wait_for_timeout(100)
+    check("B8 « Le remplir pour moi » écrit le code", pg.input_value("#env-in") == "essai-demo-0000")
+    type_code(pg, "  Essai-DÉMO 0000 ")
+    check("B9 le bon code (majuscules, accents, espaces sans importance) mène au serment", pane(pg) == "chut", pane(pg))
+    check("B10 la clé est gardée sur le téléphone, pas le code", len(keys(pg, "carnet.sim.k.")) == 1 and "essai" not in (ls(pg, "carnet.sim.k.Mangue") or "").lower())
+    txt = sp(pg.inner_text("#chut-txt"))
+    check("B11 serment de Boop", txt.startswith("Chut ! Cette enveloppe est pour toi") and "Maintiens le doigt une seconde pour jurer." in txt, txt)
+    check("B12 la mascotte du serment est Boop", pg.locator('#chut-pics img[src$="doudou_boop.webp"]').count() == 1)
+    check("B13 l'image de Boop est bien chargée", pg.evaluate("document.querySelector('#chut-pics img').naturalWidth > 10"))
+    pg.screenshot(path=OUT + "env_b3_serment.png")
+    # un appui court ne suffit pas
+    bb = pg.locator("#env-hold").bounding_box()
+    pg.mouse.move(bb["x"] + 40, bb["y"] + 30); pg.mouse.down(); pg.wait_for_timeout(300); pg.mouse.up(); pg.wait_for_timeout(1000)
+    check("B14 un appui court ne jure pas : on reste sur le serment", pane(pg) == "chut", pane(pg))
+    # on lâche en route
+    pg.mouse.move(bb["x"] + 40, bb["y"] + 30); pg.mouse.down(); pg.wait_for_timeout(700); pg.mouse.up(); pg.wait_for_timeout(700)
+    check("B15 lâcher avant la fin annule le serment", pane(pg) == "chut", pane(pg))
+    hold(pg)
+    check("B16 maintenir une seconde ouvre la mission", pane(pg) == "card", pane(pg))
+    check("B17 titre de la mission", sp(pg.inner_text("#card-title")).lower() == "tu es le gorille de litchi.", pg.inner_text("#card-title"))
+    check("B18 trois attentions", pg.locator("#card-items li").count() == 3)
+    check("B19 Boop parle dans la mission", pg.locator('#card-say img[src$="doudou_boop.webp"]').count() == 1 and "simulation" in pg.inner_text("#card-say"))
+    check("B20 le petit texte de fin parle de la chambre", "chambre" in pg.inner_text("#card-foot"))
+    check("B21 pas de tableau de bord des mots pour la cacahuète", not vis(pg, "#env-dock"))
+    check("B22 la barre de temps est visible", vis(pg, ".env-bar"))
+    check("B23 pas de débordement horizontal", not overflow(pg) and pg.evaluate("document.querySelector('#env-scroll').scrollWidth <= document.querySelector('#env-scroll').clientWidth + 1"))
+    check("B24 le point clignotant est parti une fois ouverte", ls(pg, "carnet.sim.o.Mangue.w1") == "1")
+    pg.screenshot(path=OUT + "env_b4_mission.png")
+    # refermer
+    pg.click("#card-close"); pg.wait_for_timeout(250)
+    check("B25 « Refermer » : écran de l'enveloppe refermée", pane(pg) == "sealed" and "19 h" in sp(pg.inner_text("#sealed-p")), pg.inner_text("#sealed-p"))
+    check("B26 la mission n'est plus dans la page", pg.inner_text("#card-items").strip() == "" and pg.inner_text("#card-title").strip() == "" and pg.inner_text("#card-say").strip() == "")
+    html_now = pg.content()
+    check("B27 aucun texte de la mission dans le code de la page", "Fais apparaître une banane" not in html_now and "gorille de Litchi" not in pg.inner_text("#env"))
+    pg.screenshot(path=OUT + "env_b5_refermee.png")
+    pg.click("#sealed-open"); pg.wait_for_timeout(500)
+    check("B28 rouvrir : plus de code à retaper, on repasse par le serment", pane(pg) == "chut", pane(pg))
+    pg.click("#env-x"); pg.wait_for_timeout(250)
+    check("B29 la croix ferme tout", not vis(pg, "#env") and vis(pg, "#sim-env-btn"))
+    check("B30 le point clignotant a disparu du bouton", not vis(pg, "#sim-env-btn .dot"))
+    check("B31 la page peut défiler de nouveau", pg.evaluate("getComputedStyle(document.documentElement).overflow") != "hidden")
+    # quitter l'appli referme l'enveloppe
+    open_sim(pg); hold(pg)
+    check("B32 enveloppe rouverte jusqu'à la mission", pane(pg) == "card", pane(pg))
+    pg.evaluate("Object.defineProperty(document, 'hidden', {value: true, configurable: true}); document.dispatchEvent(new Event('visibilitychange'))")
+    pg.wait_for_timeout(250)
+    check("B33 quitter l'appli referme et efface tout", not vis(pg, "#env") and pg.inner_text("#card-items").strip() == "")
+    pg.evaluate("Object.defineProperty(document, 'hidden', {value: false, configurable: true})")
+    # la touche Échap
+    open_sim(pg); pg.keyboard.press("Escape"); pg.wait_for_timeout(200)
+    check("B34 la touche Échap ferme", not vis(pg, "#env"))
+    ctx.close()
+
+    # ───── C. vague 2 : le killer sans victime (les mots) ─────
+    ctx, pg = newctx(b)
+    pg.goto(BASE + "#/essai", wait_until="load"); pg.wait_for_timeout(500)
+    pg.click('[data-sw="2"]'); pg.wait_for_timeout(100)
+    check("C1 le texte du jeu 2 s'affiche", "Mot dit" in pg.inner_text("#sim-w-desc"))
+    open_sim(pg); type_code(pg, "essai-demo-0000")
+    check("C2 serment de Minou", pane(pg) == "chut" and "n’existe pas" in sp(pg.inner_text("#chut-txt")).replace("'", "’") and pg.locator('#chut-pics img[src$="doudou_minou.webp"]').count() == 1)
+    hold(pg)
+    check("C3 mission du killer", pane(pg) == "card" and "cible" in pg.inner_text("#card-title").lower() and pg.locator("#card-items li").count() == 6)
+    check("C4 le tableau de bord des mots est visible", vis(pg, "#env-dock") and sp(pg.inner_text("#ed-word")) == "kangourou", pg.inner_text("#ed-word"))
+    check("C5 score à zéro, « Annuler » inactif", pg.inner_text("#ed-n") == "0" and "mot dit" in pg.inner_text("#ed-nl") and pg.is_disabled("#ed-undo"))
+    pg.screenshot(path=OUT + "env_c1_chasse.png")
+    quips = []
+    pg.click("#ed-ok"); pg.wait_for_timeout(120)
+    check("C6 « Mot dit ! » : un autre mot arrive", sp(pg.inner_text("#ed-word")) == "parapluie", pg.inner_text("#ed-word"))
+    check("C7 le score passe à 1 (singulier)", pg.inner_text("#ed-n") == "1" and pg.inner_text("#ed-nl") == "mot dit")
+    q = sp(pg.inner_text("#ed-qt")); quips.append(q)
+    check("C8 Minou réagit", len(q) > 5 and vis(pg, "#ed-qb"), q)
+    for i in range(3):
+        pg.click("#ed-ok"); pg.wait_for_timeout(80); quips.append(sp(pg.inner_text("#ed-qt")))
+    check("C9 jamais deux fois la même réplique de suite", all(quips[i] != quips[i + 1] for i in range(len(quips) - 1)), quips)
+    pg.click("#ed-ok"); pg.wait_for_timeout(150)
+    check("C10 cinq mots dits : pluriel", pg.inner_text("#ed-n") == "5" and pg.inner_text("#ed-nl") == "mots dits")
+    check("C11 le mot affiché est le sixième", sp(pg.inner_text("#ed-word")) == "marmotte", pg.inner_text("#ed-word"))
+    check("C12 des confettis aux cinq mots", pg.evaluate("document.querySelectorAll('canvas').length") >= 1)
+    pg.click("#ed-skip"); pg.wait_for_timeout(100)
+    check("C13 « Passer ce mot » : mot suivant, score inchangé", sp(pg.inner_text("#ed-word")) == "spaghetti" and pg.inner_text("#ed-n") == "5", pg.inner_text("#ed-word"))
+    check("C14 réplique de Minou quand on passe", "Passer est permis" in sp(pg.inner_text("#ed-qt")))
+    pg.click("#ed-undo"); pg.wait_for_timeout(100)
+    check("C15 « Annuler le dernier » après un passage : revient au mot passé, score inchangé", sp(pg.inner_text("#ed-word")) == "marmotte" and pg.inner_text("#ed-n") == "5")
+    pg.click("#ed-undo"); pg.wait_for_timeout(100)
+    check("C16 annuler un mot dit : le score redescend", pg.inner_text("#ed-n") == "4" and sp(pg.inner_text("#ed-word")) == "xylophone", pg.inner_text("#ed-word"))
+    check("C17 réplique d'annulation", "Revenir en arrière" in sp(pg.inner_text("#ed-qt")))
+    st = json.loads(ls(pg, "carnet.sim.h.Mangue.w2"))
+    check("C18 l'état est gardé sur le téléphone (position, score, historique)", st["i"] == 4 and st["n"] == 4 and st["h"] == ["s", "s", "s", "s"], st)
+    # le tableau de bord ne cache pas la fin de la mission
+    pg.evaluate("document.querySelector('#env-scroll').scrollTop = 99999"); pg.wait_for_timeout(150)
+    r = pg.evaluate("""() => { const li = [...document.querySelectorAll('#card-items li')].pop().getBoundingClientRect(), d = document.querySelector('#env-dock').getBoundingClientRect(); return [li.bottom, d.top]; }""")
+    check("C19 en bas de page, la dernière règle reste au-dessus du tableau de bord", r[0] <= r[1] + 1, r)
+    pg.screenshot(path=OUT + "env_c2_chasse_bas.png")
+    # fermer, rouvrir : l'état est repris
+    pg.click("#env-x"); pg.wait_for_timeout(200)
+    open_sim(pg); hold(pg)
+    check("C20 rouvert : même mot, même score", pane(pg) == "card" and sp(pg.inner_text("#ed-word")) == "xylophone" and pg.inner_text("#ed-n") == "4", pg.inner_text("#ed-word"))
+    # épuiser les mots
+    for i in range(7):
+        if not pg.is_disabled("#ed-skip"): pg.click("#ed-skip"); pg.wait_for_timeout(40)
+    check("C21 plus de mots : message de Minou, boutons inactifs", pg.is_disabled("#ed-ok") and pg.is_disabled("#ed-skip") and "sans voix" in sp(pg.inner_text("#ed-qt")), pg.inner_text("#ed-qt"))
+    check("C22 on peut encore annuler", not pg.is_disabled("#ed-undo"))
+    pg.click("#ed-undo"); pg.wait_for_timeout(80)
+    check("C23 annuler rend le dernier mot", not pg.is_disabled("#ed-ok") and sp(pg.inner_text("#ed-word")) == "cornichon", pg.inner_text("#ed-word"))
+    pg.click("#env-x"); pg.wait_for_timeout(150)
+    # révélation
+    pg.click('[data-st="2"]'); pg.wait_for_timeout(100)
+    check("C24 à l'heure des aveux, le point clignote de nouveau", vis(pg, "#sim-env-btn .dot"))
+    open_sim(pg)
+    check("C25 la révélation s'ouvre directement", pane(pg) == "rev", pane(pg))
+    check("C26 voix de Minou", "tribunal" in pg.inner_text("#rev-say") and pg.locator('#rev-say img[src$="doudou_minou.webp"]').count() == 1)
+    rows = pg.locator("#rev-tbl tbody tr")
+    check("C27 quatre lignes, ma ligne mise en valeur", rows.count() == 4 and pg.locator("#rev-tbl tr.me").count() == 1 and "Mangue" in pg.inner_text("#rev-tbl tr.me"))
+    check("C28 mon score est rappelé", "Ton score" in pg.inner_text("#rev-score") and "mot" in pg.inner_text("#rev-score"), pg.inner_text("#rev-score"))
+    check("C29 pas de tableau de bord à la révélation", not vis(pg, "#env-dock"))
+    pg.screenshot(path=OUT + "env_c3_revelation.png")
+    pg.click("#rev-close"); pg.wait_for_timeout(150)
+    check("C30 une fois vue, le point disparaît", not vis(pg, "#sim-env-btn .dot"))
+    # fin : tout s'efface
+    pg.click('[data-st="3"]'); pg.wait_for_timeout(150)
+    check("C31 après : plus de clé, plus de score, plus de trace", keys(pg, "carnet.sim.k.") == [] and keys(pg, "carnet.sim.h.") == [] and keys(pg, "carnet.sim.o.") == [] and keys(pg, "carnet.sim.r.") == [], keys(pg, "carnet.sim."))
+    pg.click('[data-st="1"]'); pg.wait_for_timeout(150)
+    open_sim(pg)
+    check("C32 revenu en arrière : le code est redemandé", pane(pg) == "code", pane(pg))
+    type_code(pg, "essai-demo-0000"); hold(pg)
+    check("C33 et le score repart de zéro", sp(pg.inner_text("#ed-word")) == "kangourou" and pg.inner_text("#ed-n") == "0", pg.inner_text("#ed-word"))
+    ctx.close()
+
+    # ───── D. vague 3 : un rôle à jouer (deux mascottes) ─────
+    ctx, pg = newctx(b)
+    pg.goto(BASE + "#/essai", wait_until="load"); pg.wait_for_timeout(500)
+    pg.click('[data-sw="3"]'); pg.wait_for_timeout(100)
+    open_sim(pg); type_code(pg, "essai-demo-0000")
+    check("D1 serment : Moomoo et Aftonsparv", pane(pg) == "chut" and pg.locator("#chut-pics img").count() == 2 and "autodétruit" in pg.inner_text("#chut-txt").replace("’", ""), pg.inner_text("#chut-txt"))
+    hold(pg)
+    check("D2 mission : deux bulles, trois consignes, pas de mots à compter", pane(pg) == "card" and pg.locator("#card-say .env-sp").count() == 2 and pg.locator("#card-items li").count() == 3 and not vis(pg, "#env-dock"))
+    check("D3 titre", "parapluie" in pg.inner_text("#card-title").lower())
+    pg.screenshot(path=OUT + "env_d1_role.png")
+    pg.click("#env-x"); pg.wait_for_timeout(150)
+    pg.click('[data-st="2"]'); pg.wait_for_timeout(100)
+    check("D4 heure des aveux du réveillon : 20 h", "20 h" in pg.inner_text("#sim-t-desc"), pg.inner_text("#sim-t-desc"))
+    open_sim(pg)
+    check("D5 révélation : « Moomoo et Aftonsparv » parlent", pane(pg) == "rev" and "moomoo et aftonsparv" in sp(pg.inner_text("#rev-say")).lower() and pg.locator("#rev-say img").count() == 2, pg.inner_text("#rev-say"))
+    check("D6 pas de score pour ce jeu", not vis(pg, "#rev-score"))
+    check("D7 quatre rôles", pg.locator("#rev-tbl tbody tr").count() == 4)
+    pg.screenshot(path=OUT + "env_d2_revelation.png")
+    ctx.close()
+
+    # ───── E. remise à zéro ─────
+    ctx, pg = newctx(b)
+    pg.goto(BASE + "#/essai", wait_until="load"); pg.wait_for_timeout(500)
+    pg.click('[data-sw="2"]'); open_sim(pg); type_code(pg, "essai-demo-0000"); hold(pg); pg.click("#ed-ok"); pg.click("#env-x"); pg.wait_for_timeout(150)
+    check("E1 l'essai a laissé des traces", len(keys(pg, "carnet.sim.")) >= 4, keys(pg, "carnet.sim."))
+    pg.click("#sim-reset"); pg.wait_for_timeout(100)
+    check("E2 un premier toucher demande confirmation", "encore" in pg.inner_text("#sim-reset").lower() and len(keys(pg, "carnet.sim.")) >= 4)
+    pg.click("#sim-reset"); pg.wait_for_timeout(200)
+    check("E3 le second efface tout et revient au jeu 1 « Pendant »", keys(pg, "carnet.sim.") == ["carnet.sim.sel"] and ls(pg, "carnet.sim.sel") == "1:1" and pg.get_attribute('[data-sw="1"]', "aria-pressed") == "true", keys(pg, "carnet.sim."))
+    ctx.close()
+
+    # ───── F. l'accueil : rien ne change tant que le vrai jeu n'est pas publié ─────
+    ctx, pg = newctx(b)
+    pg.goto(BASE, wait_until="load"); pg.wait_for_timeout(500)
+    check("F1 accueil : pas d'enveloppe (le vrai jeu n'est pas publié)", not vis(pg, "#env-btn") and pg.evaluate("JSON.parse(document.getElementById('env-data').textContent).real") is None)
+    pg.click('#who button[data-n="Anne"]'); pg.wait_for_timeout(900)
+    check("F2 choisir son prénom marche toujours", vis(pg, "#who-bar") and "Anne" in pg.inner_text("#who-hi"))
+    check("F3 le bandeau et la rangée du prénom sont alignés", pg.evaluate("document.querySelector('.who-row').getBoundingClientRect().width > 300"))
+    pg.evaluate("location.hash = '#/essai'"); pg.wait_for_timeout(250)
+    check("F4 la page d'essai ne dépend pas du prénom de l'accueil", vis(pg, "#sim-env-btn"))
+    pg.evaluate("localStorage.setItem('carnet.open','1')"); pg.reload(wait_until="load"); pg.wait_for_timeout(400)
+    pg.evaluate("location.hash = '#/essai'"); pg.wait_for_timeout(250)
+    pg.click('[data-st="0"]'); pg.wait_for_timeout(100)
+    check("F5 le mot secret du mode essai n'ouvre rien : « Avant » reste vide", not vis(pg, "#sim-env-btn"))
+    ctx.close()
+
+    # ───── G. enveloppes illisibles dans les fichiers publiés ─────
+    page = open("/home/claude/site_en_ligne/web/index.html", encoding="utf-8").read()
+    for needle in ["Fais apparaître une banane", "kangourou", "trottinette", "cornichon", "La lanterne", "Le tapis volant", "Brouille les pistes", "sans voix"]:
+        check("G1 « %s » n'est pas en clair dans index.html" % needle, needle not in page)
+    m = re.search(r'<script type="application/json" id="env-data">(.*?)</script>', page, re.S)
+    d = json.loads(m.group(1))
+    check("G2 une enveloppe par jeu pour la seule personne de l'essai", set(d["sim"]["b"]) == {"Mangue"} and set(d["sim"]["b"]["Mangue"]) == {"w1", "w2", "w3"})
+    check("G3 le vrai jeu est vide", d["real"] is None)
+    check("G4 pas de balise fermante de script dans les données", "</" not in m.group(1))
+
+    # ───── H. petit téléphone (320×568) ─────
+    ctx, pg = newctx(b, vw=320, vh=568)
+    pg.goto(BASE + "#/essai", wait_until="load"); pg.wait_for_timeout(500)
+    check("H1 page d'essai sans débordement à 320 px", not overflow(pg))
+    pg.screenshot(path=OUT + "env_h1_page_320.png", full_page=True)
+    pg.click('[data-sw="2"]'); open_sim(pg)
+    pg.screenshot(path=OUT + "env_h2_code_320.png")
+    type_code(pg, "essai-demo-0000")
+    check("H3 serment sans débordement", not overflow(pg) and pane(pg) == "chut")
+    pg.screenshot(path=OUT + "env_h3_serment_320.png")
+    hold(pg)
+    check("H4 mission : tableau de bord visible en bas", pane(pg) == "card" and vis(pg, "#env-dock"))
+    r = pg.evaluate("() => { const d = document.querySelector('#env-dock').getBoundingClientRect(); return [d.top, d.bottom, innerHeight]; }")
+    check("H5 le tableau de bord tient dans l'écran et ne prend pas plus de la moitié", r[1] <= r[2] + 1 and (r[2] - r[0]) <= r[2] * 0.52, r)
+    pg.screenshot(path=OUT + "env_h4_mission_320.png")
+    pg.evaluate("document.querySelector('#env-scroll').scrollTop = 99999"); pg.wait_for_timeout(150)
+    pg.screenshot(path=OUT + "env_h5_mission_bas_320.png")
+    ctx.close()
+
+    # ───── I. appareil trop ancien (pas de WebCrypto) ─────
+    ctx, pg = newctx(b, init="Object.defineProperty(window.crypto, 'subtle', {value: undefined, configurable: true})")
+    pg.goto(BASE + "#/essai", wait_until="load"); pg.wait_for_timeout(500)
+    open_sim(pg)
+    check("I1 sans WebCrypto : message clair, pas de plantage", pane(pg) == "bad" and "trop ancien" in pg.inner_text("#bad-p") and "oral" in pg.inner_text("#bad-p"), pg.inner_text("#bad-p"))
+    pg.click("#bad-close"); pg.wait_for_timeout(150)
+    check("I2 on peut fermer", not vis(pg, "#env"))
+    ctx.close()
+
+    # ───── J. l'enveloppe se referme toute seule (horloge simulée) ─────
+    ctx, pg = newctx(b, clock=ms(2026, 11, 21, 12, 0))
+    pg.goto(BASE + "#/essai", wait_until="load"); pg.wait_for_timeout(600)
+    open_sim(pg); type_code(pg, "essai-demo-0000")
+    hold(pg, 1100, fake=True)
+    check("J1 mission ouverte", pane(pg) == "card", pane(pg))
+    pg.clock.run_for(30000); pg.wait_for_timeout(100)
+    check("J2 après 30 s sans toucher : toujours ouverte", pane(pg) == "card")
+    pg.touchscreen.tap(200, 400); pg.wait_for_timeout(50)
+    pg.clock.run_for(30000); pg.wait_for_timeout(100)
+    check("J3 un toucher relance le compte à rebours", pane(pg) == "card")
+    pg.clock.run_for(20000); pg.wait_for_timeout(150)
+    check("J4 45 s sans toucher : l'enveloppe se referme", pane(pg) == "sealed", pane(pg))
+    check("J5 et la mission est effacée de la page", pg.inner_text("#card-items").strip() == "")
+    pg.click("#sealed-open"); pg.wait_for_timeout(400)
+    check("J6 on peut rouvrir (serment)", pane(pg) == "chut")
+    pg.clock.run_for(50000); pg.wait_for_timeout(150)
+    check("J7 oublié sur le serment : se referme aussi", pane(pg) == "sealed", pane(pg))
+    ctx.close()
+
+    b.close()
+
+print("\nt33 : %d OK, %d échec(s)" % (ok_n, fail_n))
+if errs:
+    print("erreurs console/page :", sorted(set(errs))[:8])
+sys.exit(1 if fail_n or errs else 0)

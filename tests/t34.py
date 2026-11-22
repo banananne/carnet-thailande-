@@ -50,6 +50,10 @@ def start(b, t, who="Anne", tz="Asia/Bangkok", extra=None):
     if init: pg.add_init_script("if (!sessionStorage.getItem('_i')) { sessionStorage.setItem('_i', '1'); %s }" % ";".join(init))
     pg.goto(BASE, wait_until="load"); pg.wait_for_timeout(600)
     return ctx, pg
+def openwho(pg):
+    """« Qui es-tu ? » reste ouvert après un choix : on ne touche la ligne que s'il est replié"""
+    if not pg.is_visible("#who-box"):
+        pg.click("#who-bar"); pg.wait_for_timeout(300)
 def banner(pg): return vis(pg, "#env-btn")
 def btxt(pg): return sp(pg.inner_text("#env-btn"))
 
@@ -126,7 +130,7 @@ with sync_playwright() as p:
     pg.click("#env-x"); pg.wait_for_timeout(200)
 
     # ───── D. un autre prénom sur le même téléphone ─────
-    pg.click("#who-bar"); pg.wait_for_timeout(300)
+    openwho(pg)
     pg.click('#who button[data-n="Daphne"]'); pg.wait_for_timeout(900)
     check("D1 autre prénom : le bandeau est de nouveau « neuf »", banner(pg) and "Une enveloppe t’attend" in btxt(pg), btxt(pg))
     pg.click("#env-btn"); pg.wait_for_timeout(300)
@@ -139,7 +143,7 @@ with sync_playwright() as p:
     pg.click("#env-x"); pg.wait_for_timeout(200)
 
     # ───── E. l'heure de la révélation (vague 1) ─────
-    pg.click("#who-bar"); pg.wait_for_timeout(300); pg.click('#who button[data-n="Anne"]'); pg.wait_for_timeout(900)
+    openwho(pg); pg.click('#who button[data-n="Anne"]'); pg.wait_for_timeout(900)
     set_time(pg, at(2026, 12, 25, 19, 59))
     check("E1 25 décembre 19 h 59 : encore la mission", banner(pg) and "Ton enveloppe secrète" in btxt(pg))
     set_time(pg, at(2026, 12, 25, 20, 0))
@@ -154,14 +158,14 @@ with sync_playwright() as p:
     pg.click("#rev-close"); pg.wait_for_timeout(200)
     check("E6 une fois vue : « La révélation », sans point", "La révélation" in btxt(pg) and not vis(pg, "#env-btn .dot"), btxt(pg))
     # un téléphone qui n'a jamais ouvert son enveloppe : le code est demandé, puis la révélation
-    pg.click("#who-bar"); pg.wait_for_timeout(300); pg.click('#who button[data-n="Flo"]'); pg.wait_for_timeout(900)
+    openwho(pg); pg.click('#who button[data-n="Flo"]'); pg.wait_for_timeout(900)
     check("E7 Flo n'a jamais ouvert : « L'heure des aveux »", "L’heure des aveux" in btxt(pg), btxt(pg))
     pg.click("#env-btn"); pg.wait_for_timeout(500)
     check("E7a le code est demandé (rien de mis de côté)", pane(pg) == "code", pane(pg))
     type_code(pg, CODES["Flo"])
     check("E7b puis la révélation, directement (pas de serment)", pane(pg) == "rev" and pg.locator("#rev-tbl tr.me").count() == 1 and "Flo" in pg.inner_text("#rev-tbl tr.me"), pane(pg))
     pg.click("#rev-close"); pg.wait_for_timeout(200)
-    pg.click("#who-bar"); pg.wait_for_timeout(300); pg.click('#who button[data-n="Anne"]'); pg.wait_for_timeout(900)
+    openwho(pg); pg.click('#who button[data-n="Anne"]'); pg.wait_for_timeout(900)
 
     # ───── F. fin de la vague 1 : tout s'efface ─────
     set_time(pg, at(2026, 12, 26, 5, 0))

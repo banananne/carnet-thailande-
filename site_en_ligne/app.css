@@ -412,6 +412,8 @@ a.tag{text-decoration:none}
 .who button.guest:last-child:nth-child(odd){grid-column:1/-1}
 .who button.guest{background:rgba(204,217,244,.45)}
 html.is-guest .rl-box{display:none}
+/* invité·e·s : pas de photo du jour, de bingo, de carnet gourmand, de prix du voyage ni de blind test */
+html.is-guest .snap,html.is-guest a[href="#/bingo"],html.is-guest a[href="#/gourmand"],html.is-guest a[href="#/prix"],html.is-guest a[href="#/blind-test"]{display:none!important}
 
 /* invité·e : « En ce moment, là-bas » */
 .guest-now[hidden]{display:none}

@@ -86,6 +86,11 @@ function bump(id, cls, msg) {
   e.addEventListener("animationend", function () { e.classList.remove(cls); });
 }
 bump("mask", "wig", function () { var p = POL.get(); return "Sawasdee " + (p || "khrap / kha") + " !"; });
+/* le masque se prononce : « sawatdi » + le petit mot poli choisi (rien si aucun n'est choisi) ; la voix et l'erreur sont gérées par say() */
+(function () {
+  var m = $("#mask"); if (!m) return;
+  m.addEventListener("click", function () { say("สวัสดี" + POL.th(false), null, true); });
+})();
 
 /* ───────────── qui es-tu ───────────── */
 var who = $("#who"), hello = $("#hello"), whoBox = $("#who-box"), whoBar = $("#who-bar"), whoHi = $("#who-hi"), whoAv = $("#who-av"), whoT = 0;
@@ -116,7 +121,7 @@ function paintWho() {
     hi(hello, me); hi(whoHi, me);
     var ini = $(".ini", sel); if (ini) whoAv.appendChild(ini.cloneNode(true));
   } else { hello.textContent = "Appuie sur ton prénom."; whoBar.hidden = true; }
-  guestNow();
+  guestNow(); xmasPaint();
 }
 /* ───────────── invité·e : « En ce moment, là-bas » (heure de Bangkok et de Paris, jour du voyage, programme du jour) ───────────── */
 var gNow = $("#gnow"), gDays = null, gTimer = 0;
@@ -156,6 +161,31 @@ function guestNow() {
   }
   paint(); gTimer = setInterval(paint, 15000);
 }
+/* ───────────── invité·e : l'enveloppe de Noël (cachée jusqu'au 25 décembre, heure de Paris ; une fois ouverte, son mot reste) ───────────── */
+var xm = $("#xmas"), XM_KEY = "carnet.xmas", XM_DAY = "2026-12-25";
+function parisDay() {
+  var o = {};
+  new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
+  return o.year + "-" + o.month + "-" + o.day;
+}
+function xmasOpen(on, quiet) {
+  var env = $("#xm-env"); if (!env) return;
+  env.classList.toggle("open", on); env.setAttribute("aria-expanded", on ? "true" : "false");
+  $("#xm-card").hidden = !on; $("#xm-hint").hidden = on;
+  if (on && !quiet) { LS.set(XM_KEY, "1"); try { $("#xm-card").scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {} }
+}
+function xmasPaint() {
+  if (!xm) return;
+  var show = false;
+  if (document.documentElement.classList.contains("is-guest")) { try { show = parisDay() >= XM_DAY; } catch (e) { show = false; } }
+  var was = xm.hidden; xm.hidden = !show;
+  if (show && was) xmasOpen(LS.get(XM_KEY, "") === "1", true);
+}
+if (xm) {
+  $("#xm-env").addEventListener("click", function () { if (!$("#xm-env").classList.contains("open")) xmasOpen(true, false); });
+  setInterval(xmasPaint, 60000);
+}
+
 /* une fois le prénom choisi, le bloc se replie (la ligne « Bonjour … Changer » le rouvre) */
 whoBar.addEventListener("click", function () { clearTimeout(whoT); whoOpen(whoBox.hidden); });
 who.addEventListener("click", function (e) {
@@ -184,6 +214,7 @@ var TITLES = { home: "Carnet Thaïlande 2026", days: "Jours · Carnet Thaïlande
   defi: "Défi du jour · Carnet Thaïlande", mot: "Mot du jour · Carnet Thaïlande", bingo: "Bingo · Carnet Thaïlande", gourmand: "Carnet gourmand · Carnet Thaïlande", prix: "Prix du voyage · Carnet Thaïlande",
   trad: "Traducteur · Carnet Thaïlande", essai: "Essai des enveloppes · Carnet Thaïlande",
   photoinv: "Photo pour les invités · Carnet Thaïlande", reportage: "Reportage photo · Carnet Thaïlande" };
+var GUEST_NO = ["bingo", "gourmand", "prix", "blind"];
 var days = $$(".day").map(function (a) { return a.getAttribute("data-id"); });
 var curDay = null, curName = "", fromDays = false;
 
@@ -204,6 +235,10 @@ function route() {
   var parts = h.split("/");
   var name = NAMES[parts[0]] || "home";
   if (!document.getElementById("v-" + name)) name = "home";     /* une page absente (l'essai des enveloppes, une fois retiré) ramène à l'accueil */
+  if (document.documentElement.classList.contains("is-guest") && GUEST_NO.indexOf(name) >= 0) {   /* invité·e·s : ces pages n'existent pas pour eux */
+    name = "jeux"; parts = ["jeux"];
+    try { history.replaceState(null, "", "#/jeux"); } catch (e) {}
+  }
   var target = null, first = curDay === null;
   if (name === "days") fromDays = false; else if (curName === "days") fromDays = true; else if (curName !== name) fromDays = false;
   if (name === "days") {
@@ -265,6 +300,35 @@ document.addEventListener("click", function (e) {
   e.preventDefault(); goDay(t.getAttribute("data-go-day"));
 });
 try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; } catch (e) {}
+/* glisser le doigt sur une page de jour : de la gauche vers la droite = jour suivant, de la droite vers la gauche = jour précédent
+   (ignoré : bandeau des jours, zones qui défilent de côté, champs, geste qui part du bord de l'écran = « retour » du téléphone) */
+(function () {
+  var vd = $("#v-days"), sx = 0, sy = 0, st = 0, ok = false;
+  if (!vd) return;
+  function sideScroll(el) {
+    for (; el && el !== vd; el = el.parentNode) {
+      if (el.nodeType !== 1) continue;
+      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT") return true;
+      if (el.scrollWidth > el.clientWidth + 2) { var o = getComputedStyle(el).overflowX; if (o === "auto" || o === "scroll") return true; }
+    }
+    return false;
+  }
+  vd.addEventListener("touchstart", function (e) {
+    var t = e.touches && e.touches[0];
+    ok = !!t && e.touches.length === 1 && t.clientX > 28 && t.clientX < (window.innerWidth - 28) && !sideScroll(e.target) && !(e.target.closest && e.target.closest(".strip"));
+    if (ok) { sx = t.clientX; sy = t.clientY; st = Date.now(); }
+  }, { passive: true });
+  vd.addEventListener("touchend", function (e) {
+    if (!ok) return; ok = false;
+    var t = e.changedTouches && e.changedTouches[0]; if (!t) return;
+    var dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.7 || Date.now() - st > 900) return;
+    var i = days.indexOf(curDay), j = i + (dx > 0 ? 1 : -1);
+    if (i < 0 || j < 0 || j >= days.length) return;
+    goDay(days[j]);
+  }, { passive: true });
+  vd.addEventListener("touchcancel", function () { ok = false; }, { passive: true });
+})();
 
 /* ───────────── photo du jour ───────────── */
 var photoUrl = {}, hasPhoto = {};
@@ -638,8 +702,9 @@ function thaiVoice() { for (var i = 0; i < voices.length; i++) { if (/^th/i.test
 getVoices().then(function (v) { voices = v; });
 var curU = null, speakingBtn = null;
 function mark(btn, on) { if (speakingBtn && speakingBtn !== btn) speakingBtn.classList.remove("on"); if (btn) btn.classList.toggle("on", on); speakingBtn = on ? btn : null; }
-function say(text, btn) {
-  if (!("speechSynthesis" in window) || !window.SpeechSynthesisUtterance) { toast("Ce téléphone ne sait pas lire à voix haute : montre l’écran."); return; }
+function say(text, btn, quiet) {   /* quiet : pas de message d'erreur (le masque de l'accueil garde son petit texte) */
+  var warn = function (m) { if (!quiet) toast(m); };
+  if (!("speechSynthesis" in window) || !window.SpeechSynthesisUtterance) { warn("Ce téléphone ne sait pas lire à voix haute : montre l’écran."); return; }
   try {
     var ss = window.speechSynthesis, busy = !!(ss.speaking || ss.pending);
     var u = new SpeechSynthesisUtterance(text), t = thaiVoice(), started = false;
@@ -647,13 +712,13 @@ function say(text, btn) {
     if (t) u.voice = t;
     u.onstart = function () { started = true; mark(btn, true); };
     u.onend = function () { if (curU === u) mark(btn, false); };
-    u.onerror = function () { mark(btn, false); toast("La lecture a échoué : montre l’écran."); };
+    u.onerror = function () { mark(btn, false); warn("La lecture a échoué : montre l’écran."); };
     curU = u;   /* garder une référence : sinon iOS peut couper la lecture */
     var go = function () { try { ss.resume(); } catch (e) {} ss.speak(u); };
     if (busy) { ss.cancel(); setTimeout(go, 150); } else go();
-    if (voices.length && !t) toast("Pas de voix thaïe sur ce téléphone : montre l’écran.");
-    else setTimeout(function () { if (!started && curU === u) toast("Rien entendu ? Vérifie le volume (et l’interrupteur de sonnerie).") }, 2800);
-  } catch (e) { toast("La lecture a échoué : montre l’écran."); }
+    if (voices.length && !t) warn("Pas de voix thaïe sur ce téléphone : montre l’écran.");
+    else setTimeout(function () { if (!started && curU === u) warn("Rien entendu ? Vérifie le volume (et l’interrupteur de sonnerie).") }, 2800);
+  } catch (e) { warn("La lecture a échoué : montre l’écran."); }
 }
 
 /* « montrer en grand » : une seule fenêtre pour le lexique, les prix et les cartes taxi */

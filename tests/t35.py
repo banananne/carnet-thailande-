@@ -62,7 +62,7 @@ with sync_playwright() as p:
     check("B7 les rubriques du site restent là (Jours, Hôtels, Métro, Cartes taxi)", pg.locator("#v-home .tile, #v-home a.tile, #v-home [data-go]").count() >= 4 or pg.locator("#v-home a[href^='#/']").count() >= 4)
     pg.evaluate("location.hash = '#/defi'"); pg.wait_for_timeout(500)
     check("B8 défi du jour : pas de rôles du jour pour l'invité·e", not vis(pg, ".rl-box") and not vis(pg, "#v-defi .rl-box"))
-    for h, v in [("#/jours/2026-12-20", "#v-days"), ("#/hotels", "#v-hotels"), ("#/utile", "#v-utile"), ("#/jeux", "#v-jeux"), ("#/taxi", "#v-taxi"), ("#/convertisseur", "#v-convert"), ("#/mots-meles", "#v-mots"), ("#/blind-test", "#v-blind"), ("#/lexique", "#v-lexique"), ("#/traduire", "#v-trad")]:
+    for h, v in [("#/jours/2026-12-20", "#v-days"), ("#/hotels", "#v-hotels"), ("#/utile", "#v-utile"), ("#/jeux", "#v-jeux"), ("#/taxi", "#v-taxi"), ("#/convertisseur", "#v-convert"), ("#/mots-meles", "#v-mots"), ("#/quiz", "#v-quiz"), ("#/lexique", "#v-lexique"), ("#/traduire", "#v-trad")]:
         pg.evaluate("h => { location.hash = h }", h); pg.wait_for_timeout(350)
         check("B9 invité·e : %s s'affiche sans débordement" % h, pg.evaluate("v => !!document.querySelector(v) && document.querySelector(v).offsetParent !== null", v) and not overflow(pg), h)
     pg.evaluate("location.hash = '#/essai'"); pg.wait_for_timeout(300)

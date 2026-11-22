@@ -270,7 +270,7 @@ def hotel_html(h):
                '<button class="btn sm alt" type="button" data-act="copy" data-copy="%s" data-ok="Adresse copiée">%sCopier</button>'
                '<a class="btn sm alt" href="#/taxi/%s">%sCarte taxi</a>'
                % (esc(maps_search(h["q"])), icon("pin"), esc(maps_dir(h.get("ll") or h["q"])), icon("route"), esc(h["addr"]), icon("copy"),
-                  h["id"], icon("car")))
+                  h["id"], icon("sign")))
     body += row("Téléphone", esc(h["phone"]),
                 '<a class="btn sm" href="tel:%s">%sAppeler</a>'
                 '<button class="btn sm alt" type="button" data-act="copy" data-copy="%s" data-ok="Numéro copié">%sCopier</button>'
@@ -297,7 +297,7 @@ def view_utile():
     items = [("rose", "#/metro", "train", "Plan du métro", "Tout le réseau, à zoomer"),
              ("sand", "#/lexique", "book", "Lexique en thaï", "À montrer ou à écouter"),
              ("blue", "#/traduire", "translate", "Traducteur", "Français ⇄ thaï, à lire et à écouter"),
-             ("mustard", "#/taxi", "car", "Cartes taxi", "Les hôtels écrits en thaï"),
+             ("mustard", "#/taxi", "sign", "Cartes taxi", "Les hôtels écrits en thaï"),
              ("blue", "#/convertisseur", "coin", "Convertisseur", "Baht et euro"),
              ("rose", "#/good-to-know", "info", "Good to know", "Histoire, savoir-vivre, urgences")]
     out = ('<main class="view" id="v-utile" hidden>'
@@ -578,6 +578,8 @@ def view_home(version):
             'Je suis invité·e</button>')   # espace visiteur : tout le site, sans les enveloppes, l’horoscope du jour ni les rôles du jour
     out += '</div><p class="hello" id="hello" role="status">Appuie sur ton prénom.</p></div></section>'
 
+    import build_photo as BPH
+    out += BPH.xmas_html()
     # carte « En ce moment, là-bas » : réservée aux invité·e·s (voir app.js, guestNow) ; le jour est celui de Bangkok
     import data_days as _XD
     gdays = {d["id"]: [typo(day_title(d["id"])), typo(GUEST_PLAN[d["id"]]), typo(d["city"])] for d in D.DAYS}
@@ -587,6 +589,8 @@ def view_home(version):
             '<div class="gn-clocks" aria-live="off"><p><small>Bangkok</small><b id="gn-bkk">--:--</b></p><p><small>Paris</small><b id="gn-par">--:--</b></p></div>'
             '<p class="gn-day" id="gn-day"></p><p class="gn-plan" id="gn-plan"></p>'
             '<a class="btn sm" id="gn-link" href="#/jours" hidden>Voir le programme du jour</a></section>' % esc(json.dumps(gdays, ensure_ascii=False, separators=(",", ":"))))
+
+    out += BPH.home_cards()
 
     import build_days as BD
     out += BD.horo_home_html()
@@ -605,13 +609,11 @@ def view_home(version):
     tiles = [("sand", "#/jours", "calendar", "Jours", "18 décembre → 3 janvier"),
              ("blue", "#/hotels", "bed", "Hôtels", "Adresses et téléphones"),
              ("rose", "#/metro", "train", "Métro", "Tout le réseau, à zoomer"),
-             ("mustard", "#/taxi", "car", "Cartes taxi", "Les hôtels écrits en thaï")]
+             ("mustard", "#/taxi", "sign", "Cartes taxi", "Les hôtels écrits en thaï")]
     out += '<div class="tiles">'
     for col, href, ic, t, sub in tiles:
         out += '<a class="tile %s" href="%s"><span class="ic">%s</span><span><b>%s</b><small>%s</small></span></a>' % (col, href, icon(ic), txt(t), txt(sub))
     out += "</div>"
-    import build_photo as BPH
-    out += BPH.home_cards()
 
     import build_games as BG
     out += BG.home_quip_html()

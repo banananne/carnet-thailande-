@@ -1,11 +1,15 @@
 /* Reportage photo : cartes de l'accueil, page des voyageurs (polaroïd à partager), page des invité·e·s (fil de polaroïds) */
-.phc{display:none;align-items:center;gap:14px;margin-top:12px;padding:14px 16px;border-radius:20px;background:var(--blue);color:var(--ink);text-decoration:none;-webkit-tap-highlight-color:transparent}
+.phc{display:none;align-items:center;gap:14px;margin:16px 0;padding:14px 16px;border-radius:22px;background:var(--navy);color:#fff;text-decoration:none;-webkit-tap-highlight-color:transparent;box-shadow:0 6px 18px rgba(27,37,87,.22)}
 html.is-trav .phc-trav,html.is-guest .phc-guest{display:flex}
-.phc>.i{flex:none;width:28px;height:28px;stroke:var(--navy)}
-.phc>span{flex:1;min-width:0}
-.phc b{display:block;font-weight:700;font-size:1.05rem;line-height:1.15}
-.phc small{display:block;margin-top:2px;font-size:.84rem;color:var(--muted);line-height:1.3}
-.phc>.i:last-child{width:20px;height:20px}
+.phc-pol{position:relative;flex:none;width:96px;height:84px}
+.phc-pol i{position:absolute;top:6px;left:var(--x);width:44px;height:56px;padding:3px 3px 11px;background:#fff;border-radius:2px;transform:rotate(var(--r));box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.phc-pol i:nth-child(2){top:12px}
+.phc-pol img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 20%;background:#E7ECF8}
+.phc-t{flex:1;min-width:0}
+.phc-t small{display:block;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--sand)}
+.phc-t b{display:block;margin-top:2px;font:700 1.4rem/1.05 var(--font-display);text-transform:uppercase;letter-spacing:.02em}
+.phc-t em{display:block;margin-top:3px;font-style:normal;font-size:.86rem;line-height:1.25;color:#CCD9F4}
+.phc>.i{flex:none;width:22px;height:22px;stroke:var(--sand)}
 .pi{margin-top:1.2rem}
 .pi .pi-pick{margin-top:.9rem;cursor:pointer}
 .pi .pi-pick .i{width:20px;height:20px}
@@ -55,3 +59,29 @@ html.is-trav .phc-trav,html.is-guest .phc-guest{display:flex}
 .pi-mine ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
 .pi-mine li{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .pi-mine li span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* enveloppe de Noël (invité·e·s) */
+.xmas{margin:16px 0;padding:16px;border-radius:22px;background:var(--sand);text-align:center}
+.xmas h2{font:700 1.3rem/1.1 var(--font-display);text-transform:uppercase;letter-spacing:.02em;color:var(--bordeaux)}
+.xm-env{position:relative;display:block;width:min(100%,250px);height:160px;margin:14px auto 4px;transition:margin-top .5s ease;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;perspective:600px}
+.xm-env>span{position:absolute;left:0;right:0}
+.xm-body{top:24px;bottom:0;background:#8E1A33;border-radius:8px}
+.xm-letter{top:34px;height:112px;left:14px;right:14px;background:#FFF8EC;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .7s ease .25s}
+.xm-pocket{top:24px;bottom:0;background:#A51C36;border-radius:8px;clip-path:polygon(0 0,50% 58%,100% 0,100% 100%,0 100%)}
+.xm-flap{top:24px;height:84px;background:#B83048;transform-origin:50% 0;clip-path:polygon(0 0,100% 0,50% 100%);transition:transform .6s ease,background .6s}
+.xm-seal{top:80px;left:50%!important;right:auto!important;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:#F7D294;color:#8E1A33;display:grid;place-items:center;font-size:16px;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:opacity .3s}
+.xm-env.open{margin-top:76px}
+.xm-env.open .xm-flap{transform:rotateX(180deg);background:#8E1A33}
+.xm-env.open .xm-seal{opacity:0}
+.xm-env.open .xm-letter{transform:translateY(-34px)}
+.xm-env:not(.open){animation:xmwig 2.6s ease-in-out 1.2s infinite}
+@keyframes xmwig{0%,88%,100%{transform:rotate(0)}91%{transform:rotate(-2.5deg)}94%{transform:rotate(2.5deg)}97%{transform:rotate(-1.5deg)}}
+.xm-hint{margin:6px 0 0;font-size:.88rem;color:var(--muted)}
+.xm-card{margin:14px 0 2px;padding:16px 16px 14px;border-radius:16px;background:#fff;text-align:left;box-shadow:0 1px 2px rgba(27,37,87,.18);animation:xmin .7s ease both}
+.xm-card img{float:right;width:64px;height:auto;margin:-2px 0 6px 10px}
+.xm-card h3{font:700 1.3rem/1.15 var(--font-display);text-transform:uppercase;letter-spacing:.02em;color:var(--bordeaux)}
+.xm-card p{margin:.55rem 0 0;font-size:.98rem;line-height:1.45;color:var(--ink)}
+.xm-card .xm-sign{font:italic 400 1.02rem/1.4 var(--font-voice);color:var(--navy)}
+.xm-card .xm-ps{font-size:.86rem;color:var(--muted)}
+@keyframes xmin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.xm-env:not(.open){animation:none}.xm-card{animation:none}.xm-letter,.xm-flap{transition:none}}

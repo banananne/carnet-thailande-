@@ -173,6 +173,9 @@ window.CarnetGames = (function () {
       $$(".dstamp").forEach(function (b) {
         var id = b.getAttribute("data-day"), on = has("d", id), box = $(".dstamp-svg", b), btn = $("button", b);
         btn.hidden = on; box.hidden = !on;
+        if (!on) box.textContent = "";
+        var dh = $(".dstamp-hint", b); if (dh) dh.hidden = !on;
+        box.setAttribute("role", on ? "button" : "presentation"); if (on) { box.setAttribute("tabindex", "0"); box.setAttribute("aria-label", "Retirer le tampon de ce jour"); } else { box.removeAttribute("tabindex"); box.removeAttribute("aria-label"); }
         if (on && !box.firstChild) {
           var src = slotOf("d", id), svg = src && $(".stamp", src);
           if (svg) {
@@ -206,6 +209,10 @@ window.CarnetGames = (function () {
       done();
       return true;
     }
+    function unday(id) {
+      var i = data.d.indexOf(id); if (i < 0) return false;
+      data.d.splice(i, 1); save(); paint(); return true;
+    }
     function bonus(key, quiet) {
       if (!earn("b", key)) return false;
       pop(slotOf("b", key));
@@ -236,6 +243,16 @@ window.CarnetGames = (function () {
       var id = b.getAttribute("data-stamp-day");
       if (day(id, { from: b })) toast("Tampon du jour ajouté au passeport");
     });
+    /* retoucher le tampon d'une page de jour l'enlève */
+    function unstamp(e) {
+      var b = e.target.closest ? e.target.closest(".dstamp-svg") : null; if (!b || b.hidden) return;
+      if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      var id = b.parentNode.getAttribute("data-day");
+      if (unday(id)) { buzz(10); toast("Tampon retiré : tu peux retamponner ce jour"); }
+    }
+    document.addEventListener("click", unstamp);
+    document.addEventListener("keydown", unstamp);
     paint();
     return { day: day, bonus: bonus, paint: paint, count: count, total: total };
   })();

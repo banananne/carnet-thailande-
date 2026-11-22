@@ -22,11 +22,32 @@ def cfg_script():
 
 
 def home_cards():
-    """Deux cartes sous les rubriques de l'accueil ; le style n'en montre qu'une, selon le prénom choisi (html.is-trav / html.is-guest)."""
-    return ('<a class="phc phc-trav" href="#/photo-invites">%s<span><b>%s</b><small>%s</small></span>%s</a>'
-            '<a class="phc phc-guest" href="#/reportage">%s<span><b>%s</b><small>%s</small></span>%s</a>'
-            % (icon("camera"), A.txt("Photo pour les invités"), A.txt("Un polaroïd à partager avec ceux qui sont restés"), icon("chevr"),
-               icon("image"), A.txt("Reportage photo"), A.txt("Les photos du voyage, avec un code"), icon("chevr")))
+    """Une grande carte en haut de l'accueil ; le style n'en montre qu'une, selon le prénom choisi (html.is-trav / html.is-guest)."""
+    pol = ('<span class="phc-pol" aria-hidden="true"><i style="--r:-9deg;--x:0px"><img src="img/doudou_minou.webp" alt="" width="40" height="45" loading="lazy" decoding="async"></i>'
+           '<i style="--r:6deg;--x:24px"><img src="img/doudou_moomoo.webp" alt="" width="40" height="45" loading="lazy" decoding="async"></i>'
+           '<i style="--r:-3deg;--x:48px"><img src="img/doudou_boop.webp" alt="" width="40" height="45" loading="lazy" decoding="async"></i></span>')
+    return ('<a class="phc phc-trav" href="#/photo-invites">%s<span class="phc-t"><small>%s</small><b>%s</b><em>%s</em></span>%s</a>'
+            '<a class="phc phc-guest" href="#/reportage">%s<span class="phc-t"><small>%s</small><b>%s</b><em>%s</em></span>%s</a>'
+            % (pol, A.txt("Pour ceux qui sont restés"), A.txt("Photo pour les invités"), A.txt("Fais un polaroïd et publie-le"), icon("chevr"),
+               pol, A.txt("Le voyage en polaroïds"), A.txt("Reportage photo"), A.txt("Avec le code reçu dans ta carte"), icon("chevr")))
+
+
+XMAS_TEXT = ("Ici, il fait plus de 30 degrés, il y a des guirlandes dans les centres commerciaux, et on pense très fort à vous. "
+             "Vous nous manquez : on trinque à votre santé avec une noix de coco, et on vous fait de gros bisous. On a hâte de tout vous raconter !")
+
+
+def xmas_html():
+    """Invité·e·s : une enveloppe cachée jusqu'au 25 décembre (heure de Paris), à ouvrir ; son petit mot reste ensuite sur ce téléphone (voir app.js, xmasPaint)."""
+    return ('<section class="xmas" id="xmas" aria-labelledby="h-xmas" hidden>'
+            '<h2 id="h-xmas">%s</h2>'
+            '<button class="xm-env" id="xm-env" type="button" aria-expanded="false" aria-controls="xm-card" aria-label="%s">'
+            '<span class="xm-body"></span><span class="xm-letter"></span><span class="xm-pocket"></span><span class="xm-flap"></span><span class="xm-seal">&#10022;</span></button>'
+            '<p class="xm-hint" id="xm-hint">%s</p>'
+            '<div class="xm-card" id="xm-card" hidden><img src="img/doudou_boop.webp" alt="" width="70" height="76" loading="lazy" decoding="async">'
+            '<h3>%s</h3><p>%s</p><p class="xm-sign">%s</p><p class="xm-ps">%s</p></div></section>'
+            % (A.txt("Une enveloppe pour toi"), A.txt("Ouvrir l’enveloppe de Noël"), A.txt("Touche l’enveloppe pour l’ouvrir."),
+               A.txt("Joyeux Noël depuis la Thaïlande !"), A.txt(XMAS_TEXT), A.txt("Anne, Arthur, Daphne et Flo"),
+               A.txt("P.-S. de Boop : j’ai gardé mon bonnet de Noël, même par 32 degrés.")))
 
 
 def view_photoinv():

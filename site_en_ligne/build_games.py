@@ -363,13 +363,13 @@ def song_html(day_id):
         return ""
     k = day_id[5:].replace("-", "")
     assert os.path.exists(os.path.join(ROOT, "img", "song_%s_cover.webp" % k)), k
-    return ('<p class="song" aria-label="La chanson du jour"><img src="img/song_%s_cover.webp" width="72" height="72" alt="" loading="lazy" decoding="async">'
-            '<span><b>%s</b> · %s</span></p>' % (k, txt(t[0]), txt(t[1])))
+    return ('<div class="song" role="group" aria-label="La BO du jour"><img src="img/song_%s_cover.webp" width="72" height="72" alt="" loading="lazy" decoding="async">'
+            '<span><small>%s La BO du jour</small><b>%s</b><i>%s</i></span></div>' % (k, icon("music"), txt(t[0]), txt(t[1])))
 
 
 def day_stamp_html(day_id):
     return ('<div class="dstamp" data-day="%s"><button class="btn sm alt" type="button" data-stamp-day="%s">%s <span>Tamponner ce jour</span></button>'
-            '<span class="dstamp-svg"></span></div>' % (day_id, day_id, icon("stamp")))
+            '<span class="dstamp-svg"></span><p class="dstamp-hint" hidden>Touche le tampon pour l’enlever.</p></div>' % (day_id, day_id, icon("stamp")))
 
 
 def home_quip_html():

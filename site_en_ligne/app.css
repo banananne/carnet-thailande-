@@ -36,13 +36,13 @@ a,button,label,summary,.chip{touch-action:manipulation}
 .lead{margin-top:.45rem;max-width:11.2rem;color:#FBDDE3;font-family:var(--font-voice);font-style:italic;font-size:.88rem;line-height:1.5}
 .stk{position:absolute;border:0;padding:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .stk svg{display:block;width:100%;height:auto;overflow:visible}
-.stk-ele{right:16px;top:-2px;width:88px;transform:rotate(6deg)}
-.stk-tuk{right:30px;bottom:-4px;width:128px}
-@media (max-width:389px){.dates{font-size:.9rem;letter-spacing:.05em}.stk-tuk{right:22px;width:114px}}
-@media (max-width:349px){.hero h1{font-size:2.75rem}.dates{font-size:.82rem}.stk-ele{width:64px;right:10px}.stk-tuk{width:98px;right:14px}}
+.stk-mask{--w:100px;right:12px;top:6px;width:var(--w);transform:rotate(5deg)}
+.stk-mask img{display:block;width:100%;height:auto}
+@media (max-width:389px){.dates{font-size:.9rem;letter-spacing:.05em}.stk-mask{--w:84px;right:10px}}
+@media (max-width:349px){.hero h1{font-size:2.75rem}.dates{font-size:.82rem}.stk-mask{--w:72px;right:8px}}
 .wig{animation:wig .7s ease-in-out}
 .drive{animation:drive 1.8s ease-in-out}
-@keyframes wig{0%,100%{transform:rotate(6deg)}25%{transform:rotate(-9deg) scale(1.05)}60%{transform:rotate(13deg) scale(1.03)}}
+@keyframes wig{0%,100%{transform:rotate(5deg)}25%{transform:rotate(-9deg) scale(1.05)}60%{transform:rotate(13deg) scale(1.03)}}
 @keyframes drive{0%{transform:translateX(0)}46%{transform:translateX(220px)}47%{transform:translateX(-260px)}100%{transform:translateX(0)}}
 
 /* ───── Titre des autres écrans ───── */

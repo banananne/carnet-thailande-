@@ -197,6 +197,8 @@ def day_html(i, d):
     st = D.STAGE[d["stage"]]
     out = '<article class="day" id="d-%s" data-id="%s" hidden>' % (d["id"], d["id"])
     out += "<h2>%s</h2>" % esc(day_title(d["id"]))
+    import build_games as BG0
+    out += BG0.song_html(d["id"])
     out += '<div class="where"><span class="tag" style="--c:%s"><i></i>%s</span>' % (st["color"], txt(d["city"]))
     if d["night"]:
         h = D.HOTEL[d["night"]]
@@ -215,7 +217,6 @@ def day_html(i, d):
         out += '<p class="pen">%s<span>Dans le carnet papier : le labyrinthe du tuk-tuk</span></p>' % icon("pen")
     if d.get("quiz"):
         out += BG.quiz_cta()
-    out += BG.song_html(d["id"])
     cards = D.facts_for(d)
     if cards:
         out += '<h3 class="sech">Fun facts</h3>' + "".join(fact_card(c) for c in cards)
@@ -538,10 +539,9 @@ def view_home(version):
            '<header class="hero"><div class="wrap">'
            '<p class="eyebrow">Carnet de voyage</p><h1>Thaïlande <span>2026</span></h1>'
            '<p class="dates">18.12.2026 — 03.01.2027</p>'
-           '<button class="stk stk-ele" id="ele" type="button" aria-label="L’éléphant te salue">%s</button>'
-           '<button class="stk stk-tuk" id="tuk" type="button" aria-label="Le tuk-tuk démarre">%s</button>'
-           '</div></header><div class="wrap">'
-           % (sticker("elephant"), sticker("tuktuk")))
+           '<button class="stk stk-mask" id="mask" type="button" aria-label="Le masque te salue">'
+           '<img src="img/sticker_masque.webp" width="296" height="356" alt="" decoding="async"></button>'
+           '</div></header><div class="wrap">')
     import build_env as BE
     out += ('<section class="sec" id="who-sec" aria-labelledby="h-who"><div class="who-row">'
             '<button class="who-bar" id="who-bar" type="button" aria-expanded="false" aria-controls="who-box" hidden>'

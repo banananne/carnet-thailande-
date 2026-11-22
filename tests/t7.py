@@ -199,8 +199,8 @@ with sync_playwright() as p:
     check("Accueil : 4 tuiles (Jours, Hôtels, Métro, Cartes taxi)", hrefs == ["#/jours", "#/hotels", "#/metro", "#/taxi"], hrefs)
     check("Accueil : la petite phrase « version téléphone » a disparu", "version téléphone" not in pg.inner_text("#v-home"))
     check("Accueil : « Le mot de la mascotte » remplace la bulle « Bientôt » (étape 3)", pg.locator("#v-home #hq").count() == 1 and pg.inner_text("#hq-q").strip() != "")
-    pg.click("#ele"); pg.wait_for_timeout(100)
-    check("Éléphant : Sawasdee kha", "Sawasdee kha" in pg.inner_text("#toast"), pg.inner_text("#toast"))
+    pg.click("#mask"); pg.wait_for_timeout(100)
+    check("Masque : Sawasdee kha", "Sawasdee kha" in pg.inner_text("#toast"), pg.inner_text("#toast"))
     pg.screenshot(path=OUT + "s2_home.png", full_page=True)
 
     errs = [l for l in logs if l[0] in ("error", "pageerror")]

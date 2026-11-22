@@ -188,7 +188,24 @@
 
   /* ───────────── carnet gourmand (Moomoo) : une note de 1 à 5 cœurs par plat ───────────── */
   var Gourmand = (function () {
-    var v = $("#v-gourmand"), KEY = "carnet.food", notes = jobj(KEY), rows = $$(".fd", v);
+    var v = $("#v-gourmand"), KEY = "carnet.food", OWN = "carnet.food.own", notes = jobj(KEY), rows = $$(".fd", v), own = jget(OWN, []);
+    if (!(own instanceof Array)) own = [];
+    own = own.filter(function (o) { return o && typeof o.k === "string" && typeof o.n === "string" && o.n; }).slice(0, 40);
+    var ownBox = $("#fd-own"), tpl = $(".fd-r", v), delT = 0, delK = "";
+    function ownRow(o) {   /* un plat ajouté à la main : même cœurs, sans le thaï */
+      var li = document.createElement("li"); li.className = "fd fd-u"; li.setAttribute("data-k", o.k);
+      var h = document.createElement("div"); h.className = "fd-h";
+      var nm = document.createElement("span"); nm.className = "fd-name"; var b = document.createElement("b"); b.textContent = o.n; nm.appendChild(b);
+      var x = document.createElement("button"); x.type = "button"; x.className = "fd-del"; x.setAttribute("data-del", o.k); x.setAttribute("aria-label", "Retirer « " + o.n + " » de la liste"); x.textContent = "×";
+      h.appendChild(nm); h.appendChild(x); li.appendChild(h);
+      var r = tpl.cloneNode(true); r.setAttribute("aria-label", "Ma note pour " + o.n);
+      $$("button", r).forEach(function (bt) { bt.classList.remove("on"); bt.setAttribute("aria-checked", "false"); });
+      li.appendChild(r); return li;
+    }
+    function drawOwn() {
+      ownBox.textContent = ""; own.forEach(function (o) { ownBox.appendChild(ownRow(o)); });
+      ownBox.hidden = !own.length; rows = $$(".fd", v);
+    }
     function rated() { return rows.filter(function (li) { return notes[li.getAttribute("data-k")] > 0; }); }
     function paint() {
       rows.forEach(function (li) {
@@ -211,14 +228,37 @@
       });
       hub("gourmand", n ? plural(n, "plat goûté", "plats goûtés") + " sur " + rows.length : "");
     }
+    var form = $("#fd-form"), inp = $("#fd-in");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var n = inp.value.replace(/\s+/g, " ").trim();
+      if (!n) { toast("Écris le nom du plat ou de la boisson"); inp.focus(); return; }
+      var low = n.toLowerCase(), same = own.some(function (o) { return o.n.toLowerCase() === low; }) || rows.some(function (li) { var nb = $(".fd-name b", li); return nb && nb.textContent.trim().toLowerCase() === low; });
+      if (same) { toast("Il est déjà dans la liste"); return; }
+      if (own.length >= 40) { toast("Ça fait beaucoup de plats : retires-en un d’abord"); return; }
+      var o = { k: "u" + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36), n: n };
+      own.push(o); jset(OWN, own); inp.value = ""; drawOwn(); paint(); toast("Ajouté : " + n); buzz(15);
+    });
     v.addEventListener("click", function (e) {
+      var d = e.target.closest ? e.target.closest(".fd-del") : null;
+      if (d) {   /* deux touches pour retirer un plat ajouté (une seule risquerait de l'effacer par erreur) */
+        var k = d.getAttribute("data-del");
+        if (delK !== k) {
+          clearTimeout(delT); $$(".fd-del.ask", v).forEach(function (z) { z.classList.remove("ask"); z.textContent = "×"; });
+          delK = k; d.classList.add("ask"); d.textContent = "Retirer ?";
+          delT = setTimeout(function () { delK = ""; d.classList.remove("ask"); d.textContent = "×"; }, 3000);
+          return;
+        }
+        clearTimeout(delT); delK = "";
+        own = own.filter(function (o) { return o.k !== k; }); delete notes[k]; jset(OWN, own); jset(KEY, notes); drawOwn(); paint(); return;
+      }
       var b = e.target.closest ? e.target.closest(".fd-r button") : null; if (!b) return;
       var li = b.closest(".fd"), k = li.getAttribute("data-k"), r = parseInt(b.getAttribute("data-r"), 10);
       if (notes[k] === r) delete notes[k]; else notes[k] = r;
       jset(KEY, notes); paint();
       if (notes[k]) { buzz(15); if (rated().length >= 10) Stamps.bonus("gourmand"); }
     });
-    paint();
+    drawOwn(); paint();
     return { enter: function () { paint(); } };
   })();
 

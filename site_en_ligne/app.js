@@ -85,8 +85,7 @@ function bump(id, cls, msg) {
   });
   e.addEventListener("animationend", function () { e.classList.remove(cls); });
 }
-bump("ele", "wig", function () { var p = POL.get(); return "Sawasdee " + (p || "khrap / kha") + " !"; });
-bump("tuk", "drive", "Pouet pouet !");
+bump("mask", "wig", function () { var p = POL.get(); return "Sawasdee " + (p || "khrap / kha") + " !"; });
 
 /* ───────────── qui es-tu ───────────── */
 var who = $("#who"), hello = $("#hello"), whoBox = $("#who-box"), whoBar = $("#who-bar"), whoHi = $("#who-hi"), whoAv = $("#who-av"), whoT = 0;

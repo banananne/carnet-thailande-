@@ -357,20 +357,11 @@ def guide_html(day_id):
 
 
 def song_html(day_id):
-    """La chanson du jour : pochette, titre, artiste et code Spotify à scanner."""
+    """La chanson du jour : une petite ligne, juste sous la date."""
     t = G.SONGS.get(day_id)
     if not t:
         return ""
-    k = day_id[5:].replace("-", "")
-    for fn in ("song_%s_cover.webp" % k, "song_%s_code.webp" % k):
-        assert os.path.exists(os.path.join(ROOT, "img", fn)), fn
-    return ('<section class="song" aria-label="La chanson du jour">'
-            '<img class="song-cover" src="img/song_%s_cover.webp" width="200" height="200" alt="" loading="lazy" decoding="async">'
-            '<p class="song-t"><small>La chanson du jour</small><b>%s</b><span>%s</span></p>'
-            '<img class="song-code" src="img/song_%s_code.webp" width="800" height="193" alt="%s" loading="lazy" decoding="async">'
-            '<p class="song-hint">%s</p></section>'
-            % (k, txt(t[0]), txt(t[1]), k, esc("Code Spotify de « %s », %s" % t),
-               txt("Dans l’appli Spotify : Recherche, puis l’icône appareil photo, et scanne ce code sur l’écran d’un autre téléphone.")))
+    return ('<p class="song" aria-label="La chanson du jour">%s<span><b>%s</b> · %s</span></p>' % (icon("music"), txt(t[0]), txt(t[1])))
 
 
 def day_stamp_html(day_id):

@@ -179,6 +179,11 @@ def view_gourmand():
            + '<p>' + intro + '</p></section>'
              '<p class="mis-n" id="fd-n" role="status"></p><div class="dots fd-dots" id="fd-dots" aria-hidden="true">%s</div>'
              '<section class="bubble sand fd-top" id="fd-top" hidden aria-label="Mon top 3"><h2>Mon top 3</h2><ol id="fd-top-l"></ol></section>'
+             '<section class="bubble blue fd-add" aria-labelledby="h-fda"><h2 id="h-fda">Un plat qui n’est pas dans la liste ?</h2>'
+             '<form class="fd-form" id="fd-form" autocomplete="off">'
+             '<input id="fd-in" type="text" aria-label="Nom du plat ou de la boisson" maxlength="40" enterkeyhint="done" placeholder="Nom du plat ou de la boisson">'
+             '<button class="btn sm" type="submit"><span>Ajouter</span></button></form>'
+             '<ul class="fd-l fd-own" id="fd-own" aria-label="Mes plats ajoutés"></ul></section>'
              % "".join("<i></i>" for _ in range(24)))
     for gname, items in X.FOOD:
         out += '<h3 class="sech navy">%s</h3><ul class="fd-l">' % txt(gname)

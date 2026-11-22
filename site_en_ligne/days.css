@@ -160,3 +160,15 @@
 
 /* page d'un jour : raccourci vers le défi */
 .day .dfl{margin-top:1.6rem}
+
+.fd-add{margin-top:1.1rem}
+.fd-add h2{font:800 1.25rem/1.1 var(--font-display);color:var(--navy)}
+.fd-form{display:flex;gap:8px;margin-top:.7rem}
+.fd-form input{flex:1;min-width:0;height:46px;padding:0 14px;border:2px solid var(--blue-d);border-radius:14px;background:var(--white);color:var(--ink);font:500 16px/1 var(--font-body)}
+.fd-form input:focus{outline:3px solid var(--navy);outline-offset:1px}
+.fd-form .btn{flex:none;height:46px}
+.fd-own{margin-top:.8rem}
+.fd-own[hidden]{display:none}
+.fd-u .fd-h{grid-template-columns:minmax(0,1fr) auto}
+.fd-del{min-width:44px;min-height:44px;padding:0 10px;border:0;border-radius:12px;background:none;color:var(--bordeaux);font:600 1.3rem/1 var(--font-body);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fd-del.ask{font-size:.9rem;background:var(--rose)}

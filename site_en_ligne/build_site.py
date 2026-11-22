@@ -218,6 +218,16 @@ self.addEventListener("fetch", (e) => {
     );
     return;
   }
+  /* reportage photo : le réseau d'abord (nouvelles photos), la copie gardée si le réseau est absent */
+  if (u.pathname.indexOf("/reportage/") >= 0) {
+    e.respondWith(
+      fetch(r, { cache: "no-cache" }).then((res) => {
+        if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(r, copy)); }
+        return res;
+      }).catch(() => caches.match(r).then((m) => m || Response.error()))
+    );
+    return;
+  }
   /* reste (polices, icônes, plan) : la copie gardée d'abord */
   e.respondWith(
     caches.match(r).then((m) => m || fetch(r).then((res) => {
@@ -260,6 +270,14 @@ def build_web():
         for fn in sorted(os.listdir(imgdir)):
             if fn.endswith(".webp"):
                 shutil.copy(os.path.join(imgdir, fn), os.path.join(WEB, "img", fn))
+
+    # reportage photo des invité·e·s : fichiers CHIFFRÉS (voir reportage_tool.py) ; REPORTAGE_DIR : dossier d'essai
+    repdir = os.environ.get("REPORTAGE_DIR") or os.path.join(ROOT, "reportage")
+    if os.path.isfile(os.path.join(repdir, "m.json")):
+        os.makedirs(os.path.join(WEB, "reportage"))
+        for fn in sorted(os.listdir(repdir)):
+            if fn == "m.json" or re.fullmatch(r"p[0-9a-f]{8}\.bin", fn):
+                shutil.copy(os.path.join(repdir, fn), os.path.join(WEB, "reportage", fn))
 
     version = time.strftime("%Y%m%d-%H%M%S")
     index = build_app.nbsp_pass(build_app.render(version, APP_META))

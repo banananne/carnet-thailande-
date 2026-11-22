@@ -610,6 +610,8 @@ def view_home(version):
     for col, href, ic, t, sub in tiles:
         out += '<a class="tile %s" href="%s"><span class="ic">%s</span><span><b>%s</b><small>%s</small></span></a>' % (col, href, icon(ic), txt(t), txt(sub))
     out += "</div>"
+    import build_photo as BPH
+    out += BPH.home_cards()
 
     import build_games as BG
     out += BG.home_quip_html()
@@ -628,7 +630,7 @@ def nav_html():
 
 
 def css_text():
-    s = "\n".join(open(os.path.join(ROOT, f), encoding="utf-8").read() for f in ("app.css", "games.css", "days.css", "trad.css", "env.css"))
+    s = "\n".join(open(os.path.join(ROOT, f), encoding="utf-8").read() for f in ("app.css", "games.css", "days.css", "trad.css", "env.css", "photo.css"))
     s = re.sub(r"/\*.*?\*/", "", s, flags=re.S)
     return "\n".join(ln.strip() for ln in s.splitlines() if ln.strip())
 
@@ -637,8 +639,9 @@ def render(version, head_meta):
     import build_env as BE
     import build_games as BG
     import build_trad as BT
+    import build_photo as BPH
     body = (view_home(version) + view_days() + view_hotels() + view_utile() + BT.view_trad() + view_metro() + view_lexique() + view_taxi()
-            + view_convert() + view_gtk() + BG.all_views() + BE.view_essai() + nav_html() + show_overlay() + BE.overlay_html()
+            + view_convert() + view_gtk() + BG.all_views() + BPH.all_views() + BE.view_essai() + nav_html() + show_overlay() + BE.overlay_html()
             + '<div id="toast" role="status" aria-live="polite"></div>'
             + '<div id="upd" hidden><span>Une nouvelle version est prête.</span><button class="btn sm" type="button" id="upd-btn">Actualiser</button></div>')
     js = open(os.path.join(ROOT, "app.js"), encoding="utf-8").read()
@@ -650,6 +653,8 @@ def render(version, head_meta):
     games = games.replace("/*@TRANS@*/", open(os.path.join(ROOT, "trans.js"), encoding="utf-8").read())
     assert "/*@ENV@*/" in games
     games = games.replace("/*@ENV@*/", open(os.path.join(ROOT, "env.js"), encoding="utf-8").read())
+    assert "/*@PHOTO@*/" in games
+    games = games.replace("/*@PHOTO@*/", open(os.path.join(ROOT, "photo.js"), encoding="utf-8").read())
     js = js.replace("/*@GAMES@*/", games)
     assert "</script" not in js
     # prénom déjà choisi : on masque « Qui es-tu ? » dès le premier affichage (pas de clignotement avant que le script du bas ne s'exécute)

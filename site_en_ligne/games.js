@@ -617,6 +617,7 @@ window.CarnetGames = (function () {
 /*@GAMES2@*/
 /*@TRANS@*/
 /*@ENV@*/
+/*@PHOTO@*/
 
   /* tout repeindre (mot secret saisi, retour dans l'appli un autre jour, cadenas remis) */
   function refreshAll() {
@@ -643,6 +644,8 @@ window.CarnetGames = (function () {
       else if (name === "gourmand") Gourmand.enter();
       else if (name === "prix") Prix.enter();
       else if (name === "trad") Trad.enter();
+      else if (name === "photoinv") PhotoInv.enter();
+      else if (name === "reportage") Rep.enter();
       if (name === "horo" && open) Horo.enter(); else Horo.leave();
     },
     photo: function (id) {

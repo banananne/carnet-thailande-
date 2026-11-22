@@ -412,3 +412,13 @@ a.tag{text-decoration:none}
 .who button.guest:last-child:nth-child(odd){grid-column:1/-1}
 .who button.guest{background:rgba(204,217,244,.45)}
 html.is-guest .rl-box{display:none}
+
+/* invité·e : « En ce moment, là-bas » */
+.guest-now[hidden]{display:none}
+.gn-clocks{display:flex;gap:10px;margin-top:.8rem}
+.gn-clocks p{flex:1;min-width:0;padding:10px 12px;border-radius:16px;background:var(--white);text-align:center;margin:0}
+.gn-clocks small{display:block;font-size:.8rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.gn-clocks b{display:block;margin-top:2px;font-size:1.7rem;line-height:1.1;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+.gn-day{margin-top:.9rem;font-weight:700;color:var(--bordeaux);line-height:1.25}
+.gn-plan{margin-top:.3rem}
+.guest-now .btn{margin-top:.8rem}

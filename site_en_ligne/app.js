@@ -115,6 +115,45 @@ function paintWho() {
     hi(hello, me); hi(whoHi, me);
     var ini = $(".ini", sel); if (ini) whoAv.appendChild(ini.cloneNode(true));
   } else { hello.textContent = "Appuie sur ton prénom."; whoBar.hidden = true; }
+  guestNow();
+}
+/* ───────────── invité·e : « En ce moment, là-bas » (heure de Bangkok et de Paris, jour du voyage, programme du jour) ───────────── */
+var gNow = $("#gnow"), gDays = null, gTimer = 0;
+function guestNow() {
+  if (!gNow) return;
+  var guest = document.documentElement.classList.contains("is-guest");
+  gNow.hidden = !guest;
+  clearInterval(gTimer); gTimer = 0;
+  if (!guest) return;
+  try { gDays = gDays || JSON.parse(gNow.getAttribute("data-days")); } catch (e) { gNow.hidden = true; return; }
+  var ids = Object.keys(gDays).sort();
+  function parts(tz, now) {
+    var f = new Intl.DateTimeFormat("fr-FR", { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit" }), o = {};
+    f.formatToParts(now).forEach(function (p) { o[p.type] = p.value; });
+    return { hm: o.hour + "\u00a0h\u00a0" + o.minute, date: o.year + "-" + o.month + "-" + o.day };
+  }
+  function paint() {
+    var now = new Date(), bk, pa;
+    try { bk = parts("Asia/Bangkok", now); pa = parts("Europe/Paris", now); } catch (e) { gNow.hidden = true; return; }
+    $("#gn-bkk").textContent = bk.hm; $("#gn-par").textContent = pa.hm;
+    var day = $("#gn-day"), plan = $("#gn-plan"), link = $("#gn-link"), t = bk.date, first = ids[0], last = ids[ids.length - 1];
+    if (t < first) {
+      var n = Math.round((Date.parse(first + "T00:00:00Z") - Date.parse(pa.date + "T00:00:00Z")) / 86400000);   /* jours entiers à l'heure de Paris : le départ est le 18 */
+      day.textContent = n === 1 ? "Départ demain" : "Départ dans " + n + "\u00a0jours";
+      plan.textContent = "Arthur, Daphne, Flo et Anne partent le vendredi 18\u00a0décembre pour la Thaïlande, et reviennent le 3\u00a0janvier. Reviens ici : le programme du jour s’affichera chaque matin.";
+      link.hidden = true;
+    } else if (t > last) {
+      day.textContent = "Le voyage est terminé";
+      plan.textContent = "Ils sont rentrés de Thaïlande le 3\u00a0janvier. Le programme de chaque jour reste consultable dans l’onglet Jours.";
+      link.hidden = false; link.setAttribute("href", "#/jours");
+    } else {
+      var id = ids.indexOf(t) >= 0 ? t : last, d = gDays[id];
+      day.textContent = "Jour\u00a0" + (ids.indexOf(id) + 1) + " sur " + ids.length + " · " + d[0] + " · " + d[2];
+      plan.textContent = d[1];
+      link.hidden = false; link.setAttribute("href", "#/jours/" + id);
+    }
+  }
+  paint(); gTimer = setInterval(paint, 15000);
 }
 /* une fois le prénom choisi, le bloc se replie (la ligne « Bonjour … Changer » le rouvre) */
 whoBar.addEventListener("click", function () { clearTimeout(whoT); whoOpen(whoBox.hidden); });

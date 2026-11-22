@@ -533,6 +533,27 @@ def thai_map_svg():
     return out + "</svg>"
 
 
+GUEST_PLAN = {
+ "2026-12-18": "Anne et Arthur s’envolent de Paris à 16 h 05 (11 h de vol) ; Daphne et Flo les rejoignent demain.",
+ "2026-12-19": "Arrivée à Bangkok, balade à Talat Noi, puis les retrouvailles avec Daphne et Flo.",
+ "2026-12-20": "Tour en bateau longtail, Jim Thompson House, puis coucher de soleil en haut du Wat Saket.",
+ "2026-12-21": "Journée à Ayutthaya : les temples de briques rouges et une croisière sur la rivière.",
+ "2026-12-22": "Marché sur les rails de Maeklong, marché flottant, Chinatown, puis boxe thaïe le soir.",
+ "2026-12-23": "Grand Palais, Wat Pho et massage, puis un tour de street food en tuk-tuk.",
+ "2026-12-24": "Marché de Chatuchak, ferry vers le Wat Arun et dîner face au temple.",
+ "2026-12-25": "Noël à Bangkok : parc Lumpini, cours de cuisine, rooftop au coucher du soleil et dîner de fête.",
+ "2026-12-26": "Grasse matinée, vol Bangkok – Sukhothaï en fin d’après-midi, puis piscine.",
+ "2026-12-27": "À vélo dans le parc historique de Sukhothaï, coucher de soleil sur le Wat Sa Si.",
+ "2026-12-28": "Matinée tranquille ou balade à vélo, Wat Saphan Hin l’après-midi, puis piscine.",
+ "2026-12-29": "Dernière matinée à Sukhothaï, avion vers Bangkok, puis la route jusqu’à Ban Phe.",
+ "2026-12-30": "Journée libre au bord de la mer : piscine, plage, massage et cocktails.",
+ "2026-12-31": "Dernier jour de l’année : journée libre au bord de la mer, avant le réveillon.",
+ "2027-01-01": "Premier de l’an : journée libre au bord de la mer.",
+ "2027-01-02": "Dernière matinée piscine, retour à Bangkok et dernière nuit sur place.",
+ "2027-01-03": "Dernier jour du voyage : le retour vers la France."
+}
+
+
 def view_home(version):
     who = [("Arthur", "#283881", "#fff"), ("Daphne", "#E9A9B8", "#5B1025"), ("Flo", "#F2A71B", "#5B1025"), ("Anne", "#A51C36", "#fff")]
     out = ('<main class="view" id="v-home">'
@@ -556,6 +577,16 @@ def view_home(version):
     out += ('<button type="button" class="guest" data-n="Invité" aria-pressed="false"><span class="ini" style="background:#CCD9F4;color:#283881">✦</span>'
             'Je suis invité·e</button>')   # espace visiteur : tout le site, sans les enveloppes, l’horoscope du jour ni les rôles du jour
     out += '</div><p class="hello" id="hello" role="status">Appuie sur ton prénom.</p></div></section>'
+
+    # carte « En ce moment, là-bas » : réservée aux invité·e·s (voir app.js, guestNow) ; le jour est celui de Bangkok
+    import data_days as _XD
+    gdays = {d["id"]: [typo(day_title(d["id"])), typo(GUEST_PLAN[d["id"]]), typo(d["city"])] for d in D.DAYS}
+    assert set(gdays) == set(GUEST_PLAN) and len(gdays) == 17
+    out += ('<section class="bubble sand guest-now" id="gnow" aria-labelledby="h-gnow" hidden data-days="%s">'
+            '<h2 id="h-gnow">En ce moment, là-bas</h2>'
+            '<div class="gn-clocks" aria-live="off"><p><small>Bangkok</small><b id="gn-bkk">--:--</b></p><p><small>Paris</small><b id="gn-par">--:--</b></p></div>'
+            '<p class="gn-day" id="gn-day"></p><p class="gn-plan" id="gn-plan"></p>'
+            '<a class="btn sm" id="gn-link" href="#/jours" hidden>Voir le programme du jour</a></section>' % esc(json.dumps(gdays, ensure_ascii=False, separators=(",", ":"))))
 
     import build_days as BD
     out += BD.horo_home_html()

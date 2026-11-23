@@ -587,13 +587,16 @@ def view_home(version):
     out += ('<section class="bubble sand guest-now" id="gnow" aria-labelledby="h-gnow" hidden data-days="%s">'
             '<h2 id="h-gnow">En ce moment, là-bas</h2>'
             '<div class="gn-clocks" aria-live="off"><p><small>Bangkok</small><b id="gn-bkk">--:--</b></p><p><small>Paris</small><b id="gn-par">--:--</b></p></div>'
+            '<p class="gn-count" id="gn-count" hidden><b id="gn-n"></b><span id="gn-nl"></span></p>'
             '<p class="gn-day" id="gn-day"></p><p class="gn-plan" id="gn-plan"></p>'
             '<a class="btn sm" id="gn-link" href="#/jours" hidden>Voir le programme du jour</a></section>' % esc(json.dumps(gdays, ensure_ascii=False, separators=(",", ":"))))
 
-    out += BPH.home_cards()
+    out += BPH.postcards_html()
 
     import build_days as BD
     out += BD.horo_home_html()
+
+    out += BPH.home_cards()
 
     out += '<section class="bubble blue" aria-labelledby="h-trip"><h2 id="h-trip">Le voyage</h2><div class="trip"><div class="tmap">%s</div><ul class="stages">' % thai_map_svg()
     for s in D.STAGES:
@@ -603,7 +606,7 @@ def view_home(version):
         out += ('<li><a href="#/jours/%s" data-go-day="%s" style="--c:%s"><span class="dot"></span>'
                 '<span><b>%s</b><small>%s</small><small>%s</small></span><span class="go">%s</span></a></li>'
                 % (s["first"], s["first"], s["color"], txt(s["city"]), txt(s["dates"]), txt(h["name"]), icon("chevr")))
-    out += "</ul></div></section>"
+    out += '</ul><a class="btn sm trip-recap" href="#/apercu">%s</a></div></section>' % txt("Le voyage en un coup d’œil")
 
     # l'accueil ne garde que l'essentiel : le reste est dans la barre du bas (Jeux, Utile)
     tiles = [("sand", "#/jours", "calendar", "Jours", "18 décembre → 3 janvier"),

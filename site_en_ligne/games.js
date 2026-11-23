@@ -663,6 +663,9 @@ window.CarnetGames = (function () {
       else if (name === "trad") Trad.enter();
       else if (name === "photoinv") PhotoInv.enter();
       else if (name === "reportage") Rep.enter();
+      else if (name === "messages") Msg.enter();
+      else if (name === "recap") Recap.enter();
+      if (name === "home") Dots.refresh(false);
       if (name === "horo" && open) Horo.enter(); else Horo.leave();
     },
     photo: function (id) {

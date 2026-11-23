@@ -94,10 +94,50 @@
     function remove(id, token) {
       return fetch(CFG.url + "/rest/v1/rpc/retirer_photo", { method: "POST", headers: head({ "Content-Type": "application/json" }), body: JSON.stringify({ p_id: id, p_token: token }) }).then(ok).then(function (r) { return r.json(); });
     }
+    var urls = {};
+    function photoObj(f) {      /* photo déchiffrée → adresse locale (mise en mémoire) */
+      if (urls[f]) return Promise.resolve(urls[f]);
+      return fetch(photoUrl(f)).then(ok).then(function (r) { return r.arrayBuffer(); }).then(function (buf) {
+        var u = new Uint8Array(buf);
+        return subtle.decrypt({ name: "AES-GCM", iv: u.slice(0, 12), additionalData: enc.encode("rep|" + f), tagLength: 128 }, st.key, u.slice(12));
+      }).then(function (pt) {
+        var u8 = new Uint8Array(pt, 0, 4); urls[f] = URL.createObjectURL(new Blob([pt], { type: u8[0] === 0x89 ? "image/png" : (u8[0] === 0x52 ? "image/webp" : "image/jpeg") })); return urls[f];
+      });
+    }
+    /* messages des invité·e·s aux voyageurs : un petit texte chiffré par message (même clé que le reportage) */
+    var MMINE = "carnet.msg.mine", TOS = ["Tous", "Anne", "Arthur", "Daphne", "Flo"];
+    function sendMsg(m) {
+      var id = newId(), token = hex(rand(16));
+      return sealWith(enc.encode(JSON.stringify(m)), "rep|msg|" + id).then(function (mb) {
+        return subtle.digest("SHA-256", enc.encode(token)).then(function (h) {
+          return fetch(CFG.url + "/rest/v1/messages", { method: "POST", headers: head({ "Content-Type": "application/json", Prefer: "return=minimal" }),
+            body: JSON.stringify({ id: id, c: b64(mb), del_hash: hex(new Uint8Array(h)) }) }).then(ok);
+        });
+      }).then(function () { return { id: id, token: token }; });
+    }
+    function listMsgs() {
+      return fetch(CFG.url + "/rest/v1/messages?select=id,c,created_at&order=created_at.asc&limit=500", { headers: head({}), cache: "no-store" }).then(ok).then(function (r) { return r.json(); }).then(function (rows) {
+        return Promise.all(rows.map(function (row) {
+          var u; try { u = unb64(row.c); } catch (e) { return null; }
+          if (!/^[0-9a-f-]{36}$/.test(row.id || "") || u.length < 29) return null;
+          return subtle.decrypt({ name: "AES-GCM", iv: u.slice(0, 12), additionalData: enc.encode("rep|msg|" + row.id), tagLength: 128 }, st.key, u.slice(12)).then(function (pt) {
+            var m = JSON.parse(dec.decode(pt)), t = String(m.t || "").slice(0, 400);
+            if (!t.trim()) return null;
+            return { id: row.id, ts: row.created_at, w: String(m.w || "").slice(0, 30), to: TOS.indexOf(m.to) >= 0 ? m.to : "Tous", op: /^\d{4}-\d{2}-\d{2}$/.test(m.op || "") ? m.op : "", t: t };
+          }).catch(function () { return null; });
+        })).then(function (a) { return a.filter(Boolean); });
+      });
+    }
+    function removeMsg(id, token) {
+      return fetch(CFG.url + "/rest/v1/rpc/retirer_message", { method: "POST", headers: head({ "Content-Type": "application/json" }), body: JSON.stringify({ p_id: id, p_token: token }) }).then(ok).then(function (r) { return r.json(); });
+    }
+    function mineMsg() { try { var a = JSON.parse(LS.get(MMINE, "[]")); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+    function setMineMsg(a) { LS.set(MMINE, JSON.stringify(a.slice(-100))); }
     function mine() { try { var a = JSON.parse(LS.get(MINE, "[]")); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
     function setMine(a) { LS.set(MINE, JSON.stringify(a.slice(-100))); }
     return { CAN: CAN, CFG: CFG, norm: norm, unb64: unb64, derive: derive, canary: canary, verify: verify, unlockSaved: unlockSaved, remember: remember, forget: forget, list: list,
-             photoUrl: photoUrl, publish: publish, remove: remove, mine: mine, setMine: setMine, key: function () { return st.key; }, enc: enc, dec: dec, subtle: subtle, savedCode: function () { return LS.get(KEY, ""); } };
+             photoUrl: photoUrl, photoObj: photoObj, publish: publish, remove: remove, mine: mine, setMine: setMine,
+             sendMsg: sendMsg, listMsgs: listMsgs, removeMsg: removeMsg, mineMsg: mineMsg, setMineMsg: setMineMsg, key: function () { return st.key; }, enc: enc, dec: dec, subtle: subtle, savedCode: function () { return LS.get(KEY, ""); } };
   })();
 
   var PhotoInv = (function () {
@@ -323,6 +363,7 @@
       var sig = list.map(function (x) { return x.f; }).join(",");
       if (sig === S.sig && feed.firstChild) return;      /* rien de nouveau : on ne redessine pas */
       clearFeed(); S.sig = sig;
+      LS.set("carnet.rep.seen", String(list.length)); Dots.clearRep();
       if (!list.length) { say("Le reportage commence : les premières photos arrivent pendant le voyage. Reviens bientôt !"); return; }
       say(nb(list.length + (list.length > 1 ? " photos" : " photo") + " · des plus récentes aux plus anciennes"));
       var items = list.map(function (it, i) { return { f: it.f, d: it.d, w: it.w, c: it.c || "", i: it.i === undefined ? i : it.i }; });
@@ -433,3 +474,191 @@
     if (CLOUD) setInterval(function () { if (!v.hidden && !document.hidden && lock.hidden && RepC.key() && !S.busy) { S.busy = true; refreshCloud().catch(function () {}).then(function () { S.busy = false; }); } }, 40000);
     return { enter: function () { big.hidden = true; start(); } };
   })();
+
+  /* ───────────── dates : « aujourd'hui » à Bangkok (les voyageurs y sont ; pour les invité·e·s, c'est le jour du voyage) ───────────── */
+  function bkkDay() {
+    try {
+      var o = {}; new Intl.DateTimeFormat("fr-FR", { timeZone: "Asia/Bangkok", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
+      return o.year + "-" + o.month + "-" + o.day;
+    } catch (e) { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  }
+  function me() { return LS.get("carnet.who", ""); }
+  function isTrav() { return ["Arthur", "Daphne", "Flo", "Anne"].indexOf(me()) >= 0; }
+  function isGuest() { return me() === "Invité"; }
+  function seenMsgs() { try { var a = JSON.parse(LS.get("carnet.msg.seen", "[]")); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function visibleMsgs(all) {      /* les mots que le voyageur choisi peut voir : pour lui ou pour tous */
+    var w = me(); return all.filter(function (m) { return m.to === "Tous" || m.to === w; });
+  }
+
+  /* ───────────── messages : les invité·e·s écrivent, les voyageurs lisent ───────────── */
+  var Msg = (function () {
+    var v = $("#v-messages"); if (!v) return { enter: function () {} };
+    var CLOUD = !!(RepC.CFG && RepC.CAN);
+    var lock = $("#ms-lock"), form = $("#ms-form"), code = $("#ms-code"), err = $("#ms-err"), who = $("#ms-who"), how = $("#mg-how"), fsec = $("#mg-form"), msec = $("#mg-mine"), tbox = $("#mt-box"), busy = false;
+    var tIn = $("#mg-t"), cnt = $("#mg-n"), st = $("#mg-st");
+    var MONTHS_ = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+    function dl(iso) { var m = +iso.slice(5, 7), d = +iso.slice(8, 10); return (d === 1 ? "1er" : d) + " " + MONTHS_[m - 1]; }
+    function show(a) { how.hidden = !a.how; lock.hidden = !a.lock; fsec.hidden = !a.form; msec.hidden = !a.mine; tbox.hidden = !a.box; who.hidden = !a.who; }
+    function wrongOrNet(e) { return e && e.name === "OperationError" ? "Ce n’est pas le bon code. Vérifie-le et réessaie." : "Impossible de joindre le serveur (réseau ?). Réessaie dans un instant."; }
+    /* ── invité·e : écrire ── */
+    function paintMine() {
+      var ul = $("#mg-mine-ul"), a = RepC.mineMsg().slice().reverse(); ul.textContent = ""; msec.hidden = !a.length || !isGuest();
+      a.forEach(function (m) {
+        var li = document.createElement("li"), p = document.createElement("p"), b = document.createElement("button"), armed = 0;
+        p.textContent = "Pour " + (m.to === "Tous" ? "tous les quatre" : m.to) + " · " + (m.op ? "à ouvrir le " + dl(m.op) : "tout de suite") + " : « " + m.t + " »";
+        b.type = "button"; b.className = "btn sm alt"; b.textContent = "Retirer";
+        b.addEventListener("click", function () {
+          if (!armed) { armed = 1; b.textContent = "Retirer ?"; setTimeout(function () { armed = 0; b.textContent = "Retirer"; }, 3500); return; }
+          b.disabled = true;
+          RepC.removeMsg(m.id, m.token).then(function () { RepC.setMineMsg(RepC.mineMsg().filter(function (x) { return x.id !== m.id; })); paintMine(); toast("Mot retiré"); })
+            .catch(function () { b.disabled = false; b.textContent = "Retirer"; toast("Pas de réseau : réessaie"); });
+        });
+        li.appendChild(p); li.appendChild(b); ul.appendChild(li);
+      });
+    }
+    function showGuest() {
+      show({ how: 1, form: 1, mine: 0 }); $("#mg-w").value = LS.get("carnet.msg.name", ""); st.textContent = ""; paintMine(); cnt.textContent = tIn.value.length + " / 400";
+    }
+    function send() {
+      var w = $("#mg-w").value.trim(), t = tIn.value.trim(), to = $("#mg-to").value, op = $("#mg-op").value;
+      if (!w) { st.textContent = "Écris ton prénom, pour que les voyageurs sachent de qui vient le mot."; $("#mg-w").focus(); return; }
+      if (!t) { st.textContent = "Écris ton message."; tIn.focus(); return; }
+      var btn = $("#mg-send"); btn.disabled = true; st.textContent = "J’envoie…";
+      RepC.sendMsg({ w: w, to: to, op: op, t: t, d: bkkDay() }).then(function (r) {
+        LS.set("carnet.msg.name", w);
+        var a = RepC.mineMsg(); a.push({ id: r.id, token: r.token, to: to, op: op, t: t.length > 60 ? t.slice(0, 60) + "…" : t }); RepC.setMineMsg(a);
+        tIn.value = ""; cnt.textContent = "0 / 400"; paintMine();
+        st.textContent = "C’est parti ! Ton mot est arrivé chez les voyageurs" + (op ? " : il s’ouvrira le " + dl(op) + "." : ".");
+        toast("Mot envoyé");
+      }).catch(function () { st.textContent = "Le mot n’est pas parti (réseau ?). Ton texte est toujours là : réessaie."; }).then(function () { btn.disabled = false; });
+    }
+    /* ── voyageur : lire ── */
+    function sealed(op) {
+      var d = document.createElement("div"); d.className = "mt-seal";
+      d.innerHTML = '<span aria-hidden="true">✉</span>'; var p = document.createElement("p"); p.textContent = "Un mot à ouvrir le " + dl(op) + "."; d.appendChild(p); return d;
+    }
+    function showTrav(all) {
+      show({ box: 1 });
+      var mine = visibleMsgs(all), today = bkkDay(), list = $("#mt-list"), seen = seenMsgs(), keep = seen.slice();
+      list.textContent = "";
+      var others = all.length - mine.length;
+      var open = mine.filter(function (m) { return !m.op || m.op <= today; }), wait = mine.filter(function (m) { return m.op && m.op > today; });
+      $("#mt-msg").textContent = !all.length ? "Pas encore de mot. Les invité·e·s peuvent écrire depuis leur téléphone : reviens voir !" :
+        (open.length + wait.length) ? (open.length + (open.length > 1 ? " mots" : " mot") + " pour toi" + (wait.length ? ", " + wait.length + " à ouvrir plus tard" : "") + (others ? " · " + others + (others > 1 ? " mots sont destinés" : " mot est destiné") + " à un autre voyageur" : "")) :
+        "Aucun mot pour toi pour l’instant" + (others ? " (" + others + (others > 1 ? " sont destinés" : " est destiné") + " à un autre voyageur)" : "") + ".";
+      open.slice().reverse().forEach(function (m) {
+        var c = document.createElement("article"), h = document.createElement("h3"), p = document.createElement("p"), s = document.createElement("small");
+        c.className = "mt-card" + (seen.indexOf(m.id) < 0 ? " new" : "");
+        h.textContent = "De la part de " + m.w; p.textContent = m.t;
+        s.textContent = (m.to === "Tous" ? "Pour vous quatre" : "Pour toi") + (m.op ? " · ouvert le " + dl(m.op) : "");
+        c.appendChild(h); c.appendChild(p); c.appendChild(s); list.appendChild(c);
+        if (keep.indexOf(m.id) < 0) keep.push(m.id);
+      });
+      wait.forEach(function (m) { list.appendChild(sealed(m.op)); });
+      LS.set("carnet.msg.seen", JSON.stringify(keep.slice(-300)));
+      Dots.paintMsg(0);
+    }
+    function loadTrav() {
+      RepC.listMsgs().then(showTrav).catch(function () { show({ box: 1 }); $("#mt-msg").textContent = "Impossible de charger les mots pour le moment (réseau ?). Réessaie dans un instant."; });
+    }
+    function start() {
+      if (busy) return;
+      show({ who: !(isGuest() || isTrav()) });
+      if (!(isGuest() || isTrav())) return;
+      if (!CLOUD) { show({}); who.hidden = false; who.textContent = "Les messages ne sont pas disponibles pour le moment."; return; }
+      busy = true;
+      RepC.canary().then(function (c) {
+        if (!c) { show({}); who.hidden = false; who.textContent = "Les messages ne sont pas encore ouverts. Reviens bientôt !"; return; }
+        return RepC.unlockSaved().then(function (ok) {
+          if (!ok) { show({ how: isGuest(), lock: 1 }); err.textContent = ""; return; }
+          if (isGuest()) showGuest(); else loadTrav();
+        });
+      }).catch(function () { show({}); who.hidden = false; who.textContent = "Impossible de joindre le serveur (réseau ?). Réessaie dans un instant."; }).then(function () { busy = false; });
+    }
+    form.addEventListener("submit", function (e) {
+      e.preventDefault(); err.textContent = "";
+      var c = code.value; if (!RepC.norm(c)) { err.textContent = "Tape le code reçu."; return; }
+      err.textContent = "Je vérifie…";
+      RepC.verify(c).then(function (r) {
+        if (r.none) { err.textContent = "Les messages ne sont pas encore ouverts."; return; }
+        RepC.remember(c); code.value = ""; err.textContent = ""; if (isGuest()) showGuest(); else loadTrav();
+      }).catch(function (e2) { err.textContent = wrongOrNet(e2); });
+    });
+    tIn.addEventListener("input", function () { cnt.textContent = tIn.value.length + " / 400"; });
+    $("#mg-send").addEventListener("click", send);
+    $("#mt-forget").addEventListener("click", function () { RepC.forget(); show({ lock: 1 }); toast("Code oublié sur ce téléphone"); });
+    return { enter: start };
+  })();
+
+  /* ───────────── points de nouveautés sur l'accueil : nouvelles photos (invité·e·s) et nouveaux mots (voyageurs) ───────────── */
+  var Dots = (function () {
+    var rep = $("#dot-rep"), msg = $("#dot-msg"), busy = false, last = 0;
+    function put(el, n) { if (!el) return; el.hidden = !(n > 0); el.textContent = n > 99 ? "99+" : String(n); el.setAttribute("aria-label", n + (n > 1 ? " nouveautés" : " nouveauté")); }
+    function paintMsg(n) { put(msg, n); }
+    function refresh(force) {
+      if (!(RepC.CFG && RepC.CAN) || busy) return;
+      var now = Date.now(); if (!force && now - last < 30000) return;
+      var g = isGuest(), t = isTrav(); if (!g && !t) { put(rep, 0); put(msg, 0); return; }
+      if (!LS.get("carnet.rep.code", "")) return;      /* sans le code gardé sur ce téléphone, on ne peut rien lire */
+      busy = true; last = now;
+      RepC.unlockSaved().then(function (ok) {
+        if (!ok) return;
+        if (g) {
+          return RepC.list().then(function (l) { var seen = parseInt(LS.get("carnet.rep.seen", "0"), 10) || 0; put(rep, Math.max(0, l.length - seen)); });
+        }
+        return RepC.listMsgs().then(function (all) {
+          var seen = seenMsgs(), today = bkkDay();
+          put(msg, visibleMsgs(all).filter(function (m) { return (!m.op || m.op <= today) && seen.indexOf(m.id) < 0; }).length);
+        });
+      }).catch(function () {}).then(function () { busy = false; });
+    }
+    return { refresh: refresh, paintMsg: paintMsg, clearRep: function () { put(rep, 0); } };
+  })();
+
+  /* ───────────── le voyage en un coup d'œil : jour après jour ───────────── */
+  var Recap = (function () {
+    var v = $("#v-recap"); if (!v) return { enter: function () {} };
+    var rows = $$(".rc-day", v), msg = $("#rc-msg"), stats = $("#rc-stats"), loaded = 0;
+    function chip(t) { var s = document.createElement("span"); s.textContent = t; return s; }
+    function stat(n, l) { var d = document.createElement("p"), b = document.createElement("b"), s = document.createElement("span"); b.textContent = n; s.textContent = l; d.appendChild(b); d.appendChild(s); return d; }
+    function thumbs(list) {
+      rows.forEach(function (r) {
+        var id = r.getAttribute("data-id"), box = $(".rc-th", r), mine = list.filter(function (x) { return x.d === id; });
+        box.textContent = ""; box.hidden = !mine.length;
+        mine.slice(0, 4).forEach(function (it) {
+          var a = document.createElement("a"), im = document.createElement("img"); a.href = "#/reportage"; a.setAttribute("aria-label", "Voir le polaroïd de " + it.w);
+          im.alt = ""; im.width = 60; im.height = 84; a.appendChild(im); box.appendChild(a);
+          RepC.photoObj(it.f).then(function (u) { im.src = u; }).catch(function () { a.hidden = true; });
+        });
+        if (mine.length > 4) { var more = document.createElement("a"); more.href = "#/reportage"; more.className = "rc-more"; more.textContent = "+" + (mine.length - 4); box.appendChild(more); }
+      });
+    }
+    function enter() {
+      var today = bkkDay(), ids = rows.map(function (r) { return r.getAttribute("data-id"); }), n = ids.filter(function (i) { return i <= today; }).length;
+      var started = n > 0, trav = isTrav();
+      $("#rc-fill").style.width = (100 * n / ids.length) + "%";
+      $("#rc-sub").textContent = !started ? "Le voyage commence le 18 décembre." : (n >= ids.length ? "Le voyage est terminé : 17 jours, de Paris à Bangkok et retour." : "Jour " + n + " sur " + ids.length);
+      msg.textContent = started ? "" : "Les jours s’ajoutent ici au fil du voyage.";
+      var stamps = {}, st = jget("carnet.stamps", null) || {}; (st.d instanceof Array ? st.d : []).forEach(function (k) { stamps[k] = 1; });
+      rows.forEach(function (r) {
+        var id = r.getAttribute("data-id"); r.hidden = id > today;
+        var c = $(".rc-chips", r); c.textContent = "";
+        if (trav && id <= today) { if (stamps[id]) c.appendChild(chip("Tampon posé")); if (hasPhoto && hasPhoto[id]) c.appendChild(chip("Photo du jour")); }
+      });
+      stats.textContent = ""; stats.appendChild(stat(Math.min(n, ids.length) + "/" + ids.length, "jours"));
+      var cities = {}; rows.forEach(function (r) { if (!r.hidden) { var cn = $(".rc-hd span", r).textContent; if (cn.indexOf("→") < 0) cities[cn] = 1; } });
+      stats.appendChild(stat(Object.keys(cities).length, Object.keys(cities).length > 1 ? "étapes" : "étape"));
+      if (trav) stats.appendChild(stat(Object.keys(stamps).length + (st.b instanceof Array ? st.b.length : 0), "tampons"));
+      if (!(RepC.CFG && RepC.CAN) || !(isGuest() || trav)) return;
+      if (!LS.get("carnet.rep.code", "")) {
+        if (started) msg.textContent = isGuest() ? "Pour voir les polaroïds ici, ouvre d’abord le Reportage photo avec ton code." : "Pour voir les polaroïds ici, tape le code dans « Photo pour les invités ».";
+        return;
+      }
+      RepC.unlockSaved().then(function (ok) {
+        if (!ok) return;
+        return RepC.list().then(function (l) { thumbs(l); stats.appendChild(stat(l.length, l.length > 1 ? "polaroïds" : "polaroïd")); });
+      }).catch(function () {});
+    }
+    return { enter: enter };
+  })();
+  setInterval(function () { if (!document.hidden && curName === "home") Dots.refresh(false); }, 60000);

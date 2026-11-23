@@ -1,7 +1,7 @@
 """Faux Supabase (essais seulement) : python3 fake_sb.py PORT. Stockage + table + fonction retirer_photo ; /__ctl/state, /__ctl/fail?n=K (les K prochaines écritures échouent), /__ctl/reset."""
 import http.server, json, re, sys, hashlib, uuid, datetime, urllib.parse
 PORT = int(sys.argv[1])
-ST = {"obj": {}, "rows": [], "fail": 0, "log": []}
+ST = {"obj": {}, "rows": [], "msgs": [], "fail": 0, "log": []}
 KEYS = ("sb_publishable_test",)
 class H(http.server.BaseHTTPRequestHandler):
     def log_message(self, *a): pass
@@ -18,9 +18,9 @@ class H(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         u = urllib.parse.urlparse(self.path); p = u.path
         if p == "/__ctl/state":
-            return self.out(200, {"obj": sorted(ST["obj"]), "sizes": {k: len(v) for k, v in ST["obj"].items()}, "rows": ST["rows"], "log": ST["log"]})
+            return self.out(200, {"obj": sorted(ST["obj"]), "sizes": {k: len(v) for k, v in ST["obj"].items()}, "rows": ST["rows"], "msgs": ST["msgs"], "log": ST["log"]})
         if p == "/__ctl/reset":
-            ST.update(obj={}, rows=[], fail=0, log=[]); return self.out(200, {"ok": 1})
+            ST.update(obj={}, rows=[], msgs=[], fail=0, log=[]); return self.out(200, {"ok": 1})
         if p == "/__ctl/fail":
             ST["fail"] = int(urllib.parse.parse_qs(u.query).get("n", ["1"])[0]); return self.out(200, {"ok": 1})
         m = re.fullmatch(r"/storage/v1/object/public/reportage/(.+)", p)
@@ -31,6 +31,10 @@ class H(http.server.BaseHTTPRequestHandler):
             if not self.authed(): return self.out(401, {"message": "no key"})
             rows = sorted(ST["rows"], key=lambda r: r["created_at"], reverse=True)
             return self.out(200, [{k: r[k] for k in ("id", "f", "meta", "created_at")} for r in rows])
+        if p == "/rest/v1/messages":
+            if not self.authed(): return self.out(401, {"message": "no key"})
+            rows = sorted(ST["msgs"], key=lambda r: r["created_at"])
+            return self.out(200, [{k: r[k] for k in ("id", "c", "created_at")} for r in rows])
         self.out(404, {"error": p})
     def do_POST(self):
         p = urllib.parse.urlparse(self.path).path; b = self.body()
@@ -55,5 +59,15 @@ class H(http.server.BaseHTTPRequestHandler):
             r = json.loads(b); h = hashlib.sha256(r["p_token"].encode()).hexdigest(); n0 = len(ST["rows"])
             ST["rows"] = [x for x in ST["rows"] if not (x["id"] == r["p_id"] and x["del_hash"] == h)]
             return self.out(200, len(ST["rows"]) < n0)
+        if p == "/rest/v1/messages":
+            r = json.loads(b)
+            if not (re.fullmatch(r"[0-9a-f-]{36}", r.get("id", "")) and re.fullmatch(r"[0-9a-f]{64}", r.get("del_hash", "")) and len(r.get("c", "")) < 6000):
+                return self.out(400, {"message": "check"})
+            r["created_at"] = datetime.datetime.utcnow().isoformat() + "Z" + str(len(ST["msgs"])).zfill(3)
+            ST["msgs"].append(r); return self.out(201)
+        if p == "/rest/v1/rpc/retirer_message":
+            r = json.loads(b); h = hashlib.sha256(r["p_token"].encode()).hexdigest(); n0 = len(ST["msgs"])
+            ST["msgs"] = [x for x in ST["msgs"] if not (x["id"] == r["p_id"] and x["del_hash"] == h)]
+            return self.out(200, len(ST["msgs"]) < n0)
         self.out(404, {"error": p})
 http.server.ThreadingHTTPServer(("127.0.0.1", PORT), H).serve_forever()

@@ -121,7 +121,7 @@ function paintWho() {
     hi(hello, me); hi(whoHi, me);
     var ini = $(".ini", sel); if (ini) whoAv.appendChild(ini.cloneNode(true));
   } else { hello.textContent = "Appuie sur ton prénom."; whoBar.hidden = true; }
-  guestNow(); xmasPaint();
+  guestNow(); postcard(); xmasPaint();
 }
 /* ───────────── invité·e : « En ce moment, là-bas » (heure de Bangkok et de Paris, jour du voyage, programme du jour) ───────────── */
 var gNow = $("#gnow"), gDays = null, gTimer = 0;
@@ -143,11 +143,22 @@ function guestNow() {
     try { bk = parts("Asia/Bangkok", now); pa = parts("Europe/Paris", now); } catch (e) { gNow.hidden = true; return; }
     $("#gn-bkk").textContent = bk.hm; $("#gn-par").textContent = pa.hm;
     var day = $("#gn-day"), plan = $("#gn-plan"), link = $("#gn-link"), t = bk.date, first = ids[0], last = ids[ids.length - 1];
-    if (t < first) {
+    var ms = now.getTime(), DEP = Date.parse("2026-12-18T16:05:00+01:00"), ARR = Date.parse("2026-12-19T09:15:00+07:00"), cnt = $("#gn-count");
+    cnt.hidden = true;
+    if (ms < DEP) {      /* avant le décollage d'Anne et Arthur (Paris, 18 décembre, 16 h 05) */
       var n = Math.round((Date.parse(first + "T00:00:00Z") - Date.parse(pa.date + "T00:00:00Z")) / 86400000);   /* jours entiers à l'heure de Paris : le départ est le 18 */
-      day.textContent = n === 1 ? "Départ demain" : "Départ dans " + n + "\u00a0jours";
+      day.textContent = n <= 0 ? "Départ aujourd’hui, à 16\u00a0h\u00a005" : n === 1 ? "Départ demain" : "Départ dans " + n + "\u00a0jours";
+      if (n >= 1) { cnt.hidden = false; $("#gn-n").textContent = String(n); $("#gn-nl").textContent = n === 1 ? "jour avant le départ" : "jours avant le départ"; }
       plan.textContent = "Arthur, Daphne, Flo et Anne partent le vendredi 18\u00a0décembre pour la Thaïlande, et reviennent le 3\u00a0janvier. Reviens ici : le programme du jour s’affichera chaque matin.";
-      link.hidden = true;
+      link.hidden = n > 0; link.setAttribute("href", "#/jours/" + first);
+    } else if (ms < ARR) {
+      day.textContent = "Anne et Arthur sont dans l’avion";
+      plan.textContent = "Décollage de Paris à 16\u00a0h\u00a005, arrivée à Bangkok demain matin à 9\u00a0h\u00a015 (heure de Bangkok). Daphne et Flo les rejoignent demain.";
+      link.hidden = false; link.setAttribute("href", "#/jours/" + first);
+    } else if (ms < ARR + 3 * 3600000) {
+      day.textContent = "Ils viennent d’atterrir à Bangkok !";
+      plan.textContent = "Anne et Arthur sont arrivés. Au programme : les chambres, une balade à Talat Noi, puis les retrouvailles avec Daphne et Flo.";
+      link.hidden = false; link.setAttribute("href", "#/jours/" + ids[1]);
     } else if (t > last) {
       day.textContent = "Le voyage est terminé";
       plan.textContent = "Ils sont rentrés de Thaïlande le 3\u00a0janvier. Le programme de chaque jour reste consultable dans l’onglet Jours.";
@@ -161,30 +172,80 @@ function guestNow() {
   }
   paint(); gTimer = setInterval(paint, 15000);
 }
-/* ───────────── invité·e : l'enveloppe de Noël (cachée jusqu'au 25 décembre, heure de Paris ; une fois ouverte, son mot reste) ───────────── */
-var xm = $("#xmas"), XM_KEY = "carnet.xmas", XM_DAY = "2026-12-25";
+/* invité·e : la carte postale du jour (Moomoo ou Aftonsparv) ; les précédentes sont repliées dessous */
+var pcSig = "";
+function postcard() {
+  var sec = $("#pcard"); if (!sec) return;
+  var guest = document.documentElement.classList.contains("is-guest"), ids = [], arts = $$("#pc-src .pc");
+  arts.forEach(function (a) { ids.push(a.getAttribute("data-id")); });
+  var first = ids[0], last = ids[ids.length - 1], cur = "";
+  if (guest && ids.length) {
+    var now = new Date(), bk = "";
+    try { var o = {}; new Intl.DateTimeFormat("fr-FR", { timeZone: "Asia/Bangkok", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(now).forEach(function (p) { o[p.type] = p.value; }); bk = o.year + "-" + o.month + "-" + o.day; } catch (e) { bk = ""; }
+    if (bk && now.getTime() >= Date.parse(first + "T07:00:00+01:00")) cur = bk < first ? first : bk > last ? last : bk;
+  }
+  sec.hidden = !cur;
+  if (!cur) { pcSig = ""; return; }
+  if (cur === pcSig) return; pcSig = cur;
+  var shown = ids.indexOf(cur), html = "";
+  $("#pc-cur").innerHTML = arts[shown].outerHTML.replace(/ data-id="[^"]*"/, "");
+  for (var i = shown - 1; i >= 0; i--) html += arts[i].outerHTML.replace(/ data-id="[^"]*"/, "");
+  $("#pc-old-l").innerHTML = html; $("#pc-old").hidden = shown === 0;
+}
+/* ───────────── invité·e : les enveloppes (Noël, Nouvel An) : cachées jusqu'à leur jour, heure de Paris ; une fois ouvertes, leur mot reste ───────────── */
+var ENVS = [{ sec: "#xmas", env: "#xm-env", card: "#xm-card", hint: "#xm-hint", key: "carnet.xmas", day: "2026-12-25" },
+            { sec: "#ny", env: "#ny-env", card: "#ny-card", hint: "#ny-hint", key: "carnet.ny", day: "2026-12-31" }];
 function parisDay() {
   var o = {};
   new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
   return o.year + "-" + o.month + "-" + o.day;
 }
-function xmasOpen(on, quiet) {
-  var env = $("#xm-env"); if (!env) return;
+function envOpen(E, on, quiet) {
+  var env = $(E.env); if (!env) return;
   env.classList.toggle("open", on); env.setAttribute("aria-expanded", on ? "true" : "false");
-  $("#xm-card").hidden = !on; $("#xm-hint").hidden = on;
-  if (on && !quiet) { LS.set(XM_KEY, "1"); try { $("#xm-card").scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {} }
+  $(E.card).hidden = !on; $(E.hint).hidden = on;
+  if (on && !quiet) { LS.set(E.key, "1"); try { $(E.card).scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {} }
 }
 function xmasPaint() {
-  if (!xm) return;
-  var show = false;
-  if (document.documentElement.classList.contains("is-guest")) { try { show = parisDay() >= XM_DAY; } catch (e) { show = false; } }
-  var was = xm.hidden; xm.hidden = !show;
-  if (show && was) xmasOpen(LS.get(XM_KEY, "") === "1", true);
+  var guest = document.documentElement.classList.contains("is-guest");
+  ENVS.forEach(function (E) {
+    var sec = $(E.sec); if (!sec) return;
+    var show = false;
+    if (guest) { try { show = parisDay() >= E.day; } catch (e) { show = false; } }
+    var was = sec.hidden; sec.hidden = !show;
+    if (show && was) envOpen(E, LS.get(E.key, "") === "1", true);
+  });
 }
-if (xm) {
-  $("#xm-env").addEventListener("click", function () { if (!$("#xm-env").classList.contains("open")) xmasOpen(true, false); });
-  setInterval(xmasPaint, 60000);
+ENVS.forEach(function (E) {
+  var b = $(E.env); if (!b) return;
+  b.addEventListener("click", function () { if (!b.classList.contains("open")) envOpen(E, true, false); });
+});
+if ($("#xmas")) setInterval(function () { xmasPaint(); postcard(); }, 60000);
+
+/* la pochette de la BO du jour : choisir où l'écouter (Spotify, Apple Musique, YouTube), la chanson est cherchée dans l'appli */
+var musBox = null;
+function musOpen(q) {
+  if (!musBox) {
+    musBox = document.createElement("div"); musBox.className = "mus"; musBox.hidden = true;
+    musBox.innerHTML = '<div class="mus-box" role="dialog" aria-modal="true" aria-labelledby="mus-h"><h2 id="mus-h">Écouter la BO du jour</h2><p id="mus-q"></p>' +
+      '<a id="mus-sp" target="_blank" rel="noopener noreferrer">Spotify<span aria-hidden="true">›</span></a>' +
+      '<a id="mus-am" target="_blank" rel="noopener noreferrer">Apple Musique<span aria-hidden="true">›</span></a>' +
+      '<a id="mus-yt" target="_blank" rel="noopener noreferrer">YouTube<span aria-hidden="true">›</span></a>' +
+      '<button class="btn sm alt mus-x" type="button">Fermer</button></div>';
+    document.body.appendChild(musBox);
+    musBox.addEventListener("click", function (e) { if (e.target === musBox || (e.target.closest && e.target.closest(".mus-x")) || (e.target.closest && e.target.closest("a"))) musBox.hidden = true; });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && musBox && !musBox.hidden) musBox.hidden = true; });
+  }
+  var u = encodeURIComponent(q);
+  $("#mus-q", musBox).textContent = q + " : la chanson est cherchée dans ton appli (il faut du réseau).";
+  $("#mus-sp", musBox).href = "https://open.spotify.com/search/" + u;
+  $("#mus-am", musBox).href = "https://music.apple.com/fr/search?term=" + u;
+  $("#mus-yt", musBox).href = "https://www.youtube.com/results?search_query=" + u;
+  musBox.hidden = false;
 }
+document.addEventListener("click", function (e) {
+  var b = e.target.closest && e.target.closest(".song-cv"); if (b) musOpen(b.getAttribute("data-song"));
+});
 
 /* une fois le prénom choisi, le bloc se replie (la ligne « Bonjour … Changer » le rouvre) */
 whoBar.addEventListener("click", function () { clearTimeout(whoT); whoOpen(whoBox.hidden); });
@@ -203,18 +264,18 @@ document.documentElement.classList.remove("has-who");
 var NAMES = { "": "home", jours: "days", hotels: "hotels", utile: "utile", metro: "metro", lexique: "lexique", taxi: "taxi", convertisseur: "convert", "good-to-know": "gtk",
   jeux: "jeux", quiz: "quiz", "test-doudou": "test", personnalite: "test", doudous: "doudous", mascottes: "doudous", "blind-test": "blind", "mots-meles": "mots", horoscope: "horo", passeport: "pass",
   defi: "defi", "mot-du-jour": "mot", mot: "mot", bingo: "bingo", gourmand: "gourmand", prix: "prix",
-  traduire: "trad", traducteur: "trad", essai: "essai", "photo-invites": "photoinv", reportage: "reportage" };
+  traduire: "trad", traducteur: "trad", essai: "essai", "photo-invites": "photoinv", reportage: "reportage", messages: "messages", apercu: "recap" };
 var NAV_OF = { home: "home", days: "days", hotels: "hotels", utile: "utile", metro: "utile", lexique: "utile", taxi: "utile", convert: "utile", gtk: "utile",
   jeux: "jeux", quiz: "jeux", test: "jeux", doudous: "jeux", blind: "jeux", mots: "jeux", horo: "jeux", pass: "jeux",
-  defi: "jeux", mot: "jeux", bingo: "jeux", gourmand: "jeux", prix: "jeux", trad: "utile", photoinv: "home", reportage: "home" };
+  defi: "jeux", mot: "jeux", bingo: "jeux", gourmand: "jeux", prix: "jeux", trad: "utile", photoinv: "home", reportage: "home", messages: "home", recap: "home" };
 var TITLES = { home: "Carnet Thaïlande 2026", days: "Jours · Carnet Thaïlande", hotels: "Hôtels · Carnet Thaïlande", utile: "Utile · Carnet Thaïlande", metro: "Plan du métro · Carnet Thaïlande",
   lexique: "Lexique · Carnet Thaïlande", taxi: "Cartes taxi · Carnet Thaïlande", convert: "Convertisseur · Carnet Thaïlande", gtk: "Good to know · Carnet Thaïlande",
   jeux: "Jeux · Carnet Thaïlande", quiz: "Quiz · Carnet Thaïlande", test: "Test de personnalité · Carnet Thaïlande", doudous: "Les mascottes · Carnet Thaïlande",
   blind: "Blind test · Carnet Thaïlande", mots: "Mots mêlés · Carnet Thaïlande", horo: "Horoscope · Carnet Thaïlande", pass: "Passeport · Carnet Thaïlande",
   defi: "Défi du jour · Carnet Thaïlande", mot: "Mot du jour · Carnet Thaïlande", bingo: "Bingo · Carnet Thaïlande", gourmand: "Carnet gourmand · Carnet Thaïlande", prix: "Prix du voyage · Carnet Thaïlande",
   trad: "Traducteur · Carnet Thaïlande", essai: "Essai des enveloppes · Carnet Thaïlande",
-  photoinv: "Photo pour les invités · Carnet Thaïlande", reportage: "Reportage photo · Carnet Thaïlande" };
-var GUEST_NO = ["bingo", "gourmand", "prix", "blind"];
+  photoinv: "Photo pour les invités · Carnet Thaïlande", reportage: "Reportage photo · Carnet Thaïlande", messages: "Messages · Carnet Thaïlande", recap: "Le voyage en un coup d’œil · Carnet Thaïlande" };
+var GUEST_NO = ["bingo", "gourmand", "prix", "blind", "defi"];
 var days = $$(".day").map(function (a) { return a.getAttribute("data-id"); });
 var curDay = null, curName = "", fromDays = false;
 
@@ -300,7 +361,7 @@ document.addEventListener("click", function (e) {
   e.preventDefault(); goDay(t.getAttribute("data-go-day"));
 });
 try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; } catch (e) {}
-/* glisser le doigt sur une page de jour : de la gauche vers la droite = jour suivant, de la droite vers la gauche = jour précédent
+/* glisser le doigt sur une page de jour : de la droite vers la gauche = jour suivant, de la gauche vers la droite = jour précédent
    (ignoré : bandeau des jours, zones qui défilent de côté, champs, geste qui part du bord de l'écran = « retour » du téléphone) */
 (function () {
   var vd = $("#v-days"), sx = 0, sy = 0, st = 0, ok = false;
@@ -323,7 +384,7 @@ try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; 
     var t = e.changedTouches && e.changedTouches[0]; if (!t) return;
     var dx = t.clientX - sx, dy = t.clientY - sy;
     if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.7 || Date.now() - st > 900) return;
-    var i = days.indexOf(curDay), j = i + (dx > 0 ? 1 : -1);
+    var i = days.indexOf(curDay), j = i + (dx < 0 ? 1 : -1);
     if (i < 0 || j < 0 || j >= days.length) return;
     goDay(days[j]);
   }, { passive: true });

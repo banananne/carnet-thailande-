@@ -252,6 +252,7 @@ whoBar.addEventListener("click", function () { clearTimeout(whoT); whoOpen(whoBo
 who.addEventListener("click", function (e) {
   var b = e.target.closest ? e.target.closest("button") : null; if (!b) return;
   LS.set("carnet.who", b.getAttribute("data-n")); paintWho();
+  try { document.dispatchEvent(new CustomEvent("carnet:who")); } catch (e) {}
   clearTimeout(whoT);
   /* le bloc reste ouvert tant qu'on ne le referme pas : la ligne « Bonjour … Changer » (ou « Bienvenue ») le replie */
   whoBar.hidden = false; whoOpen(true);

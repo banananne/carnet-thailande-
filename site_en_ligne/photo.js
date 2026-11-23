@@ -118,6 +118,16 @@
         })).then(function (a) { return a.filter(Boolean); });
       });
     }
+    function idsMsg() {      /* identifiants des mots, sans code : sert au point de nouveautés quand le code n'est pas encore gardé sur ce téléphone */
+      return fetch(CFG.url + "/rest/v1/messages?select=id&limit=500", { headers: head({}), cache: "no-store" }).then(ok).then(function (r) { return r.json(); }).then(function (rows) {
+        return rows.map(function (x) { return x.id; }).filter(function (i) { return /^[0-9a-f-]{36}$/.test(i || ""); });
+      });
+    }
+    function countRep() {      /* nombre de polaroïds publiés, sans code */
+      return fetch(CFG.url + "/rest/v1/reportage?select=f&limit=500", { headers: head({}), cache: "no-store" }).then(ok).then(function (r) { return r.json(); }).then(function (rows) {
+        return rows.filter(function (x) { return /^p[0-9a-f]{12}$/.test(x.f || ""); }).length;
+      });
+    }
     function removeMsg(id, token) {
       return fetch(CFG.url + "/rest/v1/rpc/retirer_message", { method: "POST", headers: head({ "Content-Type": "application/json" }), body: JSON.stringify({ p_id: id, p_token: token }) }).then(ok).then(function (r) { return r.json(); });
     }
@@ -127,7 +137,7 @@
     function setMine(a) { LS.set(MINE, JSON.stringify(a.slice(-100))); }
     return { CAN: CAN, CFG: CFG, norm: norm, unb64: unb64, derive: derive, canary: canary, verify: verify, unlockSaved: unlockSaved, remember: remember, forget: forget, list: list,
              photoUrl: photoUrl, publish: publish, remove: remove, mine: mine, setMine: setMine,
-             sendMsg: sendMsg, listMsgs: listMsgs, removeMsg: removeMsg, mineMsg: mineMsg, setMineMsg: setMineMsg, key: function () { return st.key; }, enc: enc, dec: dec, subtle: subtle, savedCode: function () { return LS.get(KEY, ""); } };
+             sendMsg: sendMsg, listMsgs: listMsgs, idsMsg: idsMsg, countRep: countRep, removeMsg: removeMsg, mineMsg: mineMsg, setMineMsg: setMineMsg, key: function () { return st.key; }, enc: enc, dec: dec, subtle: subtle, savedCode: function () { return LS.get(KEY, ""); } };
   })();
 
   var PhotoInv = (function () {
@@ -546,6 +556,7 @@
       });
       wait.forEach(function (m) { list.appendChild(sealed(m.op)); });
       LS.set("carnet.msg.seen", JSON.stringify(keep.slice(-300)));
+      LS.set("carnet.msg.known", JSON.stringify(all.map(function (m) { return m.id; }).slice(-500)));
       Dots.paintMsg(0);
     }
     function loadTrav() {
@@ -582,26 +593,37 @@
 
   /* ───────────── points de nouveautés sur l'accueil : nouvelles photos (invité·e·s) et nouveaux mots (voyageurs) ───────────── */
   var Dots = (function () {
-    var rep = $("#dot-rep"), msg = $("#dot-msg"), busy = false, last = 0;
+    var rep = $("#dot-rep"), msg = $("#dot-msg"), busy = false, last = 0, lastWho = null;
     function put(el, n) { if (!el) return; el.hidden = !(n > 0); el.textContent = n > 99 ? "99+" : String(n); el.setAttribute("aria-label", n + (n > 1 ? " nouveautés" : " nouveauté")); }
     function paintMsg(n) { put(msg, n); }
+    function known() { try { var a = JSON.parse(LS.get("carnet.msg.known", "[]")); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
     function refresh(force) {
       if (!(RepC.CFG && RepC.CAN) || busy) return;
-      var now = Date.now(); if (!force && now - last < 30000) return;
-      var g = isGuest(), t = isTrav(); if (!g && !t) { put(rep, 0); put(msg, 0); return; }
-      if (!LS.get("carnet.rep.code", "")) return;      /* sans le code gardé sur ce téléphone, on ne peut rien lire */
+      var g = isGuest(), t = isTrav(), w = me();
+      if (w !== lastWho) { lastWho = w; force = true; put(rep, 0); put(msg, 0); }      /* on vient de changer de prénom : on revérifie tout de suite */
+      var now = Date.now(); if (!force && now - last < 20000) return;
+      if (!g && !t) return;
       busy = true; last = now;
-      RepC.unlockSaved().then(function (ok) {
-        if (!ok) return;
+      var hasCode = !!LS.get("carnet.rep.code", "");
+      var job = hasCode ? RepC.unlockSaved().catch(function () { return false; }) : Promise.resolve(false);
+      job.then(function (ok) {
         if (g) {
-          return RepC.list().then(function (l) { var seen = parseInt(LS.get("carnet.rep.seen", "0"), 10) || 0; put(rep, Math.max(0, l.length - seen)); });
+          var seen = parseInt(LS.get("carnet.rep.seen", "0"), 10) || 0;
+          return (ok ? RepC.list().then(function (l) { return l.length; }) : RepC.countRep()).then(function (n) { put(rep, Math.max(0, n - seen)); });
         }
-        return RepC.listMsgs().then(function (all) {
-          var seen = seenMsgs(), today = bkkDay();
-          put(msg, visibleMsgs(all).filter(function (m) { return (!m.op || m.op <= today) && seen.indexOf(m.id) < 0; }).length);
-        });
+        if (ok) {
+          return RepC.listMsgs().then(function (all) {
+            var seen = seenMsgs(), today = bkkDay();
+            put(msg, visibleMsgs(all).filter(function (m) { return (!m.op || m.op <= today) && seen.indexOf(m.id) < 0; }).length);
+          });
+        }
+        /* pas de code sur ce téléphone : on ne peut pas lire les mots, mais on voit s'il y en a de nouveaux */
+        return RepC.idsMsg().then(function (ids) { var k = known(); put(msg, ids.filter(function (i) { return k.indexOf(i) < 0; }).length); });
       }).catch(function () {}).then(function () { busy = false; });
     }
+    document.addEventListener("carnet:who", function () { refresh(true); });
+    document.addEventListener("visibilitychange", function () { if (!document.hidden && curName === "home") refresh(false); });
+    window.addEventListener("pageshow", function () { if (curName === "home") refresh(false); });
     return { refresh: refresh, paintMsg: paintMsg, clearRep: function () { put(rep, 0); } };
   })();
 
@@ -619,4 +641,4 @@
     $$("[data-pv-pc]").forEach(function (b) { b.addEventListener("click", function () { idx += +b.getAttribute("data-pv-pc"); card(); }); });
     return { enter: function () { PVS.forEach(function (E) { envOpen(E, false, true); }); idx = 0; card(); } };
   })();
-  setInterval(function () { if (!document.hidden && curName === "home") Dots.refresh(false); }, 60000);
+  setInterval(function () { if (!document.hidden && curName === "home") Dots.refresh(false); }, 30000);

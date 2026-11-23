@@ -114,7 +114,7 @@ function paintWho() {
   document.documentElement.classList.toggle("is-guest", me === "Invité");
   document.documentElement.classList.toggle("is-trav", ["Arthur", "Daphne", "Flo", "Anne"].indexOf(me) >= 0);   /* voyageur : carte « Photo pour les invités » */   /* espace visiteur : pas d'enveloppes, d'horoscope du jour ni de rôles du jour */
   if (me === "Invité" && sel) {
-    hello.textContent = "Bienvenue ! Tu visites le carnet en invité·e : les enveloppes secrètes et les rôles du jour sont réservés aux voyageurs.";
+    hello.textContent = "Bienvenue ! Tu visites le carnet en invité·e : les enveloppes secrètes et le défi du jour sont réservés aux voyageurs.";
     whoHi.textContent = ""; var gb = document.createElement("b"); gb.textContent = "Bienvenue"; whoHi.appendChild(gb); whoHi.appendChild(document.createTextNode("\u00a0!"));
     var gi = $(".ini", sel); if (gi) whoAv.appendChild(gi.cloneNode(true));
   } else if (me && sel) {
@@ -192,9 +192,9 @@ function postcard() {
   for (var i = shown - 1; i >= 0; i--) html += arts[i].outerHTML.replace(/ data-id="[^"]*"/, "");
   $("#pc-old-l").innerHTML = html; $("#pc-old").hidden = shown === 0;
 }
-/* ───────────── invité·e : les enveloppes (Noël, Nouvel An) : cachées jusqu'à leur jour, heure de Paris ; une fois ouvertes, leur mot reste ───────────── */
-var ENVS = [{ sec: "#xmas", env: "#xm-env", card: "#xm-card", hint: "#xm-hint", key: "carnet.xmas", day: "2026-12-25" },
-            { sec: "#ny", env: "#ny-env", card: "#ny-card", hint: "#ny-hint", key: "carnet.ny", day: "2026-12-31" }];
+/* ───────────── invité·e : les enveloppes (Noël le 25 décembre ; Nouvel An les 31 décembre et 1er janvier ; heure de Paris) : cachées avant, retirées après ; une fois ouvertes, leur mot reste le temps de leur jour ───────────── */
+var ENVS = [{ sec: "#xmas", env: "#xm-env", card: "#xm-card", hint: "#xm-hint", key: "carnet.xmas", day: "2026-12-25", until: "2026-12-25" },
+            { sec: "#ny", env: "#ny-env", card: "#ny-card", hint: "#ny-hint", key: "carnet.ny", day: "2026-12-31", until: "2027-01-01" }];
 function parisDay() {
   var o = {};
   new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
@@ -204,14 +204,14 @@ function envOpen(E, on, quiet) {
   var env = $(E.env); if (!env) return;
   env.classList.toggle("open", on); env.setAttribute("aria-expanded", on ? "true" : "false");
   $(E.card).hidden = !on; $(E.hint).hidden = on;
-  if (on && !quiet) { LS.set(E.key, "1"); try { $(E.card).scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {} }
+  if (on && !quiet) { if (E.key) LS.set(E.key, "1"); try { $(E.card).scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {} }
 }
 function xmasPaint() {
   var guest = document.documentElement.classList.contains("is-guest");
   ENVS.forEach(function (E) {
     var sec = $(E.sec); if (!sec) return;
     var show = false;
-    if (guest) { try { show = parisDay() >= E.day; } catch (e) { show = false; } }
+    if (guest) { try { var pd = parisDay(); show = pd >= E.day && pd <= E.until; } catch (e) { show = false; } }
     var was = sec.hidden; sec.hidden = !show;
     if (show && was) envOpen(E, LS.get(E.key, "") === "1", true);
   });
@@ -264,17 +264,17 @@ document.documentElement.classList.remove("has-who");
 var NAMES = { "": "home", jours: "days", hotels: "hotels", utile: "utile", metro: "metro", lexique: "lexique", taxi: "taxi", convertisseur: "convert", "good-to-know": "gtk",
   jeux: "jeux", quiz: "quiz", "test-doudou": "test", personnalite: "test", doudous: "doudous", mascottes: "doudous", "blind-test": "blind", "mots-meles": "mots", horoscope: "horo", passeport: "pass",
   defi: "defi", "mot-du-jour": "mot", mot: "mot", bingo: "bingo", gourmand: "gourmand", prix: "prix",
-  traduire: "trad", traducteur: "trad", essai: "essai", "photo-invites": "photoinv", reportage: "reportage", messages: "messages", apercu: "recap" };
+  traduire: "trad", traducteur: "trad", essai: "essai", "photo-invites": "photoinv", reportage: "reportage", messages: "messages", previsualisation: "previsu" };
 var NAV_OF = { home: "home", days: "days", hotels: "hotels", utile: "utile", metro: "utile", lexique: "utile", taxi: "utile", convert: "utile", gtk: "utile",
   jeux: "jeux", quiz: "jeux", test: "jeux", doudous: "jeux", blind: "jeux", mots: "jeux", horo: "jeux", pass: "jeux",
-  defi: "jeux", mot: "jeux", bingo: "jeux", gourmand: "jeux", prix: "jeux", trad: "utile", photoinv: "home", reportage: "home", messages: "home", recap: "home" };
+  defi: "jeux", mot: "jeux", bingo: "jeux", gourmand: "jeux", prix: "jeux", trad: "utile", photoinv: "home", reportage: "home", messages: "home", previsu: "home" };
 var TITLES = { home: "Carnet Thaïlande 2026", days: "Jours · Carnet Thaïlande", hotels: "Hôtels · Carnet Thaïlande", utile: "Utile · Carnet Thaïlande", metro: "Plan du métro · Carnet Thaïlande",
   lexique: "Lexique · Carnet Thaïlande", taxi: "Cartes taxi · Carnet Thaïlande", convert: "Convertisseur · Carnet Thaïlande", gtk: "Good to know · Carnet Thaïlande",
   jeux: "Jeux · Carnet Thaïlande", quiz: "Quiz · Carnet Thaïlande", test: "Test de personnalité · Carnet Thaïlande", doudous: "Les mascottes · Carnet Thaïlande",
   blind: "Blind test · Carnet Thaïlande", mots: "Mots mêlés · Carnet Thaïlande", horo: "Horoscope · Carnet Thaïlande", pass: "Passeport · Carnet Thaïlande",
   defi: "Défi du jour · Carnet Thaïlande", mot: "Mot du jour · Carnet Thaïlande", bingo: "Bingo · Carnet Thaïlande", gourmand: "Carnet gourmand · Carnet Thaïlande", prix: "Prix du voyage · Carnet Thaïlande",
   trad: "Traducteur · Carnet Thaïlande", essai: "Essai des enveloppes · Carnet Thaïlande",
-  photoinv: "Photo pour les invités · Carnet Thaïlande", reportage: "Reportage photo · Carnet Thaïlande", messages: "Messages · Carnet Thaïlande", recap: "Le voyage en un coup d’œil · Carnet Thaïlande" };
+  photoinv: "Photo pour les invités · Carnet Thaïlande", reportage: "Reportage photo · Carnet Thaïlande", messages: "Messages · Carnet Thaïlande", previsu: "Aperçu des surprises · Carnet Thaïlande" };
 var GUEST_NO = ["bingo", "gourmand", "prix", "blind", "defi"];
 var days = $$(".day").map(function (a) { return a.getAttribute("data-id"); });
 var curDay = null, curName = "", fromDays = false;

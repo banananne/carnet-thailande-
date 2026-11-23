@@ -94,16 +94,6 @@
     function remove(id, token) {
       return fetch(CFG.url + "/rest/v1/rpc/retirer_photo", { method: "POST", headers: head({ "Content-Type": "application/json" }), body: JSON.stringify({ p_id: id, p_token: token }) }).then(ok).then(function (r) { return r.json(); });
     }
-    var urls = {};
-    function photoObj(f) {      /* photo déchiffrée → adresse locale (mise en mémoire) */
-      if (urls[f]) return Promise.resolve(urls[f]);
-      return fetch(photoUrl(f)).then(ok).then(function (r) { return r.arrayBuffer(); }).then(function (buf) {
-        var u = new Uint8Array(buf);
-        return subtle.decrypt({ name: "AES-GCM", iv: u.slice(0, 12), additionalData: enc.encode("rep|" + f), tagLength: 128 }, st.key, u.slice(12));
-      }).then(function (pt) {
-        var u8 = new Uint8Array(pt, 0, 4); urls[f] = URL.createObjectURL(new Blob([pt], { type: u8[0] === 0x89 ? "image/png" : (u8[0] === 0x52 ? "image/webp" : "image/jpeg") })); return urls[f];
-      });
-    }
     /* messages des invité·e·s aux voyageurs : un petit texte chiffré par message (même clé que le reportage) */
     var MMINE = "carnet.msg.mine", TOS = ["Tous", "Anne", "Arthur", "Daphne", "Flo"];
     function sendMsg(m) {
@@ -136,7 +126,7 @@
     function mine() { try { var a = JSON.parse(LS.get(MINE, "[]")); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
     function setMine(a) { LS.set(MINE, JSON.stringify(a.slice(-100))); }
     return { CAN: CAN, CFG: CFG, norm: norm, unb64: unb64, derive: derive, canary: canary, verify: verify, unlockSaved: unlockSaved, remember: remember, forget: forget, list: list,
-             photoUrl: photoUrl, photoObj: photoObj, publish: publish, remove: remove, mine: mine, setMine: setMine,
+             photoUrl: photoUrl, publish: publish, remove: remove, mine: mine, setMine: setMine,
              sendMsg: sendMsg, listMsgs: listMsgs, removeMsg: removeMsg, mineMsg: mineMsg, setMineMsg: setMineMsg, key: function () { return st.key; }, enc: enc, dec: dec, subtle: subtle, savedCode: function () { return LS.get(KEY, ""); } };
   })();
 
@@ -615,50 +605,18 @@
     return { refresh: refresh, paintMsg: paintMsg, clearRep: function () { put(rep, 0); } };
   })();
 
-  /* ───────────── le voyage en un coup d'œil : jour après jour ───────────── */
-  var Recap = (function () {
-    var v = $("#v-recap"); if (!v) return { enter: function () {} };
-    var rows = $$(".rc-day", v), msg = $("#rc-msg"), stats = $("#rc-stats"), loaded = 0;
-    function chip(t) { var s = document.createElement("span"); s.textContent = t; return s; }
-    function stat(n, l) { var d = document.createElement("p"), b = document.createElement("b"), s = document.createElement("span"); b.textContent = n; s.textContent = l; d.appendChild(b); d.appendChild(s); return d; }
-    function thumbs(list) {
-      rows.forEach(function (r) {
-        var id = r.getAttribute("data-id"), box = $(".rc-th", r), mine = list.filter(function (x) { return x.d === id; });
-        box.textContent = ""; box.hidden = !mine.length;
-        mine.slice(0, 4).forEach(function (it) {
-          var a = document.createElement("a"), im = document.createElement("img"); a.href = "#/reportage"; a.setAttribute("aria-label", "Voir le polaroïd de " + it.w);
-          im.alt = ""; im.width = 60; im.height = 84; a.appendChild(im); box.appendChild(a);
-          RepC.photoObj(it.f).then(function (u) { im.src = u; }).catch(function () { a.hidden = true; });
-        });
-        if (mine.length > 4) { var more = document.createElement("a"); more.href = "#/reportage"; more.className = "rc-more"; more.textContent = "+" + (mine.length - 4); box.appendChild(more); }
-      });
+  /* ───────────── page d'aperçu des surprises (hors menus) : enveloppes et cartes postales, sans attendre la date ───────────── */
+  var Preview = (function () {
+    var v = $("#v-previsu"); if (!v) return { enter: function () {} };
+    var PVS = [{ env: "#pvx-env", card: "#pvx-card", hint: "#pvx-hint" }, { env: "#pvn-env", card: "#pvn-card", hint: "#pvn-hint" }], idx = 0;
+    PVS.forEach(function (E) { var b = $(E.env); b.addEventListener("click", function () { if (!b.classList.contains("open")) envOpen(E, true, false); }); });
+    $$("[data-pv-close]").forEach(function (b) { b.addEventListener("click", function () { envOpen(PVS[+b.getAttribute("data-pv-close")], false, true); }); });
+    function card() {
+      var arts = $$("#pc-src .pc"); if (!arts.length) return;
+      idx = Math.max(0, Math.min(arts.length - 1, idx));
+      $("#pv-pc").innerHTML = arts[idx].outerHTML.replace(/ data-id="[^"]*"/, ""); $("#pv-pc-n").textContent = "Jour " + (idx + 1) + " sur " + arts.length;
     }
-    function enter() {
-      var today = bkkDay(), ids = rows.map(function (r) { return r.getAttribute("data-id"); }), n = ids.filter(function (i) { return i <= today; }).length;
-      var started = n > 0, trav = isTrav();
-      $("#rc-fill").style.width = (100 * n / ids.length) + "%";
-      $("#rc-sub").textContent = !started ? "Le voyage commence le 18 décembre." : (n >= ids.length ? "Le voyage est terminé : 17 jours, de Paris à Bangkok et retour." : "Jour " + n + " sur " + ids.length);
-      msg.textContent = started ? "" : "Les jours s’ajoutent ici au fil du voyage.";
-      var stamps = {}, st = jget("carnet.stamps", null) || {}; (st.d instanceof Array ? st.d : []).forEach(function (k) { stamps[k] = 1; });
-      rows.forEach(function (r) {
-        var id = r.getAttribute("data-id"); r.hidden = id > today;
-        var c = $(".rc-chips", r); c.textContent = "";
-        if (trav && id <= today) { if (stamps[id]) c.appendChild(chip("Tampon posé")); if (hasPhoto && hasPhoto[id]) c.appendChild(chip("Photo du jour")); }
-      });
-      stats.textContent = ""; stats.appendChild(stat(Math.min(n, ids.length) + "/" + ids.length, "jours"));
-      var cities = {}; rows.forEach(function (r) { if (!r.hidden) { var cn = $(".rc-hd span", r).textContent; if (cn.indexOf("→") < 0) cities[cn] = 1; } });
-      stats.appendChild(stat(Object.keys(cities).length, Object.keys(cities).length > 1 ? "étapes" : "étape"));
-      if (trav) stats.appendChild(stat(Object.keys(stamps).length + (st.b instanceof Array ? st.b.length : 0), "tampons"));
-      if (!(RepC.CFG && RepC.CAN) || !(isGuest() || trav)) return;
-      if (!LS.get("carnet.rep.code", "")) {
-        if (started) msg.textContent = isGuest() ? "Pour voir les polaroïds ici, ouvre d’abord le Reportage photo avec ton code." : "Pour voir les polaroïds ici, tape le code dans « Photo pour les invités ».";
-        return;
-      }
-      RepC.unlockSaved().then(function (ok) {
-        if (!ok) return;
-        return RepC.list().then(function (l) { thumbs(l); stats.appendChild(stat(l.length, l.length > 1 ? "polaroïds" : "polaroïd")); });
-      }).catch(function () {});
-    }
-    return { enter: enter };
+    $$("[data-pv-pc]").forEach(function (b) { b.addEventListener("click", function () { idx += +b.getAttribute("data-pv-pc"); card(); }); });
+    return { enter: function () { PVS.forEach(function (E) { envOpen(E, false, true); }); idx = 0; card(); } };
   })();
   setInterval(function () { if (!document.hidden && curName === "home") Dots.refresh(false); }, 60000);

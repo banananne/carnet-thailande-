@@ -230,28 +230,18 @@ with sync_playwright() as p:
     blk = pg.locator("#v-defi .dfd:visible")
     check("D4 un seul bloc visible", blk.count() == 1)
     i = 4
-    texts = [low(x) for x in blk.locator(".rl-i .rl-r").all_text_contents()]
-    want = [low(X.ROLES[(pp + i) % 4]["name"]) for pp in range(4)]
-    check("D5 les quatre rôles sont distribués (jour 5)", [squash(x) for x in texts] == [squash(x) for x in want] and len(set(texts)) == 4, texts)
-    me = blk.locator(".rl-i.me")
-    check("D6 ma ligne est mise en avant (Anne) avec le texte du rôle", me.count() == 1 and me.get_attribute("data-n") == "Anne" and squash(X.ROLES[(3 + i) % 4]["text"]) in squash(me.locator(".rl-more").text_content()))
-    check("D7 le texte du rôle n'est montré que pour moi", blk.locator(".rl-i:not(.me) .rl-more:visible").count() == 0)
+    check("D5 plus de rôles du jour sur la page du défi", pg.locator("#v-defi .rl-i, #v-defi .rl-box").count() == 0 and "rôle" not in low(pg.locator("#v-defi").text_content()))
     check("D8 la mission du jour", squash(X.MISSIONS[i][0]) in squash(blk.locator(".mis-t").text_content()) and squash(X.MISSIONS[i][1]) in squash(blk.locator(".mis-b").text_content()))
     check("D9 le lien « Prendre la photo » mène à la photo de ce jour", blk.locator("a.btn.alt").get_attribute("href") == "#/jours/2026-12-22/photo")
-    check("D10 pas de pastilles de prénom (prénom déjà choisi)", not vis(pg, "#v-defi .whopick"))
-    # les jours précédents, les rôles qui tournent
-    seen_roles = {}
+    check("D10 pas de pastilles de prénom sur la page du défi", pg.locator("#v-defi .whopick").count() == 0)
+    # les jours précédents
     for k in range(4, -1, -1):
         blk = pg.locator("#v-defi .dfd:visible")
-        rows = [low(x) for x in blk.locator(".rl-i .rl-r").all_text_contents()]
-        check("D11 jour %d : quatre rôles différents" % (k + 1), len(set(rows)) == 4)
-        seen_roles[k] = rows
         check("D12 jour %d : défi relevé non coché au départ" % (k + 1), blk.locator('[data-df="done"]').get_attribute("aria-pressed") == "false")
         blk.locator('[data-df="done"]').click(); pg.wait_for_timeout(120)
         check("D13 jour %d : coché" % (k + 1), pg.locator("#v-defi .dfd:visible [data-df=done]").get_attribute("aria-pressed") == "true")
         if k > 0:
             pg.click('#v-defi [data-step="-1"]'); pg.wait_for_timeout(100)
-    check("D14 chaque personne change de rôle tous les jours (jours 1→5)", all(seen_roles[k][pp] != seen_roles[k + 1][pp] for k in range(4) for pp in range(4)))
     check("D15 le premier jour : « précédent » désactivé", pg.locator('#v-defi [data-step="-1"]').is_disabled() and "18 décembre" in low(pg.locator("#v-defi .dn-t b").text_content()))
     check("D16 5 défis → tampon spécial « défi »", "defi" in stamps_b(pg), stamps_b(pg))
     check("D17 compteur : 5 défis sur 17", "5 défis relevés sur 17" in low(pg.text_content("#mis-n")), pg.text_content("#mis-n"))
@@ -268,15 +258,6 @@ with sync_playwright() as p:
     check("D22 le sous-titre de la tuile suit", "4 défis relevés sur 17" in low(pg.locator('[data-hub="defi"]').text_content()), pg.locator('[data-hub="defi"]').text_content())
     # l'état est par jour, pas par prénom : on garde les 4
     pg.screenshot(path=OUT + "t30_hub.png", full_page=True)
-    ctx.close()
-
-    # sans prénom : pastilles pour choisir, puis rôle surligné
-    ctx, pg = newctx(b, when=ms(2026, 12, 19))
-    pg.goto(BASE + "#/defi", wait_until="load"); pg.wait_for_timeout(500)
-    check("D23 sans prénom : pastilles visibles", vis(pg, "#v-defi .whopick") and pg.locator("#v-defi .rl-i.me").count() == 0)
-    pg.click('#v-defi .whopick [data-wp="Flo"]'); pg.wait_for_timeout(250)
-    check("D24 après avoir choisi : pastilles cachées, ligne de Flo en avant", not vis(pg, "#v-defi .whopick") and pg.locator("#v-defi .dfd:visible .rl-i.me").get_attribute("data-n") == "Flo"
-          and ls_get(pg, "carnet.who") == "Flo")
     ctx.close()
 
     # ───────────────────────── E. mot du jour ─────────────────────────

@@ -77,35 +77,20 @@ def day_title(i):
     return A.day_title(IDS[i])
 
 
-# ───────────────────────── défi du jour + rôles ─────────────────────────
-def roles_ul(i):
-    out = '<ul class="rl">'
-    for p, (name, bg, fg) in enumerate(G.PLAYERS):
-        r = X.ROLES[(p + i) % 4]
-        m = BG.DD[r["mascot"]]
-        out += ('<li class="rl-i" data-n="%s"><span class="ini" style="background:%s;color:%s">%s</span>'
-                '<div class="rl-b"><b>%s</b><span class="rl-r">%s</span>'
-                '<p class="rl-more">%s</p><p class="rl-voice">« %s »<small>%s</small></p></div>%s</li>'
-                % (name, bg, fg, name[0], name, txt(r["name"]), txt(r["text"]), txt(r["voice"]),
-                   txt(m["short"]), BG.dd_img(r["mascot"], "rl-img")))
-    return out + "</ul>"
-
-
+# ───────────────────────── défi du jour (la photo de Minou ; les rôles ont été retirés à la demande d'Anne, 23 novembre) ─────────────────────────
 def view_defi():
     minou = BG.dd_img("minou", "df-img", lazy=True)
-    out = ('<main class="view" id="v-defi" hidden>' + A.back_head("Défi du jour", "Un rôle chacun, une photo pour tous", "#/jeux")
-           + '<div class="wrap"><p class="how">' + typo('Chaque jour, <b>Minou</b> envoie de loin un défi photo à toute l’équipe. '
-             'Les quatre <b>rôles</b> tournent : chacun change de rôle tous les jours.') + '</p>'
-           + daynav("defi") + who_pick())
+    out = ('<main class="view" id="v-defi" hidden>' + A.back_head("Défi du jour", "Une mission photo pour la journée", "#/jeux")
+           + '<div class="wrap"><p class="how">' + typo('Chaque jour, <b>Minou</b> envoie de loin un défi photo à toute l’équipe.') + '</p>'
+           + daynav("defi"))
     for i, d in enumerate(D.DAYS):
         defi, bonus, mk = X.MISSIONS[i]
         out += ('<div class="dfd" data-i="%d" data-id="%s" data-title="%s" hidden>'
-                '<section class="bubble blue rl-box" aria-label="Les rôles du jour"><h2>Les rôles du jour</h2>%s</section>'
                 '<section class="bubble sand mis" aria-label="Le défi photo"><div class="mis-top">%s<div><p class="mis-kick">Minou écrit de loin</p><h2>Le défi photo</h2></div></div>'
                 '<p class="mis-t">%s</p><p class="mis-b">%s<span><small>Bonus mascotte</small>%s</span></p>'
                 '<div class="acts"><button class="btn" type="button" data-df="done" aria-pressed="false">%s<span>Défi relevé</span></button>'
                 '<a class="btn alt" href="#/jours/%s/photo">%s Prendre la photo</a></div></section></div>'
-                % (i, d["id"], esc(day_title(i)), roles_ul(i), minou, txt(defi), BG.dd_img(mk, "mis-ph", lazy=True), txt(bonus),
+                % (i, d["id"], esc(day_title(i)), minou, txt(defi), BG.dd_img(mk, "mis-ph", lazy=True), txt(bonus),
                    icon("check"), d["id"], icon("camera")))
     out += ('<div class="mis-sum"><p class="mis-n" id="mis-n" role="status"></p><div class="dots" id="mis-dots" aria-hidden="true">%s</div></div>'
             % "".join("<i></i>" for _ in IDS))
@@ -250,7 +235,7 @@ def horo_home_html():
 # ───────────────────────── pièces pour les autres pages ─────────────────────────
 def day_link_html(day_id):
     """Sur la page d'un jour : un raccourci vers le défi photo de ce jour."""
-    return ('<a class="tile blue qz-cta dfl" href="#/defi/%s"><span class="ic">%s</span><span><b>Le défi du jour</b><small>Une mission photo et les rôles</small></span></a>'
+    return ('<a class="tile blue qz-cta dfl" href="#/defi/%s"><span class="ic">%s</span><span><b>Le défi du jour</b><small>Une mission photo par jour</small></span></a>'
             % (day_id, icon("camera")))
 
 

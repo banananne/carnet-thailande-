@@ -664,7 +664,7 @@ window.CarnetGames = (function () {
       else if (name === "photoinv") PhotoInv.enter();
       else if (name === "reportage") Rep.enter();
       else if (name === "messages") Msg.enter();
-      else if (name === "recap") Recap.enter();
+      else if (name === "previsu") Preview.enter();
       if (name === "home") Dots.refresh(false);
       if (name === "horo" && open) Horo.enter(); else Horo.leave();
     },

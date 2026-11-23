@@ -68,16 +68,11 @@
     return { paint: paint };
   })();
 
-  /* ───────────── défi du jour : rôles + mission photo de Minou ───────────── */
+  /* ───────────── défi du jour : la mission photo de Minou ───────────── */
   var Defi = (function () {
     var v = $("#v-defi"), KEY = "carnet.defi", done = jlist(KEY);
     var nav = DayNav(v, "defi", ".dfd", function (i, blk) { paintBlock(blk); });
-    function mark(blk) {
-      var who = me();
-      $$(".rl-i", blk).forEach(function (li) { li.classList.toggle("me", li.getAttribute("data-n") === who); });
-    }
     function paintBlock(blk) {
-      mark(blk);
       var on = done.indexOf(blk.getAttribute("data-id")) >= 0, b = $('[data-df="done"]', blk);
       b.setAttribute("aria-pressed", on ? "true" : "false"); b.classList.toggle("on", on);
       $("span", b).textContent = on ? "Défi relevé !" : "Défi relevé";
@@ -96,7 +91,7 @@
       jset(KEY, done); paintBlock(blk);
       if (on) { buzz(20); var c = centerOf(b); Confetti.burst(c.x, c.y, 40); if (done.length >= 5) Stamps.bonus("defi"); }
     });
-    function enter() { paintWhoPick(v); var k = dayFromHash(); nav.set(k >= 0 ? k : Cal.idxToday()); }
+    function enter() { var k = dayFromHash(); nav.set(k >= 0 ? k : Cal.idxToday()); }
     summary();
     return { enter: enter };
   })();

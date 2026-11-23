@@ -575,7 +575,7 @@ def view_home(version):
         out += ('<button type="button" data-n="%s" aria-pressed="false"><span class="ini" style="background:%s;color:%s">%s</span>%s</button>'
                 % (n, bg, fg, n[0], n))
     out += ('<button type="button" class="guest" data-n="Invité" aria-pressed="false"><span class="ini" style="background:#CCD9F4;color:#283881">✦</span>'
-            'Je suis invité·e</button>')   # espace visiteur : tout le site, sans les enveloppes, l’horoscope du jour ni les rôles du jour
+            'Je suis invité·e</button>')   # espace visiteur : tout le site, sans les enveloppes, l’horoscope du jour ni le défi du jour
     out += '</div><p class="hello" id="hello" role="status">Appuie sur ton prénom.</p></div></section>'
 
     import build_photo as BPH
@@ -606,7 +606,7 @@ def view_home(version):
         out += ('<li><a href="#/jours/%s" data-go-day="%s" style="--c:%s"><span class="dot"></span>'
                 '<span><b>%s</b><small>%s</small><small>%s</small></span><span class="go">%s</span></a></li>'
                 % (s["first"], s["first"], s["color"], txt(s["city"]), txt(s["dates"]), txt(h["name"]), icon("chevr")))
-    out += '</ul><a class="btn sm trip-recap" href="#/apercu">%s</a></div></section>' % txt("Le voyage en un coup d’œil")
+    out += "</ul></div></section>"
 
     # l'accueil ne garde que l'essentiel : le reste est dans la barre du bas (Jeux, Utile)
     tiles = [("sand", "#/jours", "calendar", "Jours", "18 décembre → 3 janvier"),

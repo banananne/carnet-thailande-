@@ -61,7 +61,7 @@ with sync_playwright() as p:
     check("B6 pas d'horoscope du jour pour l'invité·e", not vis(pg, "#hsd"))
     check("B7 les rubriques du site restent là (Jours, Hôtels, Métro, Cartes taxi)", pg.locator("#v-home .tile, #v-home a.tile, #v-home [data-go]").count() >= 4 or pg.locator("#v-home a[href^='#/']").count() >= 4)
     pg.evaluate("location.hash = '#/defi'"); pg.wait_for_timeout(500)
-    check("B8 défi du jour : pas de rôles du jour pour l'invité·e", not vis(pg, ".rl-box") and not vis(pg, "#v-defi .rl-box"))
+    check("B8 défi du jour : l'invité·e est ramené aux jeux", pg.evaluate("location.hash") == "#/jeux" and not vis(pg, "#v-defi"))
     for h, v in [("#/jours/2026-12-20", "#v-days"), ("#/hotels", "#v-hotels"), ("#/utile", "#v-utile"), ("#/jeux", "#v-jeux"), ("#/taxi", "#v-taxi"), ("#/convertisseur", "#v-convert"), ("#/mots-meles", "#v-mots"), ("#/quiz", "#v-quiz"), ("#/lexique", "#v-lexique"), ("#/traduire", "#v-trad")]:
         pg.evaluate("h => { location.hash = h }", h); pg.wait_for_timeout(350)
         check("B9 invité·e : %s s'affiche sans débordement" % h, pg.evaluate("v => !!document.querySelector(v) && document.querySelector(v).offsetParent !== null", v) and not overflow(pg), h)
@@ -80,11 +80,11 @@ with sync_playwright() as p:
     check("B13 l'horoscope du jour revient pour Flo", vis(pg, "#hsd"))
     ctx.close()
 
-    # ───── C. depuis la page « rôles du jour » : choix du prénom avec invité·e ─────
+    # ───── C. depuis la page du bingo : choix du prénom avec invité·e ─────
     ctx, pg = newctx(b, at(2026, 12, 22, 10, 0))
-    pg.goto(BASE + "#/defi", wait_until="load"); pg.wait_for_timeout(600)
+    pg.goto(BASE + "#/bingo", wait_until="load"); pg.wait_for_timeout(600)
     wp = pg.locator(".whopick button")
-    check("C1 sur la page du défi, aussi : « Je suis invité·e »", wp.count() >= 5 and pg.locator('.whopick button[data-wp="Invité"]').count() >= 1, wp.count())
+    check("C1 sur la page du bingo, aussi : « Je suis invité·e »", wp.count() >= 5 and pg.locator('.whopick button[data-wp="Invité"]').count() >= 1, wp.count())
     pg.locator('.whopick button[data-wp="Invité"]').first.click(); pg.wait_for_timeout(500)
     check("C2 invité·e choisi : le choix du prénom se range et les rôles restent cachés", pg.evaluate("localStorage.getItem('carnet.who')") == "Invité" and not vis(pg, ".rl-box"))
     ctx.close()

@@ -46,17 +46,17 @@ NY_TEXT = ("Ici, la nouvelle année arrive six heures avant chez vous : on trinq
 NY_PS = "P.-S. de Boop et de Minou, restés à la maison avec vous : on garde la meilleure place pour les histoires du retour."
 
 
-def _envelope(sec, env, card, hint, heading, aria, hint_txt, title, text, sign, ps, mates, cls=""):
+def _envelope(sec, env, card, hint, heading, aria, hint_txt, title, text, sign, ps, mates, cls="", hidden=True):
     """Une enveloppe à ouvrir (cachée par le script jusqu'à sa date, voir app.js, xmasPaint)."""
     imgs = "".join('<img src="img/doudou_%s.webp" alt="" width="58" height="63" loading="lazy" decoding="async">' % m for m in mates)
-    return ('<section class="xmas%s" id="%s" aria-labelledby="h-%s" hidden>'
+    return ('<section class="xmas%s" id="%s" aria-labelledby="h-%s"%s>'
             '<h2 id="h-%s">%s</h2>'
             '<button class="xm-env" id="%s" type="button" aria-expanded="false" aria-controls="%s" aria-label="%s">'
             '<span class="xm-body"></span><span class="xm-letter"></span><span class="xm-pocket"></span><span class="xm-flap"></span><span class="xm-seal">&#10022;</span></button>'
             '<p class="xm-hint" id="%s">%s</p>'
             '<div class="xm-card" id="%s" hidden><div class="xm-mates">%s</div>'
             '<h3>%s</h3><p>%s</p><p class="xm-sign">%s</p><p class="xm-ps">%s</p></div></section>'
-            % (cls, sec, sec, sec, A.txt(heading), env, card, A.txt(aria), hint, A.txt(hint_txt), card, imgs,
+            % (cls, sec, sec, " hidden" if hidden else "", sec, A.txt(heading), env, card, A.txt(aria), hint, A.txt(hint_txt), card, imgs,
                A.txt(title), A.txt(text), A.txt(sign), A.txt(ps)))
 
 
@@ -177,19 +177,25 @@ def view_messages():
     return out + '</div></main>'
 
 
-def view_recap():
-    """« Le voyage en un coup d’œil » : où on en est, jour par jour, avec les polaroïds publiés et (pour les voyageurs) les tampons et photos du jour."""
+def view_preview():
+    """Page hors menus, pour Anne : montre les surprises des invité·e·s comme elles s'afficheront, sans attendre la date (/#/previsualisation)."""
     t = A.txt
-    gp = {d["id"]: (A.day_title(d["id"]), d["city"], A.GUEST_PLAN[d["id"]]) for d in A.D.DAYS}
-    out = ('<main class="view" id="v-recap" hidden>' + A.back_head("Le voyage en un coup d’œil", "Jour après jour, de Paris à Bangkok et retour", "#/") + '<div class="wrap">')
-    out += ('<section class="bubble blue rc-top" aria-labelledby="rc-h"><h2 id="rc-h">%s</h2><div class="rc-bar" aria-hidden="true"><i id="rc-fill"></i></div>'
-            '<p class="rc-sub" id="rc-sub"></p><div class="rc-stats" id="rc-stats"></div></section>' % t("Où en est le voyage"))
-    out += '<p class="rp-msg" id="rc-msg" role="status"></p><ol class="rc-days" id="rc-days">'
-    for i, (k, (title, city, plan)) in enumerate(gp.items()):
-        out += ('<li class="rc-day" data-id="%s" hidden><div class="rc-hd"><b>%s</b><span>%s</span></div><p>%s</p>'
-                '<div class="rc-th" hidden></div><p class="rc-chips"></p></li>' % (k, t(title), t(city), t(plan)))
-    return out + '</ol></div></main>'
+    xm = _envelope("pvx", "pvx-env", "pvx-card", "pvx-hint", "Une enveloppe pour toi", "Ouvrir l’enveloppe de Noël", "Touche l’enveloppe pour l’ouvrir.",
+                   "Joyeux Noël depuis la Thaïlande !", XMAS_TEXT, "Anne, Arthur, Daphne et Flo", XMAS_PS, ("moomoo", "aftonsparv"), hidden=False)
+    ny = _envelope("pvn", "pvn-env", "pvn-card", "pvn-hint", "Une nouvelle enveloppe", "Ouvrir l’enveloppe du Nouvel An", "Touche l’enveloppe pour l’ouvrir.",
+                   "Bonne année 2027 !", NY_TEXT, "Anne, Arthur, Daphne et Flo", NY_PS, ("boop", "minou"), " ny", hidden=False)
+    out = ('<main class="view" id="v-previsu" hidden>' + A.back_head("Aperçu des surprises", "Ce que verront les invité·e·s", "#/") + '<div class="wrap">')
+    out += '<p class="rp-msg">%s</p>' % t("Cette page n’est dans aucun menu. Elle montre les surprises des invité·e·s comme elles s’afficheront, sans attendre la date. Touche une enveloppe pour l’ouvrir.")
+    out += ('<h2 class="pv-h">%s</h2><p class="pv-d">%s</p>%s<p class="pv-b"><button class="btn sm alt" type="button" data-pv-close="0">%s</button></p>'
+            % (t("Noël"), t("Chez les invité·e·s : le 25 décembre seulement, puis l’enveloppe disparaît."), xm, t("Refermer l’enveloppe")))
+    out += ('<h2 class="pv-h">%s</h2><p class="pv-d">%s</p>%s<p class="pv-b"><button class="btn sm alt" type="button" data-pv-close="1">%s</button></p>'
+            % (t("Nouvel An"), t("Chez les invité·e·s : les 31 décembre et 1er janvier, puis l’enveloppe disparaît."), ny, t("Refermer l’enveloppe")))
+    out += ('<h2 class="pv-h">%s</h2><p class="pv-d">%s</p>'
+            '<div class="pv-step"><button class="btn sm alt" type="button" data-pv-pc="-1" aria-label="Jour précédent">%s</button><b id="pv-pc-n"></b>'
+            '<button class="btn sm alt" type="button" data-pv-pc="1" aria-label="Jour suivant">%s</button></div><div id="pv-pc"></div>'
+            % (t("La carte postale du jour"), t("Chez les invité·e·s, sur l’accueil, à partir du 18 décembre : une carte par jour, écrite par Moomoo ou Aftonsparv."), icon("chevl"), icon("chevr")))
+    return out + '</div></main>'
 
 
 def all_views():
-    return view_photoinv() + view_reportage() + view_messages() + view_recap()
+    return view_photoinv() + view_reportage() + view_messages() + view_preview()

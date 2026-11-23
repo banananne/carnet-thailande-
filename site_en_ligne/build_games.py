@@ -60,7 +60,7 @@ def dd_img(key, cls="dd-img", lazy=True):
 # (couleur, adresse, icône, titre, sous-titre, identifiant du sous-titre, clé du cadenas)
 # trois rubriques, rangées par ordre de parution (date d'ouverture) ; à date égale, l'ordre d'avant est gardé
 HUB_EVERYDAY = [
-    ("blue", "#/defi", "camera", "Défi du jour", "Une mission photo et un rôle pour chacun", "defi", "defi"),
+    ("blue", "#/defi", "camera", "Défi du jour", "Une mission photo par jour", "defi", "defi"),
     ("rose", "#/mot-du-jour", "speech", "Mot du jour", "Un mot de thaï à dire chaque jour", "mot", "mot"),
     ("sand", "#/gourmand", "fork", "Carnet gourmand", "Note les plats que tu goûtes", "gourmand", "gourmand"),
     ("sand", "#/passeport", "stamp", "Passeport", "Un tampon par jour", "pass", "pass"),

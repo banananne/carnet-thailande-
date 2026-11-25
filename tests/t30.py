@@ -420,8 +420,8 @@ with sync_playwright() as p:
     # ───────────────────────── I. passeport à 28 tampons, mascottes ─────────────────────────
     ctx, pg = newctx(b, when=ms(2026, 12, 22), who="Anne")
     pg.goto(BASE + "#/passeport", wait_until="load"); pg.wait_for_timeout(500)
-    check("I1 28 cases (17 jours + 11 spéciaux)", pg.locator("#v-pass .slot").count() == 28 and pg.locator('#v-pass .slot[data-stamp="b"]').count() == 11 and pg.locator('#v-pass .slot[data-stamp="d"]').count() == 17)
-    check("I2 « 0 sur 28 tampons »", "0 sur 28" in low(pg.inner_text("#v-pass .pp-top")), pg.inner_text("#v-pass .pp-top"))
+    check("I1 29 cases (17 jours + 12 spéciaux)", pg.locator("#v-pass .slot").count() == 29 and pg.locator('#v-pass .slot[data-stamp="b"]').count() == 12 and pg.locator('#v-pass .slot[data-stamp="d"]').count() == 17)
+    check("I2 « 0 sur 29 tampons »", "0 sur 29" in low(pg.inner_text("#v-pass .pp-top")), pg.inner_text("#v-pass .pp-top"))
     for k in ("defi", "bingo", "mot", "gourmand", "prix"):
         check("I3 tampon spécial %s présent" % k, pg.locator('#v-pass .slot[data-stamp="b"][data-id="%s"]' % k).count() == 1 and pg.locator('#v-pass .slot[data-stamp="b"][data-id="%s"] svg' % k).count() >= 1)
     ctx.close()

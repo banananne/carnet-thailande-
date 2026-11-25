@@ -117,6 +117,7 @@ P = {
     "b_gourmand": ('<path d="M6 25H42C42 35 34 41.5 24 41.5C14 41.5 6 35 6 25Z"/><path d="M17.5 45.5H30.5"/>'
                    '<path d="M13 19Q10.5 15.5 13 12M20 19Q17.5 15.5 20 12M27 19Q24.5 15.5 27 12"/>'
                    '<path d="M34 23L43 5M39 24.5L46.5 9"/>'),
+    "b_curieux": ('<circle cx="20" cy="20" r="13"/><path d="M30 30L42.5 42.5"/><path d="M13.5 17.5Q15.5 12.5 21.5 12.5"/>'),
     "b_prix": ('<path d="M15 6H33V18C33 24.5 29 28.5 24 28.5C19 28.5 15 24.5 15 18Z"/><path d="M15 10H9.5Q9 20 16.5 21.5M33 10H38.5Q39 20 31.5 21.5"/>'
                '<path d="M24 28.5V34.5"/><path d="M18 34.5H30V41.5H18Z"/><path d="M14 41.5H34"/>'
                '<path d="%s"/>' % _star(24, 16.5, 4.2, 1.9)),
@@ -166,6 +167,7 @@ BONUS_SPEC = {
     "mot": ("octagon", PLUM, "b_mot"),
     "gourmand": ("arch", OCHRE, "b_gourmand"),
     "prix": ("postmark", NAVY, "b_prix"),
+    "curieux": ("scallop", GREEN, "b_curieux"),
 }
 
 # ───────────────────────── mise en page ─────────────────────────

@@ -427,3 +427,5 @@ html.is-guest .snap,html.is-guest a[href="#/bingo"],html.is-guest a[href="#/gour
 .gn-day{margin-top:.9rem;font-weight:700;color:var(--bordeaux);line-height:1.25}
 .gn-plan{margin-top:.3rem}
 .guest-now .btn{margin-top:.8rem}
+
+#toast.wide{width:calc(100% - 32px);max-width:420px;border-radius:18px;text-align:center;line-height:1.35}

@@ -52,8 +52,36 @@ def photo_dims(fn):
 def dd_img(key, cls="dd-img", lazy=True):
     d = DD[key]
     w, h = photo_dims(d["photo"])
-    return ('<img class="%s" src="img/%s" width="%d" height="%d" alt="%s"%s decoding="async">'
-            % (cls, d["photo"], w, h, esc(d["alt"]), ' loading="lazy"' if lazy else ""))
+    return ('<img class="%s" src="img/%s" width="%d" height="%d" alt="%s" data-dd="%s"%s decoding="async">'
+            % (cls, d["photo"], w, h, esc(d["alt"]), key, ' loading="lazy"' if lazy else ""))
+
+
+
+# ───────────────────────── calques des secrets : éléphant qui traverse l'écran, remerciements des mascottes du 3 janvier ─────────────────────────
+MERCI = [
+    ("aftonsparv", "Mission accomplie. Rapport pour ma planète : beaucoup de rires, trop de piment, quelques moustiques. Merci de m’avoir emmené."),
+    ("moomoo", "Meuh. (Ça veut dire merci. Et aussi : encore.)"),
+    ("boop", "J’ai tout suivi depuis la maison, les antennes dressées. Merci pour les photos : vous m’avez donné faim."),
+    ("minou", "J’ai délibéré. Verdict : ce voyage était réussi. Je ne le répéterai pas."),
+]
+
+
+def new3():
+    return os.environ.get("CARNET_NEW3") == "1"
+
+
+def secret_layers():
+    if not new3():
+        return ""
+    from build_site import sticker
+    names = {d["key"]: d["short"] for d in G.DOUDOUS}
+    out = '<template id="tpl-eleph">%s</template>' % sticker("elephant")
+    out += ('<div class="merci" id="merci" role="dialog" aria-modal="true" aria-label="Merci de la part des mascottes" hidden><div class="merci-in">'
+            '<p class="mis-kick">3 janvier</p><h2>Merci de la part des mascottes</h2><ul>')
+    for k, t in MERCI:
+        out += '<li>%s<p><b>%s</b> %s</p></li>' % (dd_img(k, "df-img", lazy=True), esc(names[k]), txt(t))
+    out += '</ul><button class="btn" type="button" data-merci="close">À bientôt !</button></div></div>'
+    return out
 
 
 # ───────────────────────── accueil des jeux ─────────────────────────
@@ -61,6 +89,7 @@ def dd_img(key, cls="dd-img", lazy=True):
 # trois rubriques, rangées par ordre de parution (date d'ouverture) ; à date égale, l'ordre d'avant est gardé
 HUB_EVERYDAY = [
     ("blue", "#/defi", "camera", "Défi du jour", "Une mission photo par jour", "defi", "defi"),
+    ("mustard", "#/gratter", "coin", "Carte à gratter", "Une surprise à gratter par jour", "gratter", "gratter"),
     ("rose", "#/mot-du-jour", "speech", "Mot du jour", "Un mot de thaï à dire chaque jour", "mot", "mot"),
     ("sand", "#/gourmand", "fork", "Carnet gourmand", "Note les plats que tu goûtes", "gourmand", "gourmand"),
     ("sand", "#/passeport", "stamp", "Passeport", "Un tampon par jour", "pass", "pass"),
@@ -106,7 +135,16 @@ def view_jeux():
     out += '</div><h2 class="sech navy">Les jeux du carnet</h2><div class="list">'
     out += "".join(hub_tile(*row) for row in HUB_BOOK)
     out += ('</div><p class="hub-try" id="hub-try" hidden><span>Mode essai : tout est ouvert sur ce téléphone.</span> '
-            '<button class="lk-link" type="button" data-relock="1">Remettre les cadenas</button></p>')
+            '<button class="lk-link" type="button" data-relock="1">Remettre les cadenas</button></p>'
+            '<div class="hub-try" id="hub-try2" hidden><span>Mode essai des surprises cachées.' + (' Éléphant : touche 3 fois « Thaïlande » sur l’accueil. Mot de la mascotte : appui long sur un tampon du passeport.' if new3() else '') + '</span>'
+            '<div class="try-row"><button class="btn sm alt" type="button" data-decor="neige">Neige</button>'
+            '<button class="btn sm alt" type="button" data-decor="feux">Feux d’artifice</button>'
+            + ('<button class="btn sm alt" type="button" data-decor="merci">Merci du 3 janvier</button>' if new3() else '') +
+            '<button class="btn sm alt" type="button" data-secrets-reset="1">Remettre les secrets à zéro</button></div></div>'
+            '<div class="hub-word"><button class="lk-link" type="button" data-word="ask">Un mot caché ?</button>'
+            '<form class="lk-form" id="hw-form" hidden autocomplete="off"><label for="hw-in">Tape le mot</label>'
+            '<div class="lk-row"><input id="hw-in" name="mot" type="text" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" maxlength="30">'
+            '<button class="btn" type="submit">Essayer</button></div></form><p class="hw-msg" id="hw-msg" role="status"></p></div>')
     return out + "</div></main>"
 
 
@@ -341,7 +379,7 @@ def view_pass():
         out += ('<button class="slot" type="button" data-stamp="b" data-id="%s" data-how="%s" data-title="%s" aria-pressed="false" aria-label="%s">'
                 '<span class="slot-ph"><i>%s</i><small>%s</small></span>%s</button>'
                 % (key, esc(how), esc(title), esc("Tampon spécial : " + title), ST.picto_icon(ST.BONUS_SPEC[key][2]), esc(title), bonus_stamp(j, key, word)))
-    out += ('</div></section><div class="acts"><button class="btn sm alt" type="button" id="pp-reset">%s <span>Effacer tous les tampons</span></button></div></div></main>' % icon("refresh"))
+    out += ('</div><p class="pp-sec" id="pp-sec" hidden></p></section><div class="acts"><button class="btn sm alt" type="button" id="pp-reset">%s <span>Effacer tous les tampons</span></button></div></div></main>' % icon("refresh"))
     return out
 
 

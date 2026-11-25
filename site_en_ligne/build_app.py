@@ -558,7 +558,7 @@ def view_home(version):
     who = [("Arthur", "#283881", "#fff"), ("Daphne", "#E9A9B8", "#5B1025"), ("Flo", "#F2A71B", "#5B1025"), ("Anne", "#A51C36", "#fff")]
     out = ('<main class="view" id="v-home">'
            '<header class="hero"><div class="wrap">'
-           '<p class="eyebrow">Carnet de voyage</p><h1>Thaïlande <span>2026</span></h1>'
+           '<p class="eyebrow">Carnet de voyage</p><h1><b class="tlw" id="tl-word">Thaïlande</b> <span>2026</span></h1>'
            '<p class="dates">18.12.2026 — 03.01.2027</p>'
            '<button class="stk stk-mask" id="mask" type="button" aria-label="Le masque te salue">'
            '<img src="img/sticker_masque.webp" width="296" height="356" alt="" decoding="async"></button>'
@@ -646,7 +646,7 @@ def render(version, head_meta):
     import build_trad as BT
     import build_photo as BPH
     body = (view_home(version) + view_days() + view_hotels() + view_utile() + BT.view_trad() + view_metro() + view_lexique() + view_taxi()
-            + view_convert() + view_gtk() + BG.all_views() + BPH.all_views() + BE.view_essai() + nav_html() + show_overlay() + BE.overlay_html()
+            + view_convert() + view_gtk() + BG.all_views() + BPH.all_views() + BE.view_essai() + nav_html() + show_overlay() + BE.overlay_html() + BG.secret_layers()
             + '<div id="toast" role="status" aria-live="polite"></div>'
             + '<div id="upd" hidden><span>Une nouvelle version est prête.</span><button class="btn sm" type="button" id="upd-btn">Actualiser</button></div>')
     js = open(os.path.join(ROOT, "app.js"), encoding="utf-8").read()
@@ -660,6 +660,10 @@ def render(version, head_meta):
     games = games.replace("/*@ENV@*/", open(os.path.join(ROOT, "env.js"), encoding="utf-8").read())
     assert "/*@PHOTO@*/" in games
     games = games.replace("/*@PHOTO@*/", open(os.path.join(ROOT, "photo.js"), encoding="utf-8").read())
+    # les trois secrets en essai (éléphant, appui long sur un tampon, remerciements du 3 janvier) : seulement si CARNET_NEW3=1
+    if os.environ.get("CARNET_NEW3") != "1":
+        games = re.sub(r"/\*@NEW3@\*/.*?/\*@/NEW3@\*/", "", games, flags=re.S)
+    assert os.environ.get("CARNET_NEW3") == "1" or "@NEW3@" not in games
     js = js.replace("/*@GAMES@*/", games)
     assert "</script" not in js
     # prénom déjà choisi : on masque « Qui es-tu ? » dès le premier affichage (pas de clignotement avant que le script du bas ne s'exécute)

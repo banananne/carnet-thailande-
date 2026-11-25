@@ -23,6 +23,7 @@ GATES = {
     "bingo":    (DAY1, D18, "Le bingo s’ouvre le {d}, le jour du départ."),
     "mot":      (DAY1, D18, "Le mot du jour s’ouvre le {d}, le jour du départ."),
     "gourmand": (DAY1, D18, "Le carnet gourmand s’ouvre le {d}, le jour du départ."),
+    "gratter":  (DAY1, D18, "La carte à gratter s’ouvre le {d}, le jour du départ."),
     "quiz":     ("2026-12-26", "26" + NB + "décembre", "Le quiz porte sur ce que vous aurez vu à Bangkok : il s’ouvre le {d}."),
     "prix":     (DAYN, "3" + NB + "janvier", "Minou délibère encore. Les prix du voyage sont décernés le {d}."),
 }
@@ -206,3 +207,53 @@ AWARDS = [
 assert len(MISSIONS) == len(MOTS) == 17
 assert len({b[0] for b in BINGO}) == len(BINGO) >= 16
 assert sum(len(items) for _, items in FOOD) == 24
+
+
+# ───────────────────────── carte à gratter du jour (un mélange : loto thaï rigolo et fortune du jour) ─────────────────────────
+# Rien n'est un vrai bon : les lots sont imaginaires. Aucun accord au féminin ou au masculin.
+SCRATCH_LOTO = [
+    "La moitié gauche d’une vache de Moomoo. La droite est restée à la maison.",
+    "Un tuk-tuk, mais seulement le bruit.",
+    "Un éléphant à ta taille, livré dans ton imagination avec trois jours de retard.",
+    "Le droit de rebaptiser le 7-Eleven, jusqu’à ce que quelqu’un s’en aperçoive.",
+    "Un hamac qui n’existe pas, pour une sieste qui n’aura pas lieu.",
+    "La moitié d’un mango sticky rice. L’autre moitié est chez Boop.",
+    "Un voyage de rêve : l’aller seulement, dans ta tête.",
+    "Un regard noir de Minou, valable à vie.",
+    "Un câlin de Moomoo. Moomoo est en tissu : le câlin est donc un peu court.",
+    "Un million de bahts en monnaie de Moomoo, soit zéro baht.",
+    "Un cocktail sans glaçons, sans verre et sans cocktail.",
+    "Un fou rire à retardement, à ouvrir dans six à huit mois.",
+    "Une moitié de selfie, l’autre moitié est floue.",
+    "Un permis de conduire le tuk-tuk, valable uniquement dans ta tête.",
+    "Le plus beau coucher de soleil de la journée, en copropriété avec tout le monde.",
+    "Un baiser d’éléphant, envoyé par la poste. Délai de livraison : jamais.",
+    "Un ticket de loto gagnant… pour un autre loto.",
+    "Zéro baht, mais zéro avec beaucoup de style.",
+    "Un « bravo » prononcé par Moomoo, en meuglement.",
+    "Un moustique en exclusivité mondiale, à garder de préférence loin de toi.",
+]
+SCRATCH_FORTUNE = [
+    "Un détour inattendu mènera aujourd’hui au meilleur souvenir.",
+    "Ce que tu cherches est déjà dans ton sac. Fouille mieux.",
+    "Un plat dont tu ne sais pas dire le nom sera ta meilleure découverte.",
+    "La chance sourit à qui goûte le piment… avec modération.",
+    "Quelqu’un du groupe aura besoin d’un fou rire. Ce sera peut-être toi qui le donnes.",
+    "Ne cherche pas l’ombre : elle arrive avec le prochain nuage.",
+    "Une rencontre brève laissera une trace longue.",
+    "Prends la ruelle que personne ne prend.",
+    "Ce soir, le ciel fera un effort. Pense à le regarder.",
+    "Sourire fait baisser le prix, dit-on. Essaie, pour voir.",
+    "Boire de l’eau est un acte de sagesse (Aftonsparv insiste).",
+    "Ton sens de l’orientation sera mis à l’épreuve. Fais confiance à la personne la plus lente.",
+    "Une petite fatigue annonce une grande joie. Assieds-toi.",
+    "Aujourd’hui, dis oui à la deuxième proposition.",
+    "L’imprévu a bon goût, aujourd’hui.",
+    "La patience est une monnaie qui n’a pas de taux de change.",
+    "Quelqu’un pense à toi, de loin, avec un tout petit peu de jalousie.",
+    "Un mot de politesse en thaï ouvrira un grand sourire.",
+    "Ce qui tombe dans la mer est rendu à la mer, sauf les lunettes de soleil. Attention.",
+    "Le meilleur moment de la journée n’a pas encore commencé.",
+]
+# couleur du jour en Thaïlande, selon le jour de la semaine (dimanche = 0)
+SCRATCH_COLORS = ["rouge", "jaune", "rose", "vert", "orange", "bleu clair", "violet"]

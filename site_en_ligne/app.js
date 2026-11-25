@@ -48,11 +48,11 @@ var DB = {
 
 /* ───────────── petits outils ───────────── */
 var toastT;
-function toast(m) {
+function toast(m, ms) {
   var t = $("#toast");
-  t.textContent = m; t.classList.add("on");
+  t.textContent = m; t.classList.toggle("wide", String(m).length > 46); t.classList.add("on");
   clearTimeout(toastT);
-  toastT = setTimeout(function () { t.classList.remove("on"); }, 2400);
+  toastT = setTimeout(function () { t.classList.remove("on"); }, ms || 2400);
 }
 function fmtSize(n) { return n >= 1048576 ? (n / 1048576).toFixed(1).replace(".", ",") + " Mo" : Math.max(1, Math.round(n / 1024)) + " Ko"; }
 function blobToBuf(b) {
@@ -264,19 +264,19 @@ document.documentElement.classList.remove("has-who");
 /* ───────────── navigation ───────────── */
 var NAMES = { "": "home", jours: "days", hotels: "hotels", utile: "utile", metro: "metro", lexique: "lexique", taxi: "taxi", convertisseur: "convert", "good-to-know": "gtk",
   jeux: "jeux", quiz: "quiz", "test-doudou": "test", personnalite: "test", doudous: "doudous", mascottes: "doudous", "blind-test": "blind", "mots-meles": "mots", horoscope: "horo", passeport: "pass",
-  defi: "defi", "mot-du-jour": "mot", mot: "mot", bingo: "bingo", gourmand: "gourmand", prix: "prix",
+  defi: "defi", gratter: "gratter", "carte-a-gratter": "gratter", "mot-du-jour": "mot", mot: "mot", bingo: "bingo", gourmand: "gourmand", prix: "prix",
   traduire: "trad", traducteur: "trad", essai: "essai", "photo-invites": "photoinv", reportage: "reportage", messages: "messages", previsualisation: "previsu" };
 var NAV_OF = { home: "home", days: "days", hotels: "hotels", utile: "utile", metro: "utile", lexique: "utile", taxi: "utile", convert: "utile", gtk: "utile",
   jeux: "jeux", quiz: "jeux", test: "jeux", doudous: "jeux", blind: "jeux", mots: "jeux", horo: "jeux", pass: "jeux",
-  defi: "jeux", mot: "jeux", bingo: "jeux", gourmand: "jeux", prix: "jeux", trad: "utile", photoinv: "home", reportage: "home", messages: "home", previsu: "home" };
+  defi: "jeux", gratter: "jeux", mot: "jeux", bingo: "jeux", gourmand: "jeux", prix: "jeux", trad: "utile", photoinv: "home", reportage: "home", messages: "home", previsu: "home" };
 var TITLES = { home: "Carnet Thaïlande 2026", days: "Jours · Carnet Thaïlande", hotels: "Hôtels · Carnet Thaïlande", utile: "Utile · Carnet Thaïlande", metro: "Plan du métro · Carnet Thaïlande",
   lexique: "Lexique · Carnet Thaïlande", taxi: "Cartes taxi · Carnet Thaïlande", convert: "Convertisseur · Carnet Thaïlande", gtk: "Good to know · Carnet Thaïlande",
   jeux: "Jeux · Carnet Thaïlande", quiz: "Quiz · Carnet Thaïlande", test: "Test de personnalité · Carnet Thaïlande", doudous: "Les mascottes · Carnet Thaïlande",
   blind: "Blind test · Carnet Thaïlande", mots: "Mots mêlés · Carnet Thaïlande", horo: "Horoscope · Carnet Thaïlande", pass: "Passeport · Carnet Thaïlande",
-  defi: "Défi du jour · Carnet Thaïlande", mot: "Mot du jour · Carnet Thaïlande", bingo: "Bingo · Carnet Thaïlande", gourmand: "Carnet gourmand · Carnet Thaïlande", prix: "Prix du voyage · Carnet Thaïlande",
+  defi: "Défi du jour · Carnet Thaïlande", gratter: "Carte à gratter · Carnet Thaïlande", mot: "Mot du jour · Carnet Thaïlande", bingo: "Bingo · Carnet Thaïlande", gourmand: "Carnet gourmand · Carnet Thaïlande", prix: "Prix du voyage · Carnet Thaïlande",
   trad: "Traducteur · Carnet Thaïlande", essai: "Essai des enveloppes · Carnet Thaïlande",
   photoinv: "Photo pour les invités · Carnet Thaïlande", reportage: "Reportage photo · Carnet Thaïlande", messages: "Messages · Carnet Thaïlande", previsu: "Aperçu des surprises · Carnet Thaïlande" };
-var GUEST_NO = ["bingo", "gourmand", "prix", "blind", "defi"];
+var GUEST_NO = ["bingo", "gourmand", "prix", "blind", "defi", "gratter"];
 var days = $$(".day").map(function (a) { return a.getAttribute("data-id"); });
 var curDay = null, curName = "", fromDays = false;
 

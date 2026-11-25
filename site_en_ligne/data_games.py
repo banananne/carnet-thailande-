@@ -112,6 +112,7 @@ BONUS_STAMPS = [
     ("mot", "MOT DU JOUR", "Mot du jour", "Dire 5 mots du jour"),
     ("gourmand", "GOURMAND", "Gourmand", "Goûter 10 plats ou boissons"),
     ("prix", "PALMARÈS", "Prix du voyage", "Décerner les prix du voyage"),
+    ("curieux", "CURIEUX·SE", "Curieux·se", "Trouver 3 secrets cachés sur le site"),
 ]
 
 # ───────────── cadenas : le test de personnalité s'ouvre à une date (heure locale du téléphone) ─────────────

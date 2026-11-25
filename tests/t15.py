@@ -60,7 +60,7 @@ with sync_playwright() as p:
     # ── hub : sous-titres
     go("#/jeux")
     print("hub passeport:", pg.inner_text('[data-hub="pass"]'))
-    ok("sur 28" in pg.inner_text('[data-hub="pass"]'), "compteur passeport dans le hub")
+    ok("sur 29" in pg.inner_text('[data-hub="pass"]'), "compteur passeport dans le hub")
     go("#/"); ok(pg.locator("[data-pass-count]").count() == 0, "l'accueil n'a plus la tuile Passeport (compteur dans le hub Jeux)")
     # ── passeport complet (via LS) + two-tap reset
     go("#/passeport")

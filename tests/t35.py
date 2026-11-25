@@ -85,7 +85,7 @@ with sync_playwright() as p:
     pg.goto(BASE + "#/bingo", wait_until="load"); pg.wait_for_timeout(600)
     wp = pg.locator(".whopick button")
     check("C1 sur la page du bingo, aussi : « Je suis invité·e »", wp.count() >= 5 and pg.locator('.whopick button[data-wp="Invité"]').count() >= 1, wp.count())
-    pg.locator('.whopick button[data-wp="Invité"]').first.click(); pg.wait_for_timeout(500)
+    pg.locator('.whopick button[data-wp="Invité"]').locator('visible=true').first.click(); pg.wait_for_timeout(500)
     check("C2 invité·e choisi : le choix du prénom se range et les rôles restent cachés", pg.evaluate("localStorage.getItem('carnet.who')") == "Invité" and not vis(pg, ".rl-box"))
     ctx.close()
 

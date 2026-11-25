@@ -97,6 +97,28 @@ def view_defi():
     return out + "</div></main>"
 
 
+# ───────────────────────── carte à gratter du jour ─────────────────────────
+def view_gratter():
+    cfg = esc(json.dumps({"loto": [typo(t) for t in X.SCRATCH_LOTO], "fort": [typo(t) for t in X.SCRATCH_FORTUNE], "col": X.SCRATCH_COLORS},
+                         ensure_ascii=False, separators=(",", ":")))
+    out = ('<main class="view" id="v-gratter" data-cfg="%s" hidden>' % cfg
+           + A.back_head("Carte à gratter", "Une surprise à découvrir chaque jour", "#/jeux")
+           + '<div class="wrap">' + who_pick() + daynav("gratter"))
+    for i, d in enumerate(D.DAYS):
+        out += '<i class="grd" data-i="%d" data-id="%s" data-title="%s" hidden></i>' % (i, d["id"], esc(day_title(i)))
+    out += ('<section class="bubble sand grc" id="grc" aria-label="La carte du jour" hidden>'
+            '<div class="mis-top"><span class="grc-mas">%s%s</span><div><p class="mis-kick" id="grc-kick"></p><h2 id="grc-h"></h2></div></div>'
+            '<div class="grc-ticket" id="grc-ticket"><div class="grc-res" id="grc-res" aria-live="polite"></div>'
+            '<canvas class="grc-foil" id="grc-foil" aria-hidden="true"></canvas></div>'
+            '<p class="grc-hint" id="grc-hint">Gratte la carte avec ton doigt.</p>'
+            '<div class="acts"><button class="btn alt sm" type="button" id="grc-all">%s<span>Tout révéler d’un coup</span></button></div></section>'
+            % (BG.dd_img("moomoo", "df-img", lazy=True), BG.dd_img("aftonsparv", "df-img", lazy=True), icon("check")))
+    out += ('<div class="mis-sum"><p class="mis-n" id="gr-n" role="status"></p><div class="dots" id="gr-dots" aria-hidden="true">%s</div></div>'
+            '<div class="acts" id="gr-reset-box" hidden><button class="btn sm alt" type="button" id="gr-reset">%s<span>Remettre mes cartes à zéro</span></button></div>'
+            % ("".join("<i></i>" for _ in IDS), icon("refresh")))
+    return out + "</div></main>"
+
+
 # ───────────────────────── mot du jour ─────────────────────────
 def th_size(th):
     """Taille du mot thaï selon sa longueur (sans les voyelles et tons qui s'empilent) : les longues phrases restent sur la ligne."""
@@ -240,4 +262,4 @@ def day_link_html(day_id):
 
 
 def all_views():
-    return (gate("defi", view_defi()) + gate("mot", view_mot()) + gate("bingo", view_bingo()) + gate("gourmand", view_gourmand()) + gate("prix", view_prix()))
+    return (gate("defi", view_defi()) + gate("gratter", view_gratter()) + gate("mot", view_mot()) + gate("bingo", view_bingo()) + gate("gourmand", view_gourmand()) + gate("prix", view_prix()))

@@ -161,3 +161,54 @@
 .fd-u .fd-h{grid-template-columns:minmax(0,1fr) auto}
 .fd-del{min-width:44px;min-height:44px;padding:0 10px;border:0;border-radius:12px;background:none;color:var(--bordeaux);font:600 1.3rem/1 var(--font-body);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .fd-del.ask{font-size:.9rem;background:var(--rose)}
+
+/* carte à gratter du jour */
+.grc{margin-top:1.1rem}
+.grc-mas{display:flex;flex:none}
+.grc-mas .df-img[hidden]{display:none}
+.grc-ticket{position:relative;margin-top:1rem;border-radius:18px;overflow:hidden;min-height:220px;background:var(--white);box-shadow:inset 0 0 0 2px var(--mustard)}
+.grc-ticket.fort{background:#FFF4DD}
+.grc-res{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.45rem;min-height:220px;padding:20px 18px;text-align:center}
+.grc-k{font:700 .74rem/1.2 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--bordeaux)}
+.grc-big{font:800 2.6rem/1 var(--font-display);color:var(--bordeaux);text-transform:uppercase}
+.grc-t{font:600 1.15rem/1.35 var(--font-body);color:var(--ink);text-wrap:pretty}
+.grc-fort{font:italic 400 1.1rem/1.5 var(--font-voice)}
+.grc-s{font-size:.82rem;line-height:1.35;color:var(--muted)}
+.grc-foil{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:pointer;transition:opacity .45s;-webkit-tap-highlight-color:transparent}
+.grc-foil.gone{opacity:0;pointer-events:none}
+.grc-hint{margin-top:.7rem;font-size:.88rem;color:var(--muted);text-align:center}
+.grc .acts{justify-content:center;margin-top:.7rem}
+.grc .acts[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.grc-foil{transition:none}}
+
+/* secrets */
+.boing{animation:boing .45s ease}
+@keyframes boing{0%{transform:scale(1)}30%{transform:scale(1.14) rotate(-4deg)}60%{transform:scale(.94) rotate(3deg)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.boing{animation:none}}
+.hub-word{margin-top:1.6rem;text-align:center;font-size:.9rem;color:var(--muted)}
+.hub-word .lk-link{margin-top:0}
+.hub-word .lk-form{margin-top:.6rem;text-align:left}
+.hw-msg{margin-top:.6rem;font-size:.92rem;line-height:1.4;color:var(--bordeaux);font-weight:600}
+.pp-sec{margin-top:.9rem;font-size:.9rem;line-height:1.4;color:var(--muted);text-align:center}
+.try-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem}
+#hub-try2{margin-top:.8rem}
+
+/* secrets : éléphant, remerciements du 3 janvier, appui long, espace invité */
+.tlw{font-weight:inherit;-webkit-tap-highlight-color:transparent}
+.eleph{position:fixed;left:0;bottom:calc(var(--nav-h) + var(--sab) + 6px);z-index:45;width:150px;pointer-events:none;animation:elephgo 5.2s linear forwards}
+.eleph svg{display:block;width:100%;height:auto;animation:elephbob .55s ease-in-out infinite alternate}
+@keyframes elephgo{from{transform:translateX(-170px)}to{transform:translateX(calc(100vw + 20px))}}
+@keyframes elephbob{from{transform:translateY(0) rotate(-1.5deg)}to{transform:translateY(-7px) rotate(1.5deg)}}
+@media (prefers-reduced-motion:reduce){.eleph{display:none}}
+.merci{position:fixed;inset:0;z-index:85;overflow:auto;background:var(--paper);padding:calc(var(--sat) + 22px) max(16px,env(safe-area-inset-right,0px)) calc(var(--sab) + 28px) max(16px,env(safe-area-inset-left,0px))}
+.merci[hidden]{display:none}
+.merci-in{max-width:520px;margin:0 auto}
+.merci h2{margin-top:.2rem;font:800 2rem/1.02 var(--font-display);color:var(--bordeaux)}
+.merci ul{list-style:none;margin:1.2rem 0 0;padding:0;display:grid;gap:12px}
+.merci li{display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;border-radius:20px;background:var(--sand)}
+.merci li:nth-child(even){background:var(--rose)}
+.merci li p{font-size:1rem;line-height:1.4;color:var(--ink)}
+.merci li b{display:block;font:700 .72rem/1.3 var(--font-body);letter-spacing:.13em;text-transform:uppercase;color:var(--bordeaux)}
+.merci .btn{margin-top:1.4rem}
+.slot{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+html.is-guest .hub-word,html.is-guest a[href^="#/gratter"],html.is-guest .slot[data-id="curieux"],html.is-guest #pp-sec{display:none!important}

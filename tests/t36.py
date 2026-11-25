@@ -79,7 +79,7 @@ with sync_playwright() as p:
     heads = pg.evaluate("() => [...document.querySelectorAll('#v-jeux h2.sech')].map(e => e.textContent.trim())")
     check("B1 trois rubriques dans l'ordre", heads == ["À faire tous les jours", "Au fil des jours", "Les jeux du carnet"], heads)
     secs = pg.evaluate("() => [...document.querySelectorAll('#v-jeux .list')].map(l => [...l.querySelectorAll('a.tile, a[href]')].map(a => a.getAttribute('href')))")
-    check("B2 à faire tous les jours : défi, mot, gourmand, passeport", secs[0] == ["#/defi", "#/mot-du-jour", "#/gourmand", "#/passeport"], secs[0])
+    check("B2 à faire tous les jours : défi, mot, gourmand, passeport", secs[0] == ["#/defi", "#/gratter", "#/mot-du-jour", "#/gourmand", "#/passeport"], secs[0])
     check("B3 au fil des jours : bingo, mascottes, prix (3 janvier en dernier)", secs[1] == ["#/bingo", "#/mascottes", "#/prix"], secs[1])
     check("B4 jeux du carnet : 18 déc. (blind test, mots mêlés, horoscope), quiz du 26, test du 29", secs[2] == ["#/blind-test", "#/mots-meles", "#/horoscope", "#/quiz", "#/personnalite"], secs[2])
     pg.screenshot(path=OUT + "jeux_rubriques.png", full_page=True)

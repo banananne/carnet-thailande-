@@ -489,11 +489,6 @@
       }
 /*@/NEW3@*/
     }
-    document.addEventListener("click", function (e) {
-      var b = e.target.closest ? e.target.closest("[data-decor],[data-secrets-reset]") : null; if (!b) return;
-      if (b.hasAttribute("data-decor")) show(b.getAttribute("data-decor"), true);
-      else { Secrets.reset(); jset("carnet.decor", []); toast("Secrets remis à zéro"); }
-    });
     return { auto: auto, show: show };
   })();
 
@@ -504,12 +499,11 @@
     var w = $("#tl-word"), tpl = $("#tpl-eleph"); if (!w || !tpl) return;
     var n = 0, t0 = 0, last = null;
     function run() {
-      if (reduce) { toast("Prrrrout ! (un éléphant est passé, en mode calme)"); return; }
+      if (reduce) return;
       if (last && last.parentNode) last.parentNode.removeChild(last);
       var d = document.createElement("div"); d.className = "eleph"; d.setAttribute("aria-hidden", "true");
       d.appendChild(tpl.content.cloneNode(true)); document.body.appendChild(d); last = d;
       setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 5600);
-      toast("Prrrrout !");
     }
     w.addEventListener("click", function () {
       if (!trav()) return;
@@ -649,7 +643,6 @@
       var t = n ? plural(n, "carte grattée", "cartes grattées") + " sur " + days.length : "";
       $("#gr-n").textContent = w ? (t || "Aucune carte grattée pour l’instant.") : "";
       $$("#gr-dots i").forEach(function (d, k) { d.classList.toggle("on", !!done[w + "|" + days[k]]); });
-      $("#gr-reset-box").hidden = !Cal.trying();
       hub("gratter", t);
     }
     function reveal(auto) {
@@ -683,9 +676,6 @@
       g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x + 0.01, b.y + 0.01); g.stroke();
     }
     allBtn.addEventListener("click", function () { reveal(false); });
-    twoTap($("#gr-reset"), "Sûr ? Touche encore pour tout remettre à zéro", function () {
-      done = {}; jset(KEY, done); paint(); toast("Cartes remises à zéro");
-    });
     window.addEventListener("resize", function () { if (!revealed && !card.hidden && !v.hidden) drawFoil(); });
     function enter() { var k = dayFromHash(); nav.set(k >= 0 ? k : Cal.idxToday()); }
     summary();

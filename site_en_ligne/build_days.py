@@ -114,8 +114,7 @@ def view_gratter():
             '<div class="acts"><button class="btn alt sm" type="button" id="grc-all">%s<span>Tout révéler d’un coup</span></button></div></section>'
             % (BG.dd_img("moomoo", "df-img", lazy=True), BG.dd_img("aftonsparv", "df-img", lazy=True), icon("check")))
     out += ('<div class="mis-sum"><p class="mis-n" id="gr-n" role="status"></p><div class="dots" id="gr-dots" aria-hidden="true">%s</div></div>'
-            '<div class="acts" id="gr-reset-box" hidden><button class="btn sm alt" type="button" id="gr-reset">%s<span>Remettre mes cartes à zéro</span></button></div>'
-            % ("".join("<i></i>" for _ in IDS), icon("refresh")))
+            % "".join("<i></i>" for _ in IDS))
     return out + "</div></main>"
 
 

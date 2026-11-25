@@ -67,7 +67,7 @@ MERCI = [
 
 
 def new3():
-    return os.environ.get("CARNET_NEW3") == "1"
+    return os.environ.get("CARNET_NEW3") != "0"
 
 
 def secret_layers():
@@ -136,11 +136,6 @@ def view_jeux():
     out += "".join(hub_tile(*row) for row in HUB_BOOK)
     out += ('</div><p class="hub-try" id="hub-try" hidden><span>Mode essai : tout est ouvert sur ce téléphone.</span> '
             '<button class="lk-link" type="button" data-relock="1">Remettre les cadenas</button></p>'
-            '<div class="hub-try" id="hub-try2" hidden><span>Mode essai des surprises cachées.' + (' Éléphant : touche 3 fois « Thaïlande » sur l’accueil. Mot de la mascotte : appui long sur un tampon du passeport.' if new3() else '') + '</span>'
-            '<div class="try-row"><button class="btn sm alt" type="button" data-decor="neige">Neige</button>'
-            '<button class="btn sm alt" type="button" data-decor="feux">Feux d’artifice</button>'
-            + ('<button class="btn sm alt" type="button" data-decor="merci">Merci du 3 janvier</button>' if new3() else '') +
-            '<button class="btn sm alt" type="button" data-secrets-reset="1">Remettre les secrets à zéro</button></div></div>'
             '<div class="hub-word"><button class="lk-link" type="button" data-word="ask">Un mot caché ?</button>'
             '<form class="lk-form" id="hw-form" hidden autocomplete="off"><label for="hw-in">Tape le mot</label>'
             '<div class="lk-row"><input id="hw-in" name="mot" type="text" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" maxlength="30">'

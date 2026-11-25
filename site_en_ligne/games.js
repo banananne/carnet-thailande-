@@ -125,7 +125,6 @@ window.CarnetGames = (function () {
       $$("#v-jeux a.tile[data-gate]").forEach(function (t) { t.classList.toggle("is-locked", !Cal.isOpen(t.getAttribute("data-gate"))); });
       $$("#v-jeux [data-hub]").forEach(function (e) { hubPaint(e.getAttribute("data-hub")); });
       var tr = $("#hub-try"); if (tr) tr.hidden = !Cal.trying();
-      var t2 = $("#hub-try2"); if (t2) t2.hidden = !Cal.trying();
     }
     document.addEventListener("click", function (e) {
       var t = e.target.closest ? e.target.closest("[data-lkv],[data-relock]") : null; if (!t) return;

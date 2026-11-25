@@ -215,6 +215,8 @@ with sync_playwright() as p:
     pg.goto(BASE, wait_until="load"); pg.wait_for_timeout(450)
     check("C12 après le voyage : le dernier jour reste affiché", "3 janvier" in low(pg.text_content("#hsd-sub")))
     # changer de prénom change le signe tout de suite
+    pg.wait_for_timeout(900)
+    if pg.is_visible("#merci"): pg.click('[data-merci="close"]'); pg.wait_for_timeout(300)
     pg.click("#who-bar"); pg.wait_for_timeout(200); pg.click('#who button[data-n="Arthur"]'); pg.wait_for_timeout(300)
     check("C13 changer de prénom change le signe (Gémeaux)", "gémeaux" in low(pg.text_content("#hsd-sub")))
     pg.screenshot(path=OUT + "t30_home_horo.png")

@@ -660,10 +660,10 @@ def render(version, head_meta):
     games = games.replace("/*@ENV@*/", open(os.path.join(ROOT, "env.js"), encoding="utf-8").read())
     assert "/*@PHOTO@*/" in games
     games = games.replace("/*@PHOTO@*/", open(os.path.join(ROOT, "photo.js"), encoding="utf-8").read())
-    # les trois secrets en essai (éléphant, appui long sur un tampon, remerciements du 3 janvier) : seulement si CARNET_NEW3=1
-    if os.environ.get("CARNET_NEW3") != "1":
+    # les trois derniers secrets (éléphant, appui long sur un tampon, remerciements du 3 janvier) : publiés le 26 novembre ; CARNET_NEW3=0 les retire
+    if os.environ.get("CARNET_NEW3") == "0":
         games = re.sub(r"/\*@NEW3@\*/.*?/\*@/NEW3@\*/", "", games, flags=re.S)
-    assert os.environ.get("CARNET_NEW3") == "1" or "@NEW3@" not in games
+    assert os.environ.get("CARNET_NEW3") != "0" or "@NEW3@" not in games
     js = js.replace("/*@GAMES@*/", games)
     assert "</script" not in js
     # prénom déjà choisi : on masque « Qui es-tu ? » dès le premier affichage (pas de clignotement avant que le script du bas ne s'exécute)
@@ -674,6 +674,11 @@ def render(version, head_meta):
     reset = "" if os.environ.get("CARNET_NO_RESET") else (
         '<script>try{var E="%s";if(localStorage.getItem("carnet.epoch")!==E){var k=[],i,n;for(i=0;i<localStorage.length;i++){n=localStorage.key(i);if(n&&n.indexOf("carnet.")===0)k.push(n)}'
         'k.forEach(function(n){localStorage.removeItem(n)});localStorage.setItem("carnet.epoch",E);try{indexedDB.deleteDatabase("carnet-thailande")}catch(e){}}}catch(e){}</script>' % EPOCH)
-    early = reset + '<script>try{if(localStorage.getItem("carnet.who"))document.documentElement.classList.add("has-who")}catch(e){}</script>'
+    # Remise à zéro ciblée UNIQUE (26 novembre) : cartes à gratter, secrets, décors et tampon « Curieux·se » gagnés pendant les essais.
+    rz = "" if os.environ.get("CARNET_NO_RESET") else (
+        '<script>try{if(localStorage.getItem("carnet.rz")!=="2026-11-26"){["carnet.gratter","carnet.secrets","carnet.decor"].forEach(function(n){localStorage.removeItem(n)});'
+        'var s=JSON.parse(localStorage.getItem("carnet.stamps")||"null");if(s&&s.b instanceof Array){s.b=s.b.filter(function(x){return x!=="curieux"});localStorage.setItem("carnet.stamps",JSON.stringify(s))}'
+        'localStorage.setItem("carnet.rz","2026-11-26")}}catch(e){}</script>')
+    early = reset + rz + '<script>try{if(localStorage.getItem("carnet.who"))document.documentElement.classList.add("has-who")}catch(e){}</script>'
     return ('<!doctype html><html lang="fr" data-v="%s"><head>%s%s<title>Carnet Thaïlande 2026</title>%s<style>%s</style></head><body>%s%s<script>%s</script></body></html>\n'
             % (esc(version), head_meta, early, font_css(), css_text(), body, BE.data_script(), js))

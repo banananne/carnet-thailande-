@@ -191,7 +191,6 @@
 .hw-msg{margin-top:.6rem;font-size:.92rem;line-height:1.4;color:var(--bordeaux);font-weight:600}
 .pp-sec{margin-top:.9rem;font-size:.9rem;line-height:1.4;color:var(--muted);text-align:center}
 .try-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem}
-#hub-try2{margin-top:.8rem}
 
 /* secrets : éléphant, remerciements du 3 janvier, appui long, espace invité */
 .tlw{font-weight:inherit;-webkit-tap-highlight-color:transparent}
